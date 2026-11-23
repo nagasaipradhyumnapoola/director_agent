@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from director import cli
+from director import RELEASE_TARGET, cli
 from director.models import Budgets, PermissionPolicy
 from tests.helpers import make_contract
 
@@ -128,6 +128,6 @@ def test_cli_broken_project_and_improvement_gate(tmp_path, capsys):
 def test_cli_version(capsys):
     assert cli.main(["version", "--root", "."]) == 0
     payload = _json_output(capsys)
-    assert payload["release_target"] == "v0.1-supervised-three-domain"
+    assert payload["release_target"] == RELEASE_TARGET
     assert payload["version"]
 

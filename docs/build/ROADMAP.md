@@ -1,6 +1,6 @@
 # Roadmap
 
-v0.1 shipped the trustworthy local substrate and three controlled pilots. Later
+v1.0.0-local-supervised shipped the trustworthy local substrate, three controlled pilots, supervised self-modification and production hardening. Later
 milestones are designed, not shipped.
 
 ## M2 — supervised reasoning
@@ -18,7 +18,7 @@ milestones are designed, not shipped.
 
 ## M2.5 - self-improvement execution
 
-Shipped in v0.1: patch allowlist, isolated git worktree, full offline tests,
+Shipped in v1.0.0: patch allowlist, isolated git worktree, full offline tests,
 independent review record, owner merge, evidence receipts, no push/deploy.
 
 Still gated: provider/keychain-driven autonomous patch authoring, container/VM

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "director-supervisor"
-version = "0.1.0"
+version = "1.0.0"
 description = "DIRECTOR: local-first supervised project supervisor (v0.1 supervised three-domain)"
 readme = "README.md"
 requires-python = ">=3.11"

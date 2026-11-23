@@ -1,7 +1,7 @@
 # DIRECTOR self-improvement
 
 Goal: DIRECTOR should get better over time without pretending to be more
-autonomous than it is. v0.1 now has two layers:
+autonomous than it is. v1.0.0-local-supervised has two layers:
 
 1. a **24/7 deterministic improvement engine** that observes evidence, findings
    and failures and records prioritised proposals;
@@ -11,7 +11,7 @@ autonomous than it is. v0.1 now has two layers:
 
 Provider-driven autonomous patch authoring and push/deploy are still gated.
 
-## What runs 24/7 in v0.1
+## What runs 24/7 in v1.0.0
 
 `director start` launches a detached local worker. It:
 
@@ -43,7 +43,7 @@ proposal queue  (category, risk, files, required checks, zero budget)
 owner approve / reject  (durable approval record)
         |
         v
-[v0.1 supervised execution]
+[v1.0.0 supervised execution]
 validated patch -> isolated git worktree at base commit -> full offline tests
         -> independent review -> owner merge approval -> local fast-forward
         -> evidence receipts -> no auto-push/deploy
@@ -99,7 +99,7 @@ default-denied by policy and budget.
 
 The supervised executor exists, but making a model author and apply patches 24/7
 without a human/agent-authored diff requires capabilities that are not part of
-v0.1:
+v1.0.0:
 
 1. **A real isolation boundary.** A temp directory, worktree, command allowlist
    or scrubbed environment is not a security boundary. Self-modifying code needs
@@ -119,7 +119,7 @@ v0.1:
    reports cannot become instructions or permission grants. Self-improvement
    must not let the agent expand its own scope.
 
-The v0.1 executor enforces change-control (allowlisted paths, isolated worktree,
+The v1.0.0 executor enforces change-control (allowlisted paths, isolated worktree,
 full tests, independent review, owner merge, no push) but it is not a kernel
 sandbox and does not authorize provider spend. A fully autonomous "self-coding
 24/7" claim still requires the remaining gates.

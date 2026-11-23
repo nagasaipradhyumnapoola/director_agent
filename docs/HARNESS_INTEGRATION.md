@@ -65,18 +65,24 @@ Each directory contains a host config, a thin `director-preflight` skill, an
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "director": {
-      "type": "local",
-      "command": ["<python>", "-m", "director", "mcp", "serve", "--db", "<abs db>"],
-      "environment": {"DIRECTOR_DB": "<abs db>", "PYTHONPATH": "<abs src>"},
-      "enabled": false
+    "servers": {
+      "director": {
+        "type": "local",
+        "command": ["<python>", "-m", "director", "mcp", "serve", "--db", "<abs db>"],
+        "environment": {"DIRECTOR_DB": "<abs db>", "PYTHONPATH": "<abs src>"},
+        "codemode": false,
+        "disabled": true
+      }
     }
   }
 }
 ```
 
-Review, merge into project config, set `enabled` true, restart. Do not replace
-global settings.
+Review, place in the project `.opencode/opencode.jsonc` (current OpenCode reads
+`mcp.servers` and `disabled`), set `disabled` false, and verify with
+`opencode mcp list`. Do not replace global settings. This shape was verified on
+OpenCode 1.19.4: the server shows `connected`. Tool-call behavior still requires
+a model session and is a separate evidence level.
 
 ### Codex
 

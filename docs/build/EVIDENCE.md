@@ -1,4 +1,4 @@
-# Release evidence â€” v0.1-supervised-three-domain
+# Release evidence - v1.0.0-local-supervised
 
 Date: 2026-11-24
 Platform: Windows 11, PowerShell 5.1, Python 3.14.4, SQLite 3.50.4,
@@ -15,7 +15,7 @@ Command:
 $env:PYTHONPATH="src"; python -m pytest
 ```
 
-Result: **70 passed in 98.28s**, no failures, no skips. The browser (real
+Result: **73 passed in 94.85s**, no failures, no skips. The browser (real
 Chromium/CDP) and MCP SDK tests executed; they were not skipped.
 
 Coverage highlights:
@@ -52,7 +52,7 @@ Observed (`demo.txt`):
 | research | pass | fail | 8 |
 
 `expectations: met`; `model calls: 0.0`; exit 0.
-Run id `20261123T183153Z-a8ace1`; raw summary copied to
+Run id `20261123T184737Z-4c92c0`; raw summary copied to
 `demo-summary.json`.
 
 Discrimination details:
@@ -88,7 +88,7 @@ external network off, trust boundary checks, MCP SDK, Node, Chrome.
 ## 4b. Packaging and benchmark
 
 - `python -m pip wheel . --no-deps --no-build-isolation` built
-  `director_supervisor-0.1.0-py3-none-any.whl` (115,868 bytes) successfully.
+  `director_supervisor-1.0.0-py3-none-any.whl` (124,713 bytes) successfully.
 - `python benchmarks/retrieval_smoke.py --files 500 --queries 100`:
   500 synthetic docs, ingest 0.4176s, recall@1 1.0, p50 0.142ms, p95 0.242ms,
   0 model calls. This is a lexical FTS5 smoke test, **not** semantic memory or
@@ -96,14 +96,15 @@ external network off, trust boundary checks, MCP SDK, Node, Chrome.
 
 ## 4c. Supervised self-modification (tested on DIRECTOR itself)
 
-- Patch patch_cdc28362d02d4f2d998e82324ecc9df9 added a read-only ersion
+- Patch patch_cdc28362d02d4f2d998e82324ecc9df9 added a read-only 
+ersion
   command and CLI test (author: this agent).
 - Isolated git worktree at base commit 85d8209; full offline suite passed in
   99.1s (exit 0). Raw: selfdev-test.txt, diff: selfdev-version.patch.
 - Independent reviewer returned **PASS**, verified reverse-apply integrity and
   ran the targeted test; only low non-blocking notes.
 - Owner approval recorded; local fast-forward merge commit f439b16.
-- Merged tree: 70/70 tests, python -m director version --json works.
+- Merged tree: 73/73 tests, python -m director version --json works.
 - The pipeline did not push; the release push was a separate owner action.
 
 ## 4d. Local model/provider gateway and 24/7 patch testing
@@ -118,6 +119,25 @@ external network off, trust boundary checks, MCP SDK, Node, Chrome.
 - selfdev test --queue enqueues patch testing; the worker claimed it and
   completed the patch test with evidence.
 - Cloud providers, provider credentials and external spend remain disabled.
+
+## 4e. Native OpenCode MCP connection
+
+- Current docs use `mcp.servers` and `disabled`; the generated adapter was
+  corrected to that schema.
+- OpenCode 1.19.4 read `.opencode/opencode.jsonc` and started the local stdio
+  server; `opencode mcp list` reported **`✓ director connected`**.
+- This is a native transport/connection test, not a native tool-call test; tool
+  invocation still needs an authorized model session.
+
+## 4f. Production hardening
+
+- `backup create` produced a ZIP with a consistent SQLite online backup and a
+  SHA-256 manifest; `backup verify` passed integrity; `backup restore` restored
+  to a **new** project and memory search survived.
+- OS keychain (`WinVaultKeyring`) round-tripped a test secret and deleted it.
+- `health --json` reported DB quick_check, schema, worker, acceptance, budget,
+  backups, keychain and disk; `doctor` includes the same gates.
+- Offline installer/uninstaller tested; wheel includes assets and selfdev.
 
 ## 5. Independent review
 
@@ -151,7 +171,13 @@ Proven on this host, with controlled fixtures:
 - the 24/7 worker runs deterministically with zero model calls;
 - self-improvement proposals are generated, deduplicated and owner-approved;
 - the supervised `selfdev` pipeline applied and merged a real DIRECTOR patch
-  only after isolated full-suite tests, independent review and owner approval.
+  only after isolated full-suite tests, independent review and owner approval;
+- the local model gateway enforces contract/grant/budget gates for stub and
+  owner-supplied command providers with zero external spend;
+- OpenCode natively loaded the generated MCP config and showed `director
+  connected` (connection only, not tool-call);
+- verified backups/restore and OS-keychain secrets work on this host, and health
+  checks cover DB/schema/worker/acceptance/backups/keychain/disk.
 
 ## 7. What is not proven
 
@@ -173,5 +199,5 @@ or broad benchmark is claimed.
   gateway/grants), `f439b16` (selfdev) and `85d8209` (pipeline), pushed to
   `origin/main` on 2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: 70 tests, full demo, zero model calls, independent
+- Verified release evidence: 73 tests, full demo, zero model calls, independent
   review fixes, one merged selfdev patch.

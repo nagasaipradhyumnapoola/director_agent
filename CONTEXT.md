@@ -11,7 +11,7 @@ contract, durable state, policy/effect gateway, budget ledger, evidence and
 completion decision. Domain evaluators supply domain-specific checks. It is
 not a model wrapper, not a coding-only tool, and not an autonomous spender.
 
-Release target: **v0.1-supervised-three-domain = M0 + M1**.
+Release target: **v1.0.0-local-supervised** (M0 + M1 + production hardening).
 
 - M0: trustworthy local substrate (contracts, SQLite store, fenced queue,
   deterministic analysis, bounded context, evidence freshness, budgets,
@@ -19,7 +19,7 @@ Release target: **v0.1-supervised-three-domain = M0 + M1**.
 - M1: website, small CPU-ML and research/document pilots sharing that core,
   using a narrow supervised runner with scoped grants and resource limits.
 - M2â€“M4 (autonomous providers, measured upstream host composition, scale) are
-  designed roadmap work, not shipped in v0.1.
+  designed roadmap work, not shipped in v1.0.0.
 
 ## Non-negotiable invariants
 
@@ -61,6 +61,8 @@ src/director/
   improve.py       proposal-only self-improvement engine
   selfdev.py       patch -> isolated worktree -> tests -> review -> owner merge
   providers.py     local stub/command model gateway (gated, no cloud)
+  keychain.py      OS keychain secret storage (no plaintext fallback)
+  backup.py        verified ZIP backup / non-destructive restore
   domains/         base, website, ml, research pilots
 fixtures/          controlled broken/clean pilot fixtures
 tests/             offline tests (browser/MCP opt-in markers)
@@ -100,6 +102,11 @@ python -m director selfdev test --patch <id> [--queue]
 python -m director selfdev review --patch <id> --verdict pass --reviewer <name>
 python -m director selfdev merge --patch <id>
 python -m director version
+python -m director backup create
+python -m director backup verify --file <zip>
+python -m director backup restore --file <zip> --to <new-project>
+python -m director health --json
+python -m director secret set --name provider/openai   # value on stdin
 python -m director mcp serve --db <path>
 python -m director demo --domains general,website,ml,research --modes clean,broken
 ```
@@ -128,9 +135,12 @@ Provider-driven autonomous authoring is not claimed; `improve apply` is blocked.
 
 ## Evidence status
 
-v0.1 is implemented and tested on this host for its controlled scope:
-- 70 offline tests pass (including a real Chromium/CDP website journey, the
-  official MCP SDK round trip, and the selfdev worktree pipeline).
+v1.0.0-local-supervised is implemented and tested on this host for its local single-user scope:
+- 73 offline tests pass (including a real Chromium/CDP website journey, the
+  official MCP SDK round trip, selfdev, provider/grants, backups/keychain).
+- Native OpenCode MCP connection is verified; tool-call path is not.
+- Verified backups/restore, OS-keychain secrets and health/doctor gates are
+  tested on this host.
 - `python -m director demo ... --modes clean,broken`: all clean fixtures pass,
   all broken fixtures fail, zero model calls.
 - Independent review found false-completion/policy defects; all high/critical

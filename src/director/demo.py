@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from . import RELEASE_TARGET
 from .analysis import ArtifactScanner
 from .domains import provision_pilot_grants, run_pilot
 from .evidence import EvidenceLedger
@@ -211,7 +212,7 @@ def run_demo(
         "schema": "director.demo.v1",
         "run_id": run_id,
         "run_root": str(run_root),
-        "release_target": "v0.1-supervised-three-domain",
+        "release_target": RELEASE_TARGET,
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "results": results,
         "expectations": expectations,

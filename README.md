@@ -5,9 +5,11 @@ contract, durable state, policy/effect gateway, budgets, evidence and completion
 decision; domain evaluators supply domain-specific checks. It is not a model
 wrapper and not a coding-only tool.
 
-**Release:** `v0.1-supervised-three-domain` (M0 substrate + M1 website, ML and
-research/document pilots on controlled fixtures). See
-[BUILD_STATUS](docs/BUILD_STATUS.md) for exact evidence and limits.
+**Release:** `v1.0.0-local-supervised` (production-hardened local single-user
+scope; the original `v0.1-supervised-three-domain` M0+M1 work is included). See
+the [v1 release notes](docs/build/V1_RELEASE.md),
+[BUILD_STATUS](docs/BUILD_STATUS.md) and [evidence](docs/build/EVIDENCE.md) for
+exact checks and limits.
 
 ## Quick start (Windows PowerShell)
 
@@ -42,7 +44,10 @@ install, use `python -m pip install -e . --no-deps` (build tooling may be needed
   latest outcome wins; freshness re-verified before acceptance.
 - Bounded context packets with untrusted-content labeling and unknown headroom.
 - FTS5 lexical memory with provenance, taint, deletion and re-ingest.
-- Bounded MCP stdio server (newline JSON-RPC 2.0) with strict argument validation.
+- Bounded MCP stdio server (newline JSON-RPC 2.0) with strict argument validation,
+  plus a verified native OpenCode MCP connection.
+- Production operations: verified ZIP backups/restore, OS-keychain secrets,
+  health/doctor checks, schema migrations, install/uninstall.
 - Local model gateway: stub + owner-supplied command providers, gated by
   contract action, owner grant, budget, secret-prompt rejection and scrubbed
   runner; no cloud provider or external spend.
@@ -63,8 +68,9 @@ install, use `python -m pip install -e . --no-deps` (build tooling may be needed
 
 - No autonomous model/provider routing or spend; no live web research.
 - No kernel/container sandbox; process-level supervision only.
-- No native OpenCode/Claude/Codex tool-call test; MCP protocol/SDK is tested and
-  adapters are generated for review.
+- Native OpenCode MCP **connection** is tested (`opencode mcp list` shows
+  connected); native tool-call behavior, and Claude/Codex native paths, are not
+  tested. MCP protocol/SDK is tested and adapters are generated for review.
 - No billion-token memory scale, A2A, computer-use or general domain competence.
 - No provider-driven autonomous code authoring (no model call/spend); `selfdev`
   requires an agent/human-authored patch, tests, independent review and owner
@@ -112,8 +118,8 @@ See [HARNESS_INTEGRATION.md](docs/HARNESS_INTEGRATION.md).
 
 ```text
 init doctor status contract scan investigate worker findings evidence verify
-waive memory preflight budget grant model improve selfdev adapters pilot demo
-mcp version start stop pause resume recover checkpoint
+waive memory preflight budget grant secret model improve selfdev backup health
+adapters pilot demo mcp version start stop pause resume recover checkpoint
 ```
 
 Run `python -m director <command> --help` for options.
@@ -132,6 +138,7 @@ docs/                research handoff + build docs + ledger
 ## Documentation
 
 - [CONTEXT.md](CONTEXT.md) — low-token context for a new session.
+- [v1 release notes](docs/build/V1_RELEASE.md)
 - [Build status / evidence](docs/BUILD_STATUS.md)
 - [Architecture](docs/build/ARCHITECTURE.md)
 - [Security and threat model](docs/build/SECURITY.md)

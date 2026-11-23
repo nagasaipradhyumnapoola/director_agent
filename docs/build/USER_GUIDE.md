@@ -195,6 +195,25 @@ Prompts containing secret-like values are refused. The command runs in the
 scrubbed runner with output/time caps; it is not a sandbox. Cloud providers,
 credentials and external spend are not implemented.
 
+## Backups, secrets and health
+
+```powershell
+python -m director backup create
+python -m director backup list
+python -m director backup verify --file .director/backups/<file>.zip
+python -m director backup restore --file <zip> --to ..\project-restored
+
+python -m director secret set --name provider/openai   # value read from stdin
+python -m director secret status --name provider/openai
+python -m director secret delete --name provider/openai
+
+python -m director health --json
+```
+
+Backups are ZIP archives with a consistent SQLite online backup and a SHA-256
+manifest. Restore only writes to a new/empty directory. Secrets go to the OS
+keychain (Windows Credential Locker), never project config or SQLite.
+
 ## MCP and host adapters
 
 ```powershell

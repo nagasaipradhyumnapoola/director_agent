@@ -1,4 +1,4 @@
-# Known limitations (v0.1)
+# Known limitations (v1.0.0-local-supervised)
 
 ## Scope
 

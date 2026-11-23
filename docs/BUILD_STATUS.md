@@ -1,6 +1,6 @@
 # DIRECTOR build ledger
 
-Release target: **v0.1-supervised-three-domain (M0 + M1)**
+Release target: **v1.0.0-local-supervised (M0 + M1 + production hardening)**
 Ledger updated: 2026-11-24
 Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 
@@ -56,7 +56,9 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 - [x] Supervised self-modification executor (worktree, tests, review, owner merge)
 - [x] Local model/provider gateway (stub + owner command) with grant/budget gates
 - [x] 24/7 worker can test queued selfdev patches
-- [x] 70-test offline suite incl. historical defect regressions and selfdev
+- [x] Production hardening: verified backups/restore, OS-keychain secrets,
+  health/doctor gates, native OpenCode MCP connection
+- [x] 73-test offline suite incl. historical defect regressions and selfdev
 - [x] Independent review rounds + fixes
 - [x] Release docs, evidence report, install/uninstall
 
@@ -69,7 +71,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
    - clean: general/website/ml/research all `pass`, 0 findings.
    - broken: general `fail` (4 findings), website `fail` (13), ML `fail` (2),
      research `fail` (8).
-   - Raw summary: `var/demo/20261123T183153Z-a8ace1/summary.json` (gitignored).
+   - Raw summary: `var/demo/20261123T184737Z-4c92c0/summary.json` (gitignored).
 3. `python -m director doctor --root var/cli-test` → all core checks ok.
 4. MCP: initialize/tools/list/tools/call over stdio + official SDK
    `ClientSession` round trip; oversized frame rejected before JSON parsing;
@@ -89,7 +91,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
    - isolated worktree at base `85d8209`; full suite passed in 99.1s;
    - independent reviewer PASS with patch-integrity verification;
    - owner approval recorded; fast-forward merge commit `f439b16`;
-   - merged tree: 70/70 tests, version command works, no push by the pipeline.
+   - merged tree: 73/73 tests, version command works, no push by the pipeline.
 8. Local model/provider gateway:
    - default policy denied a local model call with zero spend;
    - owner grant + contract `model_call_local` + model-call budget enabled the
@@ -97,6 +99,18 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
    - an owner-supplied local command ran in the scrubbed runner;
    - secret-like prompts refused; budget cap enforced; cloud providers disabled;
    - worker tested a queued selfdev patch (`selfdev test --queue`).
+9. Native OpenCode MCP connection:
+   - corrected generated config to current `mcp.servers` + `disabled` shape;
+   - OpenCode 1.19.4 read `.opencode/opencode.jsonc` and `opencode mcp list`
+     reported `director connected`;
+   - native `director_*` tool call still requires a model session and is not
+     claimed.
+10. Production hardening:
+   - SQLite online backup -> hashed ZIP manifest -> `verify_backup` integrity
+     check -> non-destructive restore to a new project; memory survived restore;
+   - OS keychain (Windows Credential Locker) secret set/status/delete round trip;
+   - `health` and `doctor` report DB/schema/worker/acceptance/backup/keychain/disk;
+   - offline installer and uninstaller tested; wheel build includes assets.
 
 ## Evidence levels (per surface)
 
@@ -105,7 +119,8 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 | Core store/queue/policy/budget/evidence | implemented, unit + integration tested |
 | Scanner/regressions | implemented, adversarial tests |
 | MCP stdio | implemented, protocol tested with official SDK |
-| OpenCode/Claude/Codex adapters | generated examples; native tool paths NOT tested |
+| OpenCode adapter | native connection tested (`opencode mcp list`: connected); tool-call path NOT tested |
+| Claude/Codex adapters | generated examples; native paths NOT tested |
 | Website pilot | domain-validated on controlled fixture with real Chrome |
 | ML pilot | domain-validated on controlled clean/leaky fixtures |
 | Research pilot | domain-validated on controlled conflicting-source fixture |
@@ -142,5 +157,5 @@ worktree/test/review/owner-merge pipeline.
   gateway/grants), `f439b16` (selfdev) and `85d8209` (pipeline), pushed to
   `origin/main` on 2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: docs/build/EVIDENCE.md (70 tests, full demo,
+- Verified release evidence: docs/build/EVIDENCE.md (73 tests, full demo,
   zero model calls, independent review fixes).

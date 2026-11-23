@@ -22,7 +22,8 @@ def test_generate_all_host_adapters_without_enabling(tmp_path):
                 assert (root / rel).is_file()
             if host == "opencode":
                 config = json.loads((out / "opencode.jsonc").read_text(encoding="utf-8"))
-                assert config["mcp"]["director"]["enabled"] is False
+                assert config["mcp"]["servers"]["director"]["disabled"] is True
+                assert config["mcp"]["servers"]["director"]["codemode"] is False
             elif host == "codex":
                 text = (out / "codex.config.toml").read_text(encoding="utf-8")
                 assert "[mcp_servers.director]" in text

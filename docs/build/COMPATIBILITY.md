@@ -5,7 +5,7 @@ Evidence levels are not interchangeable:
 `designed → implemented → statically inspected → unit-tested → integration-tested
 → protocol-tested → native-client tested → domain-validated → operationally supported`
 
-| Surface | Level in v0.1 | Evidence / limits |
+| Surface | Level in v1.0.0-local-supervised | Evidence / limits |
 |---|---|---|
 | Python core (contracts/store/policy/budget/evidence) | implemented, unit + integration tested | 57 offline tests, Windows 11 + Python 3.14 |
 | Fenced queue / recovery | implemented, integration tested | lease expiry, stale publish rejection, retry cap, concurrent claim |
@@ -14,7 +14,7 @@ Evidence levels are not interchangeable:
 | Context packet / memory | implemented, tested | bounded output, untrusted labels, deletion/re-ingest, project isolation |
 | MCP stdio server | **protocol tested** | official Python `mcp` 1.29.0 `ClientSession` round trip; protocol negotiated `2025-11-25`; oversized frame before parse; strict args |
 | Generic MCP config (`mcp.json`) | adapter generated | not native-host tested |
-| OpenCode adapter | adapter generated | `opencode.jsonc` disabled by default; native `director_*` tool call **not tested** (no authorized model session) |
+| OpenCode adapter | **native connection tested** | current `mcp.servers`/`disabled` shape; `opencode mcp list` shows `director connected`; native `director_*` tool call still not tested |
 | Claude adapter (`.mcp.json`) | adapter generated | not native-host tested |
 | Codex adapter (`codex.config.toml`) | adapter generated | not native-host tested |
 | Website pilot | **domain-validated** | real headless Chrome 158 CDP journey on controlled fixtures; Node 24; Edge present but not separately validated |
@@ -23,6 +23,9 @@ Evidence levels are not interchangeable:
 | Self-improvement proposals | implemented, tested | proposal-only, owner approval, zero model calls |
 | Supervised selfdev executor | implemented, integration tested | path allowlist, isolated worktree, full tests, independent review record, owner merge; no push; provider authoring NOT implemented |
 | Local model gateway | implemented, tested | stub + owner command provider; contract action + owner grant + budget; secret-prompt refusal; cloud providers/credentials NOT implemented |
+| Backups/restore | implemented, tested | consistent SQLite online backup, hashed manifest, integrity verify, non-destructive restore |
+| OS keychain | implemented, tested | Windows Credential Locker round trip; no plaintext fallback |
+| Health/doctor | implemented, tested | DB/schema/worker/acceptance/backups/keychain/disk checks |
 | 24/7 patch testing | implemented, integration tested | worker claims queued `selfdev_test` jobs and records evidence |
 | 24/7 worker | implemented, integration tested | detached start/heartbeat/pause/resume/stop; requires running host |
 | Autonomous provider routing | designed only (M2) | not implemented; zero spend default |

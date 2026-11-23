@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import sys
 from pathlib import Path
 from typing import Any, Sequence
@@ -12,11 +13,19 @@ from typing import Any, Sequence
 from . import RELEASE_TARGET, __version__
 from .adapter import SUPPORTED_HOSTS, generate as generate_adapter
 from .analysis import ArtifactScanner, ScanConfig
+from .backup import create_backup, list_backups, restore_backup, verify_backup
 from .context import ContextBuilder
 from .demo import build_contract, run_demo
 from .domains import PROFILES, provision_pilot_grants, run_pilot
 from .evidence import EvidenceLedger
 from .improve import apply_proposal, generate_proposals
+from .keychain import (
+    KeychainUnavailable,
+    available as keychain_available,
+    delete_secret,
+    has_secret,
+    set_secret,
+)
 from .policy import PolicyDenied, PolicyGateway
 from .providers import PROVIDERS, call_model
 from .selfdev import (
@@ -177,6 +186,14 @@ def cmd_doctor(args: argparse.Namespace) -> int:
                 "degraded" if lifecycle["degraded"] else str(lifecycle["lifecycle"].get("status")),
                 level="warn" if lifecycle["degraded"] else "info",
             )
+            schema = int(store.conn.execute("PRAGMA user_version").fetchone()[0])
+            add("schema_version", schema == 4, str(schema))
+            backups = list_backups(store)
+            add("backup", bool(backups), backups[0]["modified_at"] if backups else "no backup yet", level="warn")
+            keychain_ok, keychain_name = keychain_available()
+            add("keychain", keychain_ok, keychain_name, level="warn")
+            free = shutil.disk_usage(str(root)).free
+            add("disk_space", free >= 1_000_000_000, f"{free // (1024 * 1024)} MiB free", level="warn")
         finally:
             store.close()
     import importlib.util
@@ -735,6 +752,104 @@ def cmd_grant(args: argparse.Namespace) -> int:
         store.close()
 
 
+def cmd_backup(args: argparse.Namespace) -> int:
+    root = _root(args)
+    store = _open(root)
+    try:
+        if args.action == "create":
+            _emit(create_backup(store))
+            return 0
+        if args.action == "list":
+            _emit({"backups": list_backups(store)})
+            return 0
+        if args.action == "verify":
+            file_path = Path(args.file)
+            if not file_path.is_absolute():
+                file_path = root / file_path
+            _emit(verify_backup(file_path))
+            return 0
+        if args.action == "restore":
+            file_path = Path(args.file)
+            if not file_path.is_absolute():
+                file_path = root / file_path
+            target = Path(args.to)
+            if not target.is_absolute():
+                target = root / target
+            _emit(restore_backup(file_path, target))
+            return 0
+        raise ValidationError("unknown backup action")
+    finally:
+        store.close()
+
+
+def cmd_health(args: argparse.Namespace) -> int:
+    root = _root(args)
+    store = _open(root)
+    try:
+        import sqlite3
+
+        check = store.quick_check()
+        schema = int(store.conn.execute("PRAGMA user_version").fetchone()[0])
+        lifecycle = lifecycle_status(store)
+        acceptance = EvidenceLedger(store).criterion_status(verify=True)
+        backups = list_backups(store)
+        disk = shutil.disk_usage(str(root))
+        payload = {
+            "ok": check == "ok" and schema == 4,
+            "project_id": store.project_id,
+            "database": {
+                "quick_check": check,
+                "schema_version": schema,
+                "bytes": store.path.stat().st_size,
+                "wal_bytes": (store.path.with_name(store.path.name + "-wal").stat().st_size if store.path.with_name(store.path.name + "-wal").exists() else 0),
+            },
+            "worker": lifecycle,
+            "queue": store.investigation_counts(),
+            "patches": store.patch_counts(),
+            "budget": store.budget_status(),
+            "model_calls_spent": store.model_calls_spent(),
+            "acceptance": acceptance,
+            "backups": {"count": len(backups), "latest": backups[0] if backups else None},
+            "disk_free_bytes": disk.free,
+            "keychain": dict(zip(("available", "backend"), keychain_available())),
+        }
+        if args.json:
+            _emit(payload)
+        else:
+            print(f"DIRECTOR health: {'ok' if payload['ok'] else 'FAILED'}")
+            print(f"  database: {check} schema {schema}")
+            print(f"  worker: {lifecycle['lifecycle'].get('status')} degraded={lifecycle['degraded']}")
+            print(f"  acceptance: {'complete' if acceptance['complete'] else 'incomplete'} unmet={acceptance['unmet']}")
+            print(f"  backups: {len(backups)}")
+            print(f"  keychain: {payload['keychain']['available']} {payload['keychain']['backend']}")
+        return 0 if payload["ok"] else 1
+    finally:
+        store.close()
+
+
+def cmd_secret(args: argparse.Namespace) -> int:
+    root = _root(args)
+    store = _open(root)
+    try:
+        if args.action == "set":
+            value = sys.stdin.readline().rstrip("\r\n")
+            if not value:
+                raise ValidationError("secret value must be provided on stdin")
+            set_secret(store.project_id, args.name, value)
+            _emit({"name": args.name, "stored": True, "backend": keychain_available()[1]})
+            return 0
+        if args.action == "status":
+            _emit({"name": args.name, "present": has_secret(store.project_id, args.name)})
+            return 0
+        if args.action == "delete":
+            delete_secret(store.project_id, args.name)
+            _emit({"name": args.name, "deleted": True})
+            return 0
+        raise ValidationError("unknown secret action")
+    finally:
+        store.close()
+
+
 def cmd_mcp(args: argparse.Namespace) -> int:
     path = Path(args.db).resolve()
     if not path.is_file():
@@ -929,6 +1044,36 @@ def build_parser() -> argparse.ArgumentParser:
     improve_apply.add_argument("proposal")
     improve_apply.set_defaults(func=cmd_improve, action="apply")
 
+    backup = sub.add_parser("backup", parents=[common], help="verified local backups")
+    backup_sub = backup.add_subparsers(dest="action", required=True)
+    backup_create = backup_sub.add_parser("create", parents=[common])
+    backup_create.set_defaults(func=cmd_backup, action="create")
+    backup_list = backup_sub.add_parser("list", parents=[common])
+    backup_list.set_defaults(func=cmd_backup, action="list")
+    backup_verify = backup_sub.add_parser("verify", parents=[common])
+    backup_verify.add_argument("--file", required=True)
+    backup_verify.set_defaults(func=cmd_backup, action="verify")
+    backup_restore = backup_sub.add_parser("restore", parents=[common])
+    backup_restore.add_argument("--file", required=True)
+    backup_restore.add_argument("--to", required=True)
+    backup_restore.set_defaults(func=cmd_backup, action="restore")
+
+    health = sub.add_parser("health", parents=[common], help="production health summary")
+    health.add_argument("--json", action="store_true")
+    health.set_defaults(func=cmd_health)
+
+    secret = sub.add_parser("secret", parents=[common], help="OS-keychain secret management")
+    secret_sub = secret.add_subparsers(dest="action", required=True)
+    secret_set = secret_sub.add_parser("set", parents=[common])
+    secret_set.add_argument("--name", required=True)
+    secret_set.set_defaults(func=cmd_secret, action="set")
+    secret_status = secret_sub.add_parser("status", parents=[common])
+    secret_status.add_argument("--name", required=True)
+    secret_status.set_defaults(func=cmd_secret, action="status")
+    secret_delete = secret_sub.add_parser("delete", parents=[common])
+    secret_delete.add_argument("--name", required=True)
+    secret_delete.set_defaults(func=cmd_secret, action="delete")
+
     model = sub.add_parser("model", parents=[common], help="local model/provider gateway")
     model_sub = model.add_subparsers(dest="action", required=True)
     model_providers = model_sub.add_parser("providers", parents=[common])
@@ -1069,7 +1214,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return int(args.func(args))
-    except (ValidationError, SafetyError, StoreError, BudgetExceeded, NotFoundError, ConflictError, PolicyDenied, OSError) as exc:
+    except (ValidationError, SafetyError, StoreError, BudgetExceeded, NotFoundError, ConflictError, PolicyDenied, KeychainUnavailable, OSError) as exc:
         print("error: " + safe_error_message(exc), file=sys.stderr)
         return 2
     except KeyboardInterrupt:

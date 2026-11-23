@@ -5,7 +5,7 @@
 DIRECTOR enforces only the actions it mediates: its scanner, queue, runner,
 budget ledger, policy gateway and MCP tools. It does **not** control every action
 of an external main agent. Host hooks/instructions are advisory. Tests distinguish
-observed, advisory, blocking and gateway-mediated paths; v0.1 claims gateway
+observed, advisory, blocking and gateway-mediated paths; v1.0.0 claims gateway
 mediation for DIRECTOR-owned work only.
 
 ## Assets
@@ -24,7 +24,7 @@ memory, skills, child reports, fixture content, MCP arguments.
 Trusted: owner actions through the CLI, OS-provided identity/permissions, the
 DIRECTOR code itself (subject to review).
 
-## Controls in v0.1
+## Controls in v1.0.0-local-supervised
 
 | Threat | Control |
 |---|---|
@@ -88,7 +88,7 @@ merge approval, rollback and no auto-push/deploy.
 
 ## Verification
 
-- 70 offline tests including links/hardlinks/junctions, oversized frames,
+- 73 offline tests including links/hardlinks/junctions, oversized frames,
   unknown args, secret redaction, fencing, budget races, stale evidence,
   latest-fail supersession, fixture threshold tampering, ML stdlib shadowing,
   citation/calculation abuse, waiver revision binding, and selfdev patch/test/review/merge.

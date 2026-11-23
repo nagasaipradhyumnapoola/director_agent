@@ -118,14 +118,18 @@ def _generic_config(project_root: Path, db_path: Path) -> dict[str, Any]:
 
 
 def _opencode_config(project_root: Path, db_path: Path) -> dict[str, Any]:
+    # Current OpenCode uses mcp.servers and `disabled` (not mcp.<name>/enabled).
     return {
         "$schema": "https://opencode.ai/config.json",
         "mcp": {
-            "director": {
-                "type": "local",
-                "command": _command(project_root, db_path),
-                "environment": _env(project_root, db_path),
-                "enabled": False,
+            "servers": {
+                "director": {
+                    "type": "local",
+                    "command": _command(project_root, db_path),
+                    "environment": _env(project_root, db_path),
+                    "codemode": False,
+                    "disabled": True,
+                }
             }
         },
     }
