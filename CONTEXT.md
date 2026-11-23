@@ -132,8 +132,9 @@ Provider-driven autonomous authoring is not claimed; `improve apply` is blocked.
 
 ## Release commit
 
-`eac3c39` (v1.0.0 production hardening) on `origin/main` (2026-11-24); earlier
-`5606419` (model gateway/grants), `f439b16` (selfdev), `f867bd2` (v0.1).
+`e04817d` (benchmarks + local-model authoring) on `origin/main` (2026-11-24);
+earlier `eac3c39` (v1.0.0 hardening), `5606419` (grants), `f439b16` (selfdev),
+`f867bd2` (v0.1).
 
 ## Evidence status
 
