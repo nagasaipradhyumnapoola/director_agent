@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo Shop</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Demo Shop</h1>
+      <nav aria-label="Main">
+        <a href="#catalog">Catalog</a>
+        <a href="#cart">Cart</a>
+      </nav>
+    </header>
+    <main id="main">
+      <form id="search-form" role="search">
+        <label for="search">Search products</label>
+        <input id="search" name="q" type="search" autocomplete="off">
+        <button id="search-button" type="submit">Search</button>
+      </form>
+      <section id="catalog" aria-labelledby="catalog-title">
+        <h2 id="catalog-title">Catalog</h2>
+        <ul id="results">
+          <li class="product">
+            <img src="mug.svg" alt="Blue ceramic mug" width="48" height="48">
+            <span>Blue mug</span>
+            <span>$12</span>
+            <button id="add-to-cart" type="button">Add to cart</button>
+          </li>
+        </ul>
+      </section>
+      <p id="cart" aria-live="polite">Cart: 0 items</p>
+      <button id="checkout" type="button">Checkout</button>
+      <section id="confirmation" hidden>
+        <h2>Order confirmed</h2>
+        <p>Thanks for your order.</p>
+      </section>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

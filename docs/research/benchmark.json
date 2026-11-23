@@ -1,0 +1,17 @@
+{
+  "kind": "synthetic lexical smoke; not semantic or billion-scale validation",
+  "python": "3.14.4",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "files": 500,
+  "source_bytes": 533400,
+  "database_bytes": 1269760,
+  "ingest_seconds": 9.5766,
+  "queries": 100,
+  "recall_at_1": 1.0,
+  "p50_search_ms": 1.105,
+  "p95_search_ms": 1.742,
+  "max_packet_byte_upper_bound": 1960,
+  "unchanged_queued": 0,
+  "unchanged_scan_seconds": 0.7079,
+  "model_calls": 0
+}

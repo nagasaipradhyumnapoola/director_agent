@@ -1,0 +1,67 @@
+{
+  "project_id": "PLACEHOLDER",
+  "revision": 1,
+  "intent": "Supervise and independently verify this project's stated outcome.",
+  "deliverables": [
+    "current acceptance evidence",
+    "open findings and known limitations"
+  ],
+  "constraints": [
+    "local-only; zero model calls; no external network",
+    "do not modify production systems"
+  ],
+  "non_goals": [
+    "autonomous code application",
+    "cloud spend"
+  ],
+  "assumptions": [
+    "the owner reviews and approves consequential changes"
+  ],
+  "domains": [
+    "general"
+  ],
+  "requirements": [
+    {
+      "key": "r.general",
+      "text": "Keep the project free of high/critical static findings and unchecked formats.",
+      "domain": "general",
+      "criteria": [
+        {
+          "key": "artifact.scan",
+          "description": "Static scan has no high/critical finding and no unchecked format",
+          "evaluator": "artifact_scan",
+          "mandatory": true,
+          "params": {}
+        }
+      ]
+    }
+  ],
+  "budgets": {
+    "max_model_calls": 0,
+    "max_input_tokens": 0,
+    "max_output_tokens": 0,
+    "max_cost_usd": 0.0,
+    "max_wall_seconds": 300,
+    "max_cpu_seconds": 300,
+    "max_memory_mb": 1024,
+    "max_concurrent": 1,
+    "max_findings": 500,
+    "max_output_bytes": 262144,
+    "max_scan_files": 2000,
+    "max_file_bytes": 1048576
+  },
+  "permissions": {
+    "allow_external_network": false,
+    "allow_cloud_spend": false,
+    "allow_untrusted_execution": false,
+    "read_roots": [],
+    "write_roots": [],
+    "allowed_actions": [
+      "read_artifact"
+    ],
+    "denied_paths": []
+  },
+  "stopping_conditions": [
+    "all mandatory criteria have current evidence or the run reports a block"
+  ]
+}

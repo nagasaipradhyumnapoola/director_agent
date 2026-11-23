@@ -1,0 +1,28 @@
+DIRECTOR
+=======
+
+This repository contains original DIRECTOR application code (MIT, see LICENSE)
+plus a research handoff package produced on 2026-11-23.
+
+Third-party research notices
+----------------------------
+The research package under docs/ and docs/research/ describes and quotes
+selected upstream projects at pinned revisions. No upstream runtime code is
+vendored into the DIRECTOR application. Original license/notice texts are
+preserved verbatim under docs/research/licenses/ and indexed by
+docs/research/licenses/manifest.json.
+
+Upstream projects referenced by the research package:
+
+  Headroom            Apache-2.0   revision ce0460cfa8598dc939243dbc7aec4b2d35f4e44a
+  Ponytail            MIT          revision ebd8654c2c627f721eb8f9c0d1bd4090a29f9e10
+  Superpowers         MIT          revision 22f0b463e7a5e579904dd6211a520321035526f7
+  ECC                 MIT (root)   revision 4adeee6732a12d1540f49a4d50a38ce8c97f9a53
+                                  (nested components carry their own notices; see
+                                   docs/research/licensing and THIRD_PARTY_NOTICES.md)
+
+External runtimes used, not distributed
+--------------------------------------
+Edge/Chrome and Node.js are optional local runtimes for the website pilot. They
+are invoked as external processes and are not distributed with DIRECTOR.
+The optional Python MCP SDK is used only for protocol conformance tests.

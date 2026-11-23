@@ -1,0 +1,10 @@
+# Review before merging into project-scoped Codex configuration.
+# Do not replace global settings.
+
+[mcp_servers.director]
+command = "<PYTHON>"
+args = ["-m", "director", "mcp", "serve", "--db", "<PROJECT>/.director/director.db"]
+
+[mcp_servers.director.env]
+DIRECTOR_DB = "<PROJECT>/.director/director.db"
+PYTHONPATH = "<REPO>/src"

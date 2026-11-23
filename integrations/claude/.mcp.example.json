@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "director": {
+      "command": "<PYTHON>",
+      "args": [
+        "-m",
+        "director",
+        "mcp",
+        "serve",
+        "--db",
+        "<PROJECT>/.director/director.db"
+      ],
+      "env": {
+        "DIRECTOR_DB": "<PROJECT>/.director/director.db",
+        "PYTHONPATH": "<REPO>/src"
+      }
+    }
+  }
+}

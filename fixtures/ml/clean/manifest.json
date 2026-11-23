@@ -1,0 +1,33 @@
+{
+  "dataset": {
+    "name": "director-ml-clean",
+    "source": "synthetic-controlled-fixture",
+    "license": "CC0-1.0",
+    "rights": "generated in-repo for DIRECTOR pilot testing; no personal data",
+    "collected": "2026-11-23",
+    "intended_use": "small CPU binary-classification pilot only",
+    "limitations": [
+      "synthetic distribution, not representative of production data",
+      "300 rows is too small for model selection claims"
+    ]
+  },
+  "split": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15,
+    "seed": 1234,
+    "strategy": "sha256(id)"
+  },
+  "features": [
+    "x1",
+    "x2",
+    "x3",
+    "x4"
+  ],
+  "label": "label",
+  "group": "group",
+  "known_limitations": [
+    "CPU-only pure-Python baseline; not a deployment model",
+    "results are fixture-scoped"
+  ]
+}

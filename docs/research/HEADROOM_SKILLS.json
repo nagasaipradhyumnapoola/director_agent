@@ -1,0 +1,32 @@
+[
+  {
+    "path": "plugins/headroom-skill/skills/headroom/SKILL.md",
+    "canonical": false,
+    "bytes": 3491,
+    "words": 456,
+    "lines": 70,
+    "sha256": "5713dbdaaa3a3b158f04eb0ccf65649cd668771d149e9e2d4eac9d64537d877f",
+    "commit": "ce0460cfa8598dc939243dbc7aec4b2d35f4e44a",
+    "source": "https://github.com/headroomlabs-ai/headroom/blob/ce0460cfa8598dc939243dbc7aec4b2d35f4e44a/plugins/headroom-skill/skills/headroom/SKILL.md",
+    "activation": "LLM cost or oversized tool/context data",
+    "mechanism": "Instructions to integrate compress API, proxy or agent wrapper; actual transforms run in runtime",
+    "permissions": "Package installation/source edits or transport config; external behavior requires offline configuration",
+    "decision": "adapt on demand; deduplicate distribution copy",
+    "evidence_level": "full skill body read; selected runtime paths inspected, not executed"
+  },
+  {
+    "path": "skills/headroom/SKILL.md",
+    "canonical": true,
+    "bytes": 3491,
+    "words": 456,
+    "lines": 70,
+    "sha256": "5713dbdaaa3a3b158f04eb0ccf65649cd668771d149e9e2d4eac9d64537d877f",
+    "commit": "ce0460cfa8598dc939243dbc7aec4b2d35f4e44a",
+    "source": "https://github.com/headroomlabs-ai/headroom/blob/ce0460cfa8598dc939243dbc7aec4b2d35f4e44a/skills/headroom/SKILL.md",
+    "activation": "LLM cost or oversized tool/context data",
+    "mechanism": "Instructions to integrate compress API, proxy or agent wrapper; actual transforms run in runtime",
+    "permissions": "Package installation/source edits or transport config; external behavior requires offline configuration",
+    "decision": "adapt on demand; deduplicate distribution copy",
+    "evidence_level": "full skill body read; selected runtime paths inspected, not executed"
+  }
+]

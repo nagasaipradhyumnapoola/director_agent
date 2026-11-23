@@ -1,0 +1,21 @@
+{
+  "kind": "synthetic lexical FTS5 smoke; not semantic or billion-scale",
+  "date": "2026-11-23",
+  "python": "3.14.4",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "files": 500,
+  "queries": 100,
+  "source_bytes": 96000,
+  "database_bytes": 6008768,
+  "ingest_seconds": 0.4176,
+  "recall_at_1": 1.0,
+  "p50_search_ms": 0.142,
+  "p95_search_ms": 0.242,
+  "max_packet_byte_upper_bound": null,
+  "model_calls": 0,
+  "limitations": [
+    "exact synthetic marker queries only",
+    "no temporal/update/deletion/ACL/contradiction evaluation",
+    "not evidence of semantic retrieval or billion-token capacity"
+  ]
+}

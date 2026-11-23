@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "director-supervisor"
+version = "0.1.0"
+description = "DIRECTOR: local-first supervised project supervisor (v0.1 supervised three-domain)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "DIRECTOR contributors" }]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[project.scripts]
+director = "director.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+director = ["assets/*"]
+"director.assets" = ["*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+addopts = "-q"
+markers = [
+  "browser: requires a local Chromium-family browser (opt-in, slower)",
+  "mcp: exercises the MCP stdio protocol",
+]
+
+
+

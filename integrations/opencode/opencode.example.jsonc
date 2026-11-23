@@ -1,0 +1,22 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "director": {
+      "type": "local",
+      "command": [
+        "<PYTHON>",
+        "-m",
+        "director",
+        "mcp",
+        "serve",
+        "--db",
+        "<PROJECT>/.director/director.db"
+      ],
+      "environment": {
+        "DIRECTOR_DB": "<PROJECT>/.director/director.db",
+        "PYTHONPATH": "<REPO>/src"
+      },
+      "enabled": false
+    }
+  }
+}

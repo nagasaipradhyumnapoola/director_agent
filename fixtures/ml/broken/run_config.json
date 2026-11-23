@@ -1,0 +1,19 @@
+{
+  "seed": 1234,
+  "model": "logistic_regression",
+  "learning_rate": 0.25,
+  "epochs": 500,
+  "l2": 0.001,
+  "split": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15,
+    "seed": 1234,
+    "strategy": "sha256(id)"
+  },
+  "acceptance": {
+    "heldout_margin_over_baseline": 0.1,
+    "minimum_test_accuracy": 0.75,
+    "minimum_slice_accuracy": 0.55
+  }
+}

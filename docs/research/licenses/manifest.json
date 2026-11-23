@@ -1,0 +1,93 @@
+[
+  {
+    "repository": "headroomlabs-ai/headroom",
+    "commit": "ce0460cfa8598dc939243dbc7aec4b2d35f4e44a",
+    "path": ".github/actions/commitlint/LICENSE",
+    "sha256": "e8583545040829375feb062440821415388d32178a4923accc04a90f2179b5b0",
+    "source": "https://github.com/headroomlabs-ai/headroom/blob/ce0460cfa8598dc939243dbc7aec4b2d35f4e44a/.github/actions/commitlint/LICENSE"
+  },
+  {
+    "repository": "headroomlabs-ai/headroom",
+    "commit": "ce0460cfa8598dc939243dbc7aec4b2d35f4e44a",
+    "path": "LICENSE",
+    "sha256": "50b9e890f4afb0a500696cdb6cde3dae08468225a1699317d23e81a1e2703a46",
+    "source": "https://github.com/headroomlabs-ai/headroom/blob/ce0460cfa8598dc939243dbc7aec4b2d35f4e44a/LICENSE"
+  },
+  {
+    "repository": "headroomlabs-ai/headroom",
+    "commit": "ce0460cfa8598dc939243dbc7aec4b2d35f4e44a",
+    "path": "NOTICE",
+    "sha256": "93c0d7d91c2aa2f9362e180714b07b25636b5f74ea71a3c88ac113a6d31ee524",
+    "source": "https://github.com/headroomlabs-ai/headroom/blob/ce0460cfa8598dc939243dbc7aec4b2d35f4e44a/NOTICE"
+  },
+  {
+    "repository": "headroomlabs-ai/headroom",
+    "commit": "ce0460cfa8598dc939243dbc7aec4b2d35f4e44a",
+    "path": "plugins/headroom-oauth2/LICENSE",
+    "sha256": "5b5f3fc8eb90ff48f2f86e2a5a2fb888337f5d317a436b92644fc5b290e8eb82",
+    "source": "https://github.com/headroomlabs-ai/headroom/blob/ce0460cfa8598dc939243dbc7aec4b2d35f4e44a/plugins/headroom-oauth2/LICENSE"
+  },
+  {
+    "repository": "DietrichGebert/ponytail",
+    "commit": "ebd8654c2c627f721eb8f9c0d1bd4090a29f9e10",
+    "path": "LICENSE",
+    "sha256": "f1af4301bd3b85026965f9f1cfa101b9bfd73a75c6b92f7a2a72bab5768abd36",
+    "source": "https://github.com/DietrichGebert/ponytail/blob/ebd8654c2c627f721eb8f9c0d1bd4090a29f9e10/LICENSE"
+  },
+  {
+    "repository": "obra/superpowers",
+    "commit": "22f0b463e7a5e579904dd6211a520321035526f7",
+    "path": "LICENSE",
+    "sha256": "0da33ed814ee87e72db078f489c4447af72f13d9f25d9e17476f32efd77705fc",
+    "source": "https://github.com/obra/superpowers/blob/22f0b463e7a5e579904dd6211a520321035526f7/LICENSE"
+  },
+  {
+    "repository": "affaan-m/ECC",
+    "commit": "4adeee6732a12d1540f49a4d50a38ce8c97f9a53",
+    "path": ".agents/skills/context-and-decisions/LICENSE",
+    "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+    "source": "https://github.com/affaan-m/ECC/blob/4adeee6732a12d1540f49a4d50a38ce8c97f9a53/.agents/skills/context-and-decisions/LICENSE"
+  },
+  {
+    "repository": "affaan-m/ECC",
+    "commit": "4adeee6732a12d1540f49a4d50a38ce8c97f9a53",
+    "path": "LICENSE",
+    "sha256": "326146379f01bb137c0a5d3c54770c1aa31076705c8b88a7f6b26a460f6221b2",
+    "source": "https://github.com/affaan-m/ECC/blob/4adeee6732a12d1540f49a4d50a38ce8c97f9a53/LICENSE"
+  },
+  {
+    "repository": "affaan-m/ECC",
+    "commit": "4adeee6732a12d1540f49a4d50a38ce8c97f9a53",
+    "path": "pi/core/LICENSE",
+    "sha256": "326146379f01bb137c0a5d3c54770c1aa31076705c8b88a7f6b26a460f6221b2",
+    "source": "https://github.com/affaan-m/ECC/blob/4adeee6732a12d1540f49a4d50a38ce8c97f9a53/pi/core/LICENSE"
+  },
+  {
+    "repository": "affaan-m/ECC",
+    "commit": "4adeee6732a12d1540f49a4d50a38ce8c97f9a53",
+    "path": "pi/core/skills/context-and-decisions/LICENSE",
+    "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+    "source": "https://github.com/affaan-m/ECC/blob/4adeee6732a12d1540f49a4d50a38ce8c97f9a53/pi/core/skills/context-and-decisions/LICENSE"
+  },
+  {
+    "repository": "affaan-m/ECC",
+    "commit": "4adeee6732a12d1540f49a4d50a38ce8c97f9a53",
+    "path": "skills/context-and-decisions/LICENSE",
+    "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+    "source": "https://github.com/affaan-m/ECC/blob/4adeee6732a12d1540f49a4d50a38ce8c97f9a53/skills/context-and-decisions/LICENSE"
+  },
+  {
+    "repository": "affaan-m/ECC",
+    "commit": "4adeee6732a12d1540f49a4d50a38ce8c97f9a53",
+    "path": "skills/osint-investigation/LICENSE.txt",
+    "sha256": "2ee4926edd20442e2237f93f90bcb519f97b4200f0334426e76f273be6a764d4",
+    "source": "https://github.com/affaan-m/ECC/blob/4adeee6732a12d1540f49a4d50a38ce8c97f9a53/skills/osint-investigation/LICENSE.txt"
+  },
+  {
+    "repository": "affaan-m/ECC",
+    "commit": "4adeee6732a12d1540f49a4d50a38ce8c97f9a53",
+    "path": "skills/taste-application/scripts/LICENSE",
+    "sha256": "326146379f01bb137c0a5d3c54770c1aa31076705c8b88a7f6b26a460f6221b2",
+    "source": "https://github.com/affaan-m/ECC/blob/4adeee6732a12d1540f49a4d50a38ce8c97f9a53/skills/taste-application/scripts/LICENSE"
+  }
+]
