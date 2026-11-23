@@ -15,7 +15,7 @@ Command:
 $env:PYTHONPATH="src"; python -m pytest
 ```
 
-Result: **79 passed in 94.83s**, no failures, no skips. The browser (real
+Result: **85 passed in 115.58s**, no failures, no skips. The browser (real
 Chromium/CDP) and MCP SDK tests executed; they were not skipped.
 
 Coverage highlights:
@@ -104,7 +104,7 @@ ersion
 - Independent reviewer returned **PASS**, verified reverse-apply integrity and
   ran the targeted test; only low non-blocking notes.
 - Owner approval recorded; local fast-forward merge commit f439b16.
-- Merged tree: 79/79 tests, python -m director version --json works.
+- Merged tree: 85/85 tests, python -m director version --json works.
 - The pipeline did not push; the release push was a separate owner action.
 
 ## 4d. Local model/provider gateway and 24/7 patch testing
@@ -142,20 +142,28 @@ ersion
 ## 4g. Native tool-call attempt and autostart
 
 - OpenCode 1.19.4 V1 loaded the corrected MCP config and showed `director
-  connected`, but its `run` agent did not expose MCP tools to `qwen3.5:4b`; the
-  model reported no tool available. `opencode2` is not installed.
-  Native tool-call is therefore **blocked**, not claimed.
+  connected`. A local Ollama model did not expose the MCP tool, but the loopback
+  OpenAI-compatible proxy did: `opencode run --model freellm/auto` emitted a
+  `tool_use` for `director_director_status`, included the status JSON, and the
+  model replied `ACCEPTANCE=false`. Native connection + tool-call are verified.
 - Task Scheduler `ONLOGON` creation was denied (no admin). DIRECTOR fell back to
   a per-user Startup-folder entry; install/status/remove passed. This is logon
   autostart in a user session, not a Windows service.
 - `improve auto --queue` can enqueue local-model authoring/testing for the 24/7
   worker; the synchronous path was exercised with a mock model and real
   qwen2.5-coder:7b (patch tested 126.8s, review PASS but rejected after review as dead code).
-- OpenAI-compatible HTTP provider: loopback mock returned exact usage/cost;
-  external endpoint was policy-denied without network permission/grant;
-  keychain auth path implemented (no real cloud key used).
+- OpenAI-compatible HTTP provider: a loopback proxy returned `OK` with exact
+  usage; an external endpoint was policy-denied without network permission and a
+  grant. The provider key was stored in the OS keychain, not config or logs.
 - Redacted JSONL audit log records evidence/model/backup/service/selfdev actions;
-  backup prune and per-user Startup-folder autostart tested.
+  backup prune, scheduled maintenance and per-user Startup-folder autostart
+  tested.
+- Container runner: Docker 29.6.2 daemon available. `python:3.12-slim` ran as uid
+  65534, read a mounted file, failed to write (read-only mount), and could not
+  open a network socket (`Network is unreachable`). Source is mounted `:ro`, caps
+  dropped, `no-new-privileges`, with memory/CPU/pid/output bounds.
+- Opt-in maintenance: first `maybe_run` created a backup, an immediate second run
+  was skipped, and disable stopped it.
 
 ## 4h. Benchmarks
 
@@ -236,5 +244,5 @@ or broad benchmark is claimed.
   (v1.0.0 hardening), `1f98389` (Ollama/selfdev), `5606419` (grants), `f439b16`
   (selfdev) and `85d8209` (pipeline), pushed to `origin/main` on 2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: 79 tests, full demo, zero model calls, independent
+- Verified release evidence: 85 tests, full demo, zero model calls, independent
   review fixes, one merged selfdev patch.

@@ -181,15 +181,15 @@ def call_model(
         "base_url": base or "",
     }
     policy.require("director.model", action, f"provider:{provider}", revision, payload=payload)
-    if provider == "openai_compatible" and not local_provider:
-        if not api_key_secret:
-            raise ValidationError("external provider requires api_key_secret")
+    if provider == "openai_compatible" and api_key_secret:
         try:
             api_key = get_secret(store.project_id, api_key_secret)
         except KeychainUnavailable as exc:
             raise ValidationError("OS keychain unavailable") from exc
-        if not api_key:
+        if not api_key and not local_provider:
             raise ValidationError("provider credential not found in OS keychain")
+    if provider == "openai_compatible" and not local_provider and not api_key:
+        raise ValidationError("external provider requires api_key_secret")
 
     input_tokens = estimate_tokens(prompt)
     output_reserve = max_tokens if provider == "openai_compatible" else (4096 if provider == "ollama" else 1024)

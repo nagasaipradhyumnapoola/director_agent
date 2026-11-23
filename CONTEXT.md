@@ -110,6 +110,9 @@ python -m director health --json
 python -m director audit list
 python -m director secret set --name provider/openai   # value on stdin
 python -m director service install|status|remove
+python -m director maintenance enable|status|run|disable
+python -m director container check
+python -m director container run --image python:3.12-slim -- ...
 python -m director improve auto --proposal <id> --queue
 python -m director mcp serve --db <path>
 python -m director demo --domains general,website,ml,research --modes clean,broken
@@ -122,38 +125,45 @@ Run `python -m director --help` for the authoritative list.
 ## Self-improvement (current boundary)
 
 The 24/7 worker is deterministic: it generates prioritized proposals, tests
-queued selfdev patches, writes heartbeats and never makes idle model calls.
+queued selfdev patches, runs enqueued local-model authoring, performs scheduled
+backups and writes heartbeats. It never makes idle model calls or merges/pushes.
 
 A supervised execution path exists: `director selfdev` accepts an
 agent/human-authored patch, applies it in an isolated git worktree, runs the
 full offline suite, requires an independent review record and owner approval,
 then fast-forwards the merge. It never pushes/deploys.
 
-`providers.py` adds a local model gateway (deterministic stub + owner-supplied
-command) gated by contract `model_call_local`, an owner grant, budget and
-secret-prompt refusal. Cloud providers/credentials/spend remain disabled.
-Provider-driven autonomous authoring is not claimed; `improve apply` is blocked.
+`providers.py` supports stub, owner command, loopback Ollama and
+OpenAI-compatible HTTP. Every call is gated by contract action, an owner grant,
+budget and secret-prompt refusal. OpenAI-compatible keys live in the OS keychain
+with exact token/cost accounting. A real cloud key/spend was not exercised;
+`improve apply` remains blocked.
 
 ## Release commit
 
-`e04817d` (benchmarks + local-model authoring) on `origin/main` (2026-11-24);
-earlier `eac3c39` (v1.0.0 hardening), `5606419` (grants), `f439b16` (selfdev),
-`f867bd2` (v0.1).
+`60be096` (Docker runner, scheduled backups, native tool-call) on `origin/main`
+(2026-11-24); earlier `2384476` (ops/provider/audit), `e04817d` (benchmarks),
+`eac3c39` (v1.0.0 hardening), `5606419` (grants), `f867bd2` (v0.1).
 
 ## Evidence status
 
 v1.0.0-local-supervised is implemented and tested on this host for its local single-user scope:
-- 79 offline tests pass (including a real Chromium/CDP website journey, the
+- 85 offline tests pass (including a real Chromium/CDP website journey, the
   official MCP SDK round trip, selfdev, provider/grants, backups/keychain).
-- Native OpenCode MCP connection is verified; tool-call path is not.
+- Native OpenCode MCP connection and `director_director_status` tool-call are
+  verified through a loopback OpenAI-compatible proxy.
 - Verified backups/restore, OS-keychain secrets and health/doctor gates are
   tested on this host.
 - Benchmarks: domain 8/8; 1M/10M lexical retrieval (p95 0.73/1.73ms); MCP p95
   1.57ms; local Ollama latency/token accounting; prompt-level upstream skill
-  ablation. Upstream runtimes, real cloud and kernel sandbox remain unmeasured
-  or blocked. See `docs/build/BENCHMARKS.md`.
-- OpenAI-compatible HTTP provider is mock-tested with keychain/cost accounting;
-  no real cloud key/spend was used. Native OpenCode tool-call is blocked on V1.
+  ablation. Upstream runtimes and real cloud remain unmeasured. The Docker
+  runner is verified but is not a hardened microVM. See
+  `docs/build/BENCHMARKS.md`.
+- OpenAI-compatible HTTP provider is verified against a loopback proxy with
+  keychain auth and exact usage; an external endpoint was denied without
+  permission and grant. No real cloud spend was made.
+- Container runner verified on Docker 29.6.2: uid 65534, read-only mount, write
+  and network denied.
 - `python -m director demo ... --modes clean,broken`: all clean fixtures pass,
   all broken fixtures fail, zero model calls.
 - Independent review found false-completion/policy defects; all high/critical

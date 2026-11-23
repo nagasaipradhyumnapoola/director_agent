@@ -21,6 +21,9 @@ Local, single-user, supervised project supervisor.
 - 24/7 deterministic worker, queued patch testing, proposal engine, autostart
   (per-user Startup folder).
 - Verified ZIP backups/restore/prune, health/doctor, redacted audit log.
+- Opt-in scheduled maintenance: worker-created verified backups + pruning.
+- Bounded Docker runner: read-only mount, no network, uid 65534, cap-drop ALL,
+  resource limits; integration tested on Docker 29.6.2.
 - Benchmarks: domain detection, 1M/10M lexical retrieval, MCP, local models,
   selfdev, upstream skill-prompt ablation.
 
@@ -28,15 +31,15 @@ Local, single-user, supervised project supervisor.
 
 - Default deny; no cloud spend/network by default; secrets in OS keychain;
   bounded frames/arguments/output; path/link protection; redaction.
-- Process-level containment only; no kernel/container sandbox. Do not run
-  untrusted code.
+- Process-level containment by default; the optional Docker runner is bounded
+  but not a hardened microVM.
 
 ### Known limitations
 
 - Controlled fixtures only; no general domain certification.
-- Native OpenCode tool-call blocked on installed V1.19.4 (connection only).
-- No cloud provider credentials/spend configured; cloud path tested only with a
-  local OpenAI-compatible mock.
+- Native OpenCode connection + tool-call verified through a loopback
+  OpenAI-compatible proxy; Claude/Codex native paths untested.
+- No real cloud provider credential/spend was authorized; the cloud path is
+  tested against a loopback OpenAI-compatible proxy/mock.
 - 100M/1B retrieval, Headroom runtime, upstream runtimes/hooks, A2A,
   computer-use beyond the browser pilot, and multi-user auth are not shipped.
-- Docker daemon was not running; no container-isolation test.

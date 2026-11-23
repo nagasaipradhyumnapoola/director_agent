@@ -63,7 +63,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
   (local mock tested; real cloud not called)
 - [x] Local Ollama authoring + 24/7 author/test queue
 - [x] Per-user autostart (Startup folder) install/status/remove
-- [x] 79-test offline suite incl. historical defect regressions and selfdev
+- [x] 85-test offline suite incl. historical defect regressions and selfdev
 - [x] Independent review rounds + fixes
 - [x] Release docs, evidence report, install/uninstall
 
@@ -96,7 +96,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
    - isolated worktree at base `85d8209`; full suite passed in 99.1s;
    - independent reviewer PASS with patch-integrity verification;
    - owner approval recorded; fast-forward merge commit `f439b16`;
-   - merged tree: 79/79 tests, version command works, no push by the pipeline.
+   - merged tree: 85/85 tests, version command works, no push by the pipeline.
 8. Local model/provider gateway:
    - default policy denied a local model call with zero spend;
    - owner grant + contract `model_call_local` + model-call budget enabled the
@@ -108,8 +108,9 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
    - corrected generated config to current `mcp.servers` + `disabled` shape;
    - OpenCode 1.19.4 read `.opencode/opencode.jsonc` and `opencode mcp list`
      reported `director connected`;
-   - native `director_*` tool call still requires a model session and is not
-     claimed.
+   - native tool-call verified: the run agent emitted a `tool_use` for
+     `director_director_status`, received the status JSON, and replied
+     `ACCEPTANCE=false`.
 10. Benchmarks (`docs/build/BENCHMARKS.md`):
    - domain discrimination 8/8; 1M/10M lexical tiers (recall@5 1.0, p95
      0.726ms/1.727ms, deletion 0 results);
@@ -117,13 +118,16 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
    - mock selfdev 1.5s; real local-model patch tested 126.8s, review PASS but
      rejected after review as dead code;
    - prompt ablation baseline/Ponytail/ECC/Headroom pass, TDD variant fail;
-     upstream runtimes not executed; cloud/sandbox blocked.
+     upstream runtimes not executed; container sandbox not available.
 11. Provider/ops extensions:
    - OpenAI-compatible HTTP provider: loopback mock returned exact usage/cost;
      external endpoint denied without network permission/grant; keychain secret
      path implemented;
    - redacted JSONL audit log for evidence/model/backup/service/selfdev actions;
-   - backup prune and per-user Startup-folder autostart tested.
+   - backup prune, opt-in scheduled maintenance and per-user Startup-folder
+     autostart tested;
+   - bounded Docker runner: read-only mount, no network, uid 65534, cap-drop ALL,
+     resource limits; verified read/deny-write/deny-network.
 12. Production hardening:
    - SQLite online backup -> hashed ZIP manifest -> `verify_backup` integrity
      check -> non-destructive restore to a new project; memory survived restore;
@@ -138,22 +142,24 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 | Core store/queue/policy/budget/evidence | implemented, unit + integration tested |
 | Scanner/regressions | implemented, adversarial tests |
 | MCP stdio | implemented, protocol tested with official SDK |
-| OpenCode adapter | native connection tested (`opencode mcp list`: connected); tool-call path NOT tested |
+| OpenCode adapter | native connection + `director_director_status` tool-call tested through a loopback OpenAI-compatible proxy |
 | Claude/Codex adapters | generated examples; native paths NOT tested |
 | Website pilot | domain-validated on controlled fixture with real Chrome |
 | ML pilot | domain-validated on controlled clean/leaky fixtures |
 | Research pilot | domain-validated on controlled conflicting-source fixture |
-| Self-improvement | proposals + supervised selfdev execution tested; provider-driven autonomous authoring NOT implemented |
-| Local model gateway | implemented/tested (stub + command), owner grant/budget gated; cloud NOT implemented |
-| 24/7 worker | detached lifecycle tested; requires running host |
+| Self-improvement | proposals + supervised selfdev execution tested; local Ollama authoring tested; cloud authoring NOT tested |
+| Local model gateway | implemented/tested (stub + command + Ollama + OpenAI-compatible); keychain secrets, owner grant, exact token/cost budget; real cloud NOT called |
+| 24/7 worker | detached lifecycle tested; deterministic jobs, queued author/test, scheduled backups |
+| Container runner | implemented, integration tested on Docker 29.6.2; not a hardened microVM |
 
 ## Known limitations
 
 - Process-level supervision only; not a kernel/container sandbox. Fixtures are
   controlled/trusted. Do not run untrusted repositories or training code.
 - Browser/ML/research pilots are fixture-scoped, not general domain claims.
-- No live web freshness, no provider/model routing (M2), no native host tool-call
-  test, no A2A, no billion-token scale.
+- Live web freshness, autonomous cloud provider routing, A2A and billion-token
+  scale are not shipped. Native OpenCode tool-call is verified; Claude/Codex
+  native paths are not. The Docker runner is bounded but not a hardened microVM.
 - ML leakage/slice checks are heuristic; `low_support` slices are skipped.
 - `verify` scans re-walk the tree; cached within one verify pass only.
 - A pre-evaluator budget block records blocked evidence but may leave older
@@ -172,9 +178,11 @@ worktree/test/review/owner-merge pipeline.
 
 ## Release record
 
-- Commit: `e04817d` (benchmarks + local-model authoring) after `eac3c39`
-  (v1.0.0 hardening), `1f98389` (Ollama/selfdev), `5606419` (grants), `f439b16`
-  (selfdev) and `85d8209` (pipeline), pushed to `origin/main` on 2026-11-24.
+- Commit: `60be096` (Docker runner, scheduled backups, native tool-call) after
+  `2384476` (ops/provider/audit), `e04817d` (benchmarks + local-model authoring),
+  `eac3c39` (v1.0.0 hardening), `1f98389` (Ollama/selfdev), `5606419` (grants),
+  `f439b16` (selfdev) and `85d8209` (pipeline), pushed to `origin/main` on
+  2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: docs/build/EVIDENCE.md (79 tests, full demo,
+- Verified release evidence: docs/build/EVIDENCE.md (85 tests, full demo,
   zero model calls, independent review fixes).

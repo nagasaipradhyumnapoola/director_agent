@@ -121,6 +121,51 @@ def test_openai_compatible_loopback_provider(tmp_path):
         store.close()
 
 
+def test_openai_loopback_uses_keychain_secret(tmp_path, monkeypatch):
+    store = _store(tmp_path)
+    seen = {}
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_POST(self):
+            seen["auth"] = self.headers.get("Authorization", "")
+            length = int(self.headers.get("Content-Length", "0"))
+            self.rfile.read(length)
+            payload = json.dumps(
+                {"choices": [{"message": {"content": "OK"}}], "usage": {"prompt_tokens": 1, "completion_tokens": 1}}
+            ).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+        def log_message(self, *_args):
+            return
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    monkeypatch.setattr("director.providers.get_secret", lambda *_a, **_k: "loopback-key")
+    try:
+        PolicyGateway(store).grant("director.model", "model_call_local", "provider:openai_compatible", 1)
+        result = call_model(
+            store,
+            "hello",
+            provider="openai_compatible",
+            model="mock-model",
+            base_url=f"http://127.0.0.1:{server.server_port}/v1",
+            api_key_secret="provider/mock",
+            max_tokens=16,
+            timeout=30,
+        )
+        assert result["output"] == "OK"
+        assert seen["auth"] == "Bearer loopback-key"
+    finally:
+        server.shutdown()
+        server.server_close()
+        store.close()
+
+
 def test_openai_external_endpoint_is_policy_denied_without_network(tmp_path):
     store = _store(tmp_path)
     try:

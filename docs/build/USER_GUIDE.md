@@ -166,6 +166,34 @@ python -m director service remove
 This uses the per-user Startup folder when Task Scheduler is unavailable. It is
 not a Windows service and runs only while the user is logged in.
 
+## Scheduled backups
+
+```powershell
+python -m director maintenance enable --interval-hours 24 --keep 14
+python -m director maintenance status
+python -m director maintenance run
+python -m director maintenance disable
+```
+
+When enabled, the running worker checks the interval (about once a minute),
+creates a verified ZIP backup and prunes older archives. Maintenance is off by
+default.
+
+## Container runner
+
+```powershell
+python -m director container check
+python -m director container run --image python:3.12-slim --workdir . `
+  --timeout 300 -- python -c "print('isolated')"
+```
+
+This requires Docker and a project contract created with `init --allow-container`
+plus an owner `container_run` grant. The source directory is mounted read-only,
+networking is disabled unless `--network` is also allowed by the contract, and
+the process runs as uid 65534 with all capabilities dropped and memory/CPU/pid
+bounds. It is bounded isolation, not a hardened microVM. `selfdev` itself still
+tests in a git worktree.
+
 ## Memory and preflight
 
 ```powershell
@@ -264,9 +292,10 @@ Generated configs are disabled/for-review by default. Review paths and merge
 into the host's project-scoped configuration. See
 `docs/HARNESS_INTEGRATION.md`.
 
-OpenCode 1.19.4 V1 can load the config and reports `director connected`, but its
-run agent did not expose MCP tools to the local model in testing. Native tool-call
-remains blocked on that host; use the CLI/MCP SDK path for verified execution.
+OpenCode 1.19.4 V1 loads the config, reports `director connected`, and successfully
+invoked `director_director_status` through a loopback OpenAI-compatible proxy in
+testing. The model returned the tool result. Claude/Codex native paths remain
+untested; the CLI/MCP SDK path is the portable fallback.
 
 ## Demo (release evidence)
 

@@ -12,8 +12,13 @@
 
 ## Isolation
 
-- Process-level supervision only: temp workspace, scrubbed env, output/time caps,
-  process-tree kill, Windows job object. **Not a kernel/container sandbox.**
+- Process-level supervision by default: temp workspace, scrubbed env, output/time
+  caps, process-tree kill, Windows job object.
+- Optional container runner (`director container run`): read-only source mount,
+  no network, uid/gid 65534, `--cap-drop ALL`, `no-new-privileges`, memory/CPU/pid
+  and output bounds. Docker and the image supply chain are trusted; it is **not**
+  a hardened microVM.
+- DIRECTOR's own `selfdev` tests still run in a git worktree, not a container.
 - ML trainer runs `-I -P` with a trusted absolute script, so fixture stdlib
   shadowing is blocked, but a fixture still runs with user privileges.
 - Browser probe uses a disposable profile and disabled DNS, but is not a general
@@ -47,23 +52,26 @@
 
 ## Host and integration
 
-- OpenCode native tool-call is blocked on installed V1.19.4 (config connects,
-  run agent exposes no MCP tools to the local model); Claude/Codex native paths
-  are not tested. Only connection and MCP protocol/SDK are claimed.
+- OpenCode native connection and `director_director_status` tool-call are tested
+  through a loopback OpenAI-compatible proxy. Claude/Codex native paths are not
+  tested.
 - Autostart is a per-user Startup-folder entry, not a Windows service; it needs
   an active user logon.
 - Local model authoring can produce correct-but-dead code; review may hold it.
+- No direct cloud-provider key/spend was exercised; the loopback proxy is not a
+  cloud-billing guarantee.
 - External agents can bypass DIRECTOR; enforcement covers only mediated actions.
 - 24/7 means while the host and worker run. Sleep/shutdown/budget exhaustion stop
   work; a new context window does not replenish budget.
 
 ## Self-improvement
 
-- The 24/7 worker is proposal-only; it cannot write code, spend, merge, push or
-  deploy. `improve apply` is blocked.
-- `selfdev` executes an agent/human-authored patch in an isolated git worktree
-  with full tests, an independent review record and owner merge. It is not a
-  kernel sandbox and does not author patches by itself.
+- The 24/7 worker executes queued deterministic investigations, enqueued
+  selfdev author/test jobs and scheduled backups. It cannot merge, push, deploy
+  or spend; `improve apply` is blocked.
+- `selfdev` applies an authored patch in an isolated git worktree with full
+  tests, an independent review record and owner merge. The worktree is not a
+  kernel/container sandbox.
 - It requires a clean working tree, an unchanged base commit and local git; it
   never pushes/deploys.
 - Provider-driven autonomous authoring exists for local Ollama; real cloud

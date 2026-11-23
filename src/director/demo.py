@@ -53,7 +53,11 @@ DOMAIN_CRITERIA: dict[str, tuple[tuple[str, str, str], ...]] = {
 }
 
 
-def build_contract(project_id: str, domains: tuple[str, ...] | list[str]) -> TaskContract:
+def build_contract(
+    project_id: str,
+    domains: tuple[str, ...] | list[str],
+    allow_container: bool = False,
+) -> TaskContract:
     requirements = []
     for domain in domains:
         criteria = DOMAIN_CRITERIA.get(domain)
@@ -97,10 +101,9 @@ def build_contract(project_id: str, domains: tuple[str, ...] | list[str]) -> Tas
         permissions=PermissionPolicy(
             allow_external_network=False,
             allow_cloud_spend=False,
-            allowed_actions=(
-                "read_artifact",
-                "run_local_subprocess",
-                "launch_browser",
+            allowed_actions=tuple(
+                ["read_artifact", "run_local_subprocess", "launch_browser"]
+                + (["container_run"] if allow_container else [])
             ),
         ),
         stopping_conditions=(

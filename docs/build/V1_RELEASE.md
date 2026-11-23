@@ -23,20 +23,24 @@ sandbox, cloud autonomy or universal domain competence.
 | Supervised self-modification | isolated worktree, full suite, independent review, owner merge |
 | Local model authoring | loopback Ollama patch authoring + 24/7 author/test queue |
 | Autostart | per-user Startup-folder install/status/remove (no admin) |
+| Container runner | Docker, read-only mount, no network, uid 65534, cap-drop ALL, resource bounds |
+| Scheduled maintenance | opt-in worker backup + prune on an interval |
 | Native OpenCode MCP connection | `opencode mcp list` shows `director connected` (1.19.4) |
 | MCP protocol | official SDK round trip, bounded frames/args/results |
 | Three domain pilots | clean fixtures pass; seeded broken fixtures fail |
 | Packaging/install | wheel builds; offline source-path installer; uninstall |
-| Test suite | 79 offline tests, browser and MCP SDK included |
+| Test suite | 85 offline tests, browser and MCP SDK included |
 
 ## Explicit non-claims
 
-- Not a kernel/container sandbox; process-level containment only.
+- Process-level containment by default. The optional Docker runner drops
+  capabilities, runs unprivileged and mounts source read-only, but Docker/kernel
+  isolation is not a hardened microVM.
 - No real cloud provider call, provider credential or API spend; the
   OpenAI-compatible path is mock-tested only. No autonomous cloud loop.
-- Native host **tool-call** is blocked on installed OpenCode 1.19.4 V1: config
-  connects, but the run agent did not expose MCP tools to the local model. No
-  `opencode2` is installed. Only the connection is claimed.
+- Native OpenCode connection and `director_director_status` tool-call are tested
+  via a loopback OpenAI-compatible proxy. Claude/Codex native paths are not
+  tested. Direct cloud-provider billing was not exercised.
 - No multi-user auth, remote service, A2A, computer-use beyond the browser pilot.
 - No billion-token memory scale or general domain certification.
 - Python child processes and the owner command provider run with user privileges.

@@ -15,6 +15,13 @@ from .adapter import SUPPORTED_HOSTS, generate as generate_adapter
 from . import audit as audit_log
 from .analysis import ArtifactScanner, ScanConfig
 from .backup import create_backup, list_backups, prune_backups, restore_backup, verify_backup
+from .container import available as container_available, run as container_run
+from .maintenance import (
+    disable as maintenance_disable,
+    enable as maintenance_enable,
+    run_now as maintenance_run,
+    status as maintenance_status,
+)
 from .context import ContextBuilder
 from .demo import build_contract, run_demo
 from .domains import PROFILES, provision_pilot_grants, run_pilot
@@ -125,7 +132,9 @@ def cmd_init(args: argparse.Namespace) -> int:
             store.save_contract(contract)
         elif store.latest_contract() is None:
             domains = tuple(args.domain or ["general"])
-            store.save_contract(build_contract(store.project_id, domains))
+            store.save_contract(
+                build_contract(store.project_id, domains, allow_container=args.allow_container)
+            )
         latest = store.latest_contract()
         payload = {
             "project_id": store.project_id,
@@ -924,6 +933,57 @@ def cmd_audit(args: argparse.Namespace) -> int:
         store.close()
 
 
+def cmd_maintenance(args: argparse.Namespace) -> int:
+    store = _open(_root(args))
+    try:
+        if args.action == "enable":
+            _emit(maintenance_enable(store, interval_hours=args.interval_hours, keep=args.keep))
+        elif args.action == "status":
+            _emit(maintenance_status(store))
+        elif args.action == "disable":
+            _emit(maintenance_disable(store))
+        elif args.action == "run":
+            _emit(maintenance_run(store))
+        else:
+            raise ValidationError("unknown maintenance action")
+        return 0
+    finally:
+        store.close()
+
+
+def cmd_container(args: argparse.Namespace) -> int:
+    store = _open(_root(args))
+    try:
+        if args.action == "check":
+            _emit(container_available())
+            return 0
+        if args.action == "run":
+            command = list(args.command or [])
+            if command and command[0] == "--":
+                command = command[1:]
+            if not command:
+                raise ValidationError("container run requires a command after --")
+            _emit(
+                container_run(
+                    store,
+                    args.image,
+                    command,
+                    args.workdir or store.root,
+                    timeout=args.timeout,
+                    network=args.network,
+                    writable=args.writable,
+                    memory=args.memory,
+                    cpus=args.cpus,
+                    pids_limit=args.pids_limit,
+                ),
+                max_bytes=512 * 1024,
+            )
+            return 0
+        raise ValidationError("unknown container action")
+    finally:
+        store.close()
+
+
 def cmd_service(args: argparse.Namespace) -> int:
     store = _open(_root(args))
     try:
@@ -1028,6 +1088,7 @@ def build_parser() -> argparse.ArgumentParser:
     init.add_argument("--domain", action="append", choices=SUPPORTED_DOMAINS, help="domain for the default contract")
     init.add_argument("--contract", default="", help="contract JSON file")
     init.add_argument("--create", action="store_true", help="create the project root directory")
+    init.add_argument("--allow-container", action="store_true", help="enable the container_run action")
     init.set_defaults(func=cmd_init)
 
     doctor = sub.add_parser("doctor", parents=[common], help="check local prerequisites and safety defaults")
@@ -1306,6 +1367,35 @@ def build_parser() -> argparse.ArgumentParser:
     version_cmd = sub.add_parser("version", parents=[common], help="print version metadata")
     version_cmd.add_argument("--json", action="store_true")
     version_cmd.set_defaults(func=cmd_version)
+
+    maintenance = sub.add_parser("maintenance", parents=[common], help="opt-in scheduled maintenance")
+    maintenance_sub = maintenance.add_subparsers(dest="action", required=True)
+    maintenance_enable_parser = maintenance_sub.add_parser("enable", parents=[common])
+    maintenance_enable_parser.add_argument("--interval-hours", type=float, default=24.0)
+    maintenance_enable_parser.add_argument("--keep", type=int, default=14)
+    maintenance_enable_parser.set_defaults(func=cmd_maintenance, action="enable")
+    maintenance_status_parser = maintenance_sub.add_parser("status", parents=[common])
+    maintenance_status_parser.set_defaults(func=cmd_maintenance, action="status")
+    maintenance_disable_parser = maintenance_sub.add_parser("disable", parents=[common])
+    maintenance_disable_parser.set_defaults(func=cmd_maintenance, action="disable")
+    maintenance_run_parser = maintenance_sub.add_parser("run", parents=[common])
+    maintenance_run_parser.set_defaults(func=cmd_maintenance, action="run")
+
+    container = sub.add_parser("container", parents=[common], help="bounded Docker runner")
+    container_sub = container.add_subparsers(dest="action", required=True)
+    container_check = container_sub.add_parser("check", parents=[common])
+    container_check.set_defaults(func=cmd_container, action="check")
+    container_run_parser = container_sub.add_parser("run", parents=[common])
+    container_run_parser.add_argument("--image", required=True)
+    container_run_parser.add_argument("--workdir", default="")
+    container_run_parser.add_argument("--timeout", type=float, default=600.0)
+    container_run_parser.add_argument("--network", action="store_true")
+    container_run_parser.add_argument("--writable", action="store_true")
+    container_run_parser.add_argument("--memory", default="512m")
+    container_run_parser.add_argument("--cpus", default="1.0")
+    container_run_parser.add_argument("--pids-limit", type=int, default=128)
+    container_run_parser.add_argument("command", nargs=argparse.REMAINDER)
+    container_run_parser.set_defaults(func=cmd_container, action="run")
 
     audit = sub.add_parser("audit", parents=[common], help="read the redacted audit log")
     audit_sub = audit.add_subparsers(dest="action", required=True)

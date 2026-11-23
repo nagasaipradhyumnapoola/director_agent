@@ -10,6 +10,10 @@ import pytest
 from director import audit, cli
 from director.backup import create_backup, prune_backups, restore_backup, verify_backup
 from director.keychain import available, delete_secret, get_secret, set_secret
+from director.maintenance import disable as maintenance_disable
+from director.maintenance import enable as maintenance_enable
+from director.maintenance import maybe_run as maintenance_maybe_run
+from director.maintenance import status as maintenance_status
 from director.service import install, remove, status
 from director.store import Store
 from tests.helpers import new_store
@@ -49,6 +53,22 @@ def test_backup_verify_and_restore_to_new_project(tmp_path):
         assert results
     finally:
         reopened.close()
+
+
+def test_scheduled_maintenance_creates_one_backup(tmp_path):
+    store = new_store(tmp_path)
+    try:
+        enabled = maintenance_enable(store, interval_hours=24, keep=1)
+        assert enabled["enabled"] is True
+        assert maintenance_status(store)["due_in_seconds"] == 0.0
+        first = maintenance_maybe_run(store)
+        assert first is not None and first["backup"].endswith(".zip")
+        assert maintenance_maybe_run(store) is None
+        assert maintenance_status(store)["due_in_seconds"] > 0
+        assert maintenance_disable(store)["enabled"] is False
+        assert maintenance_maybe_run(store) is None
+    finally:
+        store.close()
 
 
 def test_backup_prune_keeps_latest(tmp_path):

@@ -60,6 +60,11 @@ install, use `python -m pip install -e . --no-deps` (build tooling may be needed
   selfdev gates; a proposal→author→test queue is available.
 - Autostart: optional per-user Startup-folder entry (no admin) starts the worker
   at logon; still only while the user session runs.
+- Optional container runner: Docker-only, read-only source mount, no network,
+  unprivileged user, dropped capabilities, memory/CPU/pid/output bounds. It is
+  not a hardened microVM.
+- Opt-in scheduled maintenance: the worker creates a verified ZIP backup and
+  prunes old archives on a configured interval.
 - Three controlled pilots:
   - website: static checks + real headless Chromium journey, keyboard, mobile
     overflow, console errors, external requests, accessibility tree;
@@ -71,15 +76,14 @@ install, use `python -m pip install -e . --no-deps` (build tooling may be needed
 ## What is deliberately not claimed
 
 - No autonomous model/provider routing or spend; no live web research.
-- No kernel/container sandbox; process-level supervision only.
-- Native OpenCode MCP **connection** is tested (`opencode mcp list` shows
-  connected). The installed OpenCode 1.19.4 V1 run-agent did not expose the MCP
-  tools to the local model, so native **tool-call** remains blocked; Claude/Codex
-  native paths are not tested. MCP protocol/SDK is tested.
+- Process-level supervision by default; the optional Docker runner is bounded
+  but not a hardened kernel/microVM sandbox.
+- Native OpenCode MCP **connection and tool-call** are tested: `director
+  director_status` executed through a loopback OpenAI-compatible proxy and the
+  model reported the result. Claude/Codex native paths are not tested.
 - No billion-token memory scale, A2A, computer-use or general domain competence.
-- No provider-driven autonomous code authoring (no model call/spend); `selfdev`
-  requires an agent/human-authored patch, tests, independent review and owner
-  merge. It never auto-pushes/deploys.
+- No autonomous cloud provider loop or cloud authoring without an owner key,
+  grant and budget; local Ollama authoring exists and is gated.
 
 Read [SELF_IMPROVEMENT.md](docs/SELF_IMPROVEMENT.md) for the gated path to
 provider-driven self-coding.
@@ -99,12 +103,19 @@ python -m director improve auto --proposal <id> --provider ollama \
 python -m director service install                    # logon autostart (Startup folder)
 python -m director service status
 python -m director service remove
+
+python -m director maintenance enable --interval-hours 24 --keep 14
+python -m director maintenance status|run|disable
+
+python -m director container check
+python -m director container run --image python:3.12-slim \
+  --workdir . --timeout 300 -- python -c "print('isolated')"
 ```
 
 The patch is validated against a path allowlist, applied in a disposable git
 worktree at a recorded base commit, tested, and bound to evidence. Merge requires
 a clean tree, unchanged HEAD, an independent review record and owner approval.
-Provider-driven autonomous authoring, push and deploy remain gated.
+Local model authoring is gated; push and deploy remain owner actions.
 
 ## Harness integration
 

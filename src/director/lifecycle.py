@@ -361,6 +361,7 @@ def process_one(store: Store, worker: str = "worker") -> dict[str, Any]:
 def worker_loop(store: Store, token: str, poll_seconds: float = 1.0, once: bool = False) -> int:
     state = _state(store)
     token = token or ""
+    next_maintenance = 0.0
     while True:
         current = read_lifecycle(store)
         if current.get("token") and token and current.get("token") != token:
@@ -382,6 +383,14 @@ def worker_loop(store: Store, token: str, poll_seconds: float = 1.0, once: bool 
         if current_status == "paused":
             time.sleep(max(0.2, poll_seconds))
             continue
+        if time.monotonic() >= next_maintenance:
+            next_maintenance = time.monotonic() + 60.0
+            try:
+                from .maintenance import maybe_run
+
+                maybe_run(store)
+            except Exception:
+                pass
         result = process_one(store, worker=f"worker:{os.getpid()}")
         if not result.get("claimed"):
             time.sleep(max(0.2, poll_seconds))

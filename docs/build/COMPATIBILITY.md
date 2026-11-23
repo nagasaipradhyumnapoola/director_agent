@@ -14,7 +14,7 @@ Evidence levels are not interchangeable:
 | Context packet / memory | implemented, tested | bounded output, untrusted labels, deletion/re-ingest, project isolation |
 | MCP stdio server | **protocol tested** | official Python `mcp` 1.29.0 `ClientSession` round trip; protocol negotiated `2025-11-25`; oversized frame before parse; strict args |
 | Generic MCP config (`mcp.json`) | adapter generated | not native-host tested |
-| OpenCode adapter | **native connection tested; tool-call blocked** | V1.19.4 connects (`director connected`), but the run agent did not expose MCP tools to the local model; no `opencode2` installed |
+| OpenCode adapter | **native connection + tool-call tested** | V1.19.4 connected and invoked `director_director_status` through the loopback OpenAI-compatible proxy; model returned `ACCEPTANCE=false` |
 | Claude adapter (`.mcp.json`) | adapter generated | not native-host tested |
 | Codex adapter (`codex.config.toml`) | adapter generated | not native-host tested |
 | Website pilot | **domain-validated** | real headless Chrome 158 CDP journey on controlled fixtures; Node 24; Edge present but not separately validated |
@@ -27,7 +27,8 @@ Evidence levels are not interchangeable:
 | OS keychain | implemented, tested | Windows Credential Locker round trip; no plaintext fallback |
 | Health/doctor | implemented, tested | DB/schema/worker/acceptance/backups/keychain/disk checks |
 | Autostart | implemented, tested | per-user Startup-folder fallback; requires user logon; not a Windows service |
-| Model authoring | implemented, tested | local Ollama authored a patch into selfdev; weak patch held by review |
+| Model authoring | implemented, tested | local Ollama authored a patch into selfdev; weak patch rejected by review |
+| Scheduled maintenance | implemented, tested | opt-in worker backup + prune on an interval |
 | 24/7 patch testing | implemented, integration tested | worker claims queued `selfdev_test` jobs and records evidence |
 | 24/7 worker | implemented, integration tested | detached start/heartbeat/pause/resume/stop; requires running host |
 | Autonomous provider routing | designed only (M2) | not implemented; zero spend default |
@@ -35,7 +36,7 @@ Evidence levels are not interchangeable:
 | Billion-token memory | roadmap (M4) | not implemented or measured |
 | A2A / computer-use | roadmap | not implemented |
 | POSIX | code paths present | not validated in this release |
-| Container/VM sandbox | not implemented | process-level containment only |
+| Container runner | implemented, tested | Docker 29.6.2; read-only mount, no network, uid 65534, cap-drop ALL; not a hardened microVM |
 
 ## MCP protocol note
 
