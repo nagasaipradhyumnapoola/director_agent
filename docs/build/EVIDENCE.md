@@ -15,7 +15,7 @@ Command:
 $env:PYTHONPATH="src"; python -m pytest
 ```
 
-Result: **59 passed in 93.07s**, no failures, no skips. The browser (real
+Result: **63 passed in 89.04s**, no failures, no skips. The browser (real
 Chromium/CDP) and MCP SDK tests executed; they were not skipped.
 
 Coverage highlights:
@@ -50,7 +50,7 @@ Observed (`demo.txt`):
 | research | pass | fail | 8 |
 
 `expectations: met`; `model calls: 0.0`; exit 0.
-Run id `20261123T173650Z-729e82`; raw summary copied to
+Run id `20261123T180920Z-a315be`; raw summary copied to
 `demo-summary.json`.
 
 Discrimination details:
@@ -86,11 +86,23 @@ external network off, trust boundary checks, MCP SDK, Node, Chrome.
 ## 4b. Packaging and benchmark
 
 - `python -m pip wheel . --no-deps --no-build-isolation` built
-  `director_supervisor-0.1.0-py3-none-any.whl` (102,915 bytes) successfully.
+  `director_supervisor-0.1.0-py3-none-any.whl` (115,868 bytes) successfully.
 - `python benchmarks/retrieval_smoke.py --files 500 --queries 100`:
   500 synthetic docs, ingest 0.4176s, recall@1 1.0, p50 0.142ms, p95 0.242ms,
   0 model calls. This is a lexical FTS5 smoke test, **not** semantic memory or
   billion-scale evidence. Raw: `benchmarks/results/retrieval_smoke.json`.
+
+## 4c. Supervised self-modification (tested on DIRECTOR itself)
+
+- Patch patch_cdc28362d02d4f2d998e82324ecc9df9 added a read-only ersion
+  command and CLI test (author: this agent).
+- Isolated git worktree at base commit 85d8209; full offline suite passed in
+  99.1s (exit 0). Raw: selfdev-test.txt, diff: selfdev-version.patch.
+- Independent reviewer returned **PASS**, verified reverse-apply integrity and
+  ran the targeted test; only low non-blocking notes.
+- Owner approval recorded; local fast-forward merge commit 439b16.
+- Merged tree: 63/63 tests, python -m director version --json works.
+- The pipeline did not push; the release push was a separate owner action.
 
 ## 5. Independent review
 
@@ -122,8 +134,9 @@ Proven on this host, with controlled fixtures:
   while accepting clean ones;
 - MCP stdio works with the installed SDK and bounds hostile frames/arguments;
 - the 24/7 worker runs deterministically with zero model calls;
-- self-improvement proposals are generated, deduplicated, owner-approved, and
-  cannot apply code.
+- self-improvement proposals are generated, deduplicated and owner-approved;
+- the supervised `selfdev` pipeline applied and merged a real DIRECTOR patch
+  only after isolated full-suite tests, independent review and owner approval.
 
 ## 7. What is not proven
 
@@ -132,14 +145,17 @@ Proven on this host, with controlled fixtures:
 - Native host tool-call integration for any agent.
 - Live web research freshness, provider routing/spend, A2A, computer-use.
 - Billion-token memory scale or semantic memory.
-- Autonomous self-coding; `improve apply` is intentionally blocked.
+- Provider-driven autonomous patch authoring; `improve apply` is blocked and
+  `selfdev` needs an agent/human-authored patch.
+- Kernel/container sandboxing; `selfdev` uses process-level isolation.
 
 Performance/quality claims are fixture-scoped; no comparative productivity study
 or broad benchmark is claimed.
 
 ## Release record
 
-- Commit: 867bd2 (pushed to origin/main on 2026-11-23).
+- Commits: `f439b16` (selfdev merge) after `85d8209` (pipeline), pushed to
+  `origin/main` on 2026-11-23.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: docs/build/EVIDENCE.md (59 tests, full demo,
-  zero model calls, independent review fixes).
+- Verified release evidence: 63 tests, full demo, zero model calls, independent
+  review fixes, one merged selfdev patch.

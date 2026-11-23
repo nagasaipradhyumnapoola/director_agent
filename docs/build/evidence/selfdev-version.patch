@@ -1,0 +1,43 @@
+--- a/src/director/cli.py
++++ b/src/director/cli.py
+@@ -623,6 +623,17 @@
+         store.close()
+ 
+ 
++def cmd_version(args: argparse.Namespace) -> int:
++    _emit(
++        {
++            "version": __version__,
++            "release_target": RELEASE_TARGET,
++            "python": sys.version.split()[0],
++        }
++    )
++    return 0
++
++
+ def cmd_mcp(args: argparse.Namespace) -> int:
+     path = Path(args.db).resolve()
+     if not path.is_file():
+@@ -895,6 +906,10 @@
+     demo.add_argument("--json", action="store_true")
+     demo.set_defaults(func=cmd_demo)
+ 
++    version_cmd = sub.add_parser("version", parents=[common], help="print version metadata")
++    version_cmd.add_argument("--json", action="store_true")
++    version_cmd.set_defaults(func=cmd_version)
++
+     mcp = sub.add_parser("mcp", help="MCP stdio adapter")
+     mcp_sub = mcp.add_subparsers(dest="action", required=True)
+     mcp_serve = mcp_sub.add_parser("serve")
+--- a/tests/test_cli.py
++++ b/tests/test_cli.py
+@@ -73,3 +73,9 @@
+     assert applied["status"] == "blocked"
+     assert applied["code_write_allowed"] is False
+ 
++def test_cli_version(capsys):
++    assert cli.main(["version", "--root", "."]) == 0
++    payload = _json_output(capsys)
++    assert payload["release_target"] == "v0.1-supervised-three-domain"
++    assert payload["version"]
++

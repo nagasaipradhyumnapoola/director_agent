@@ -54,10 +54,15 @@
 
 ## Self-improvement
 
-- The 24/7 engine is proposal-only: it cannot write code, spend, merge, push or
+- The 24/7 worker is proposal-only; it cannot write code, spend, merge, push or
   deploy. `improve apply` is blocked.
-- Autonomous self-coding requires M2 sandbox/provider/budget/review gates (see
-  `docs/SELF_IMPROVEMENT.md`).
+- `selfdev` executes an agent/human-authored patch in an isolated git worktree
+  with full tests, an independent review record and owner merge. It is not a
+  kernel sandbox and does not author patches by itself.
+- It requires a clean working tree, an unchanged base commit and local git; it
+  never pushes/deploys.
+- Provider-driven autonomous authoring, keychain/provider budgets and broader
+  sandboxing remain M2 gates (see `docs/SELF_IMPROVEMENT.md`).
 
 ## Memory
 

@@ -59,6 +59,7 @@ src/director/
   opencode_adapter.py  compatibility wrapper
   lifecycle.py     detached worker, heartbeat, recovery
   improve.py       proposal-only self-improvement engine
+  selfdev.py       patch -> isolated worktree -> tests -> review -> owner merge
   domains/         base, website, ml, research pilots
 fixtures/          controlled broken/clean pilot fixtures
 tests/             offline tests (browser/MCP opt-in markers)
@@ -86,7 +87,16 @@ python -m director memory add --path docs/RESEARCH.md
 python -m director memory search "evidence"
 python -m director preflight --query "next action"
 python -m director adapters generate --host opencode --out .opencode
-python -m director pilot run --domain website|ml|research --fixture <dir>`r`npython -m director improve propose`r`npython -m director improve list`r`npython -m director start   # 24/7 deterministic worker`r`npython -m director stop
+python -m director pilot run --domain website|ml|research --fixture <dir>
+python -m director improve propose
+python -m director improve list
+python -m director start          # 24/7 deterministic worker
+python -m director stop
+python -m director selfdev propose --file patch.diff --title "..."
+python -m director selfdev test --patch <id>
+python -m director selfdev review --patch <id> --verdict pass --reviewer <name>
+python -m director selfdev merge --patch <id>
+python -m director version
 python -m director mcp serve --db <path>
 python -m director demo --domains general,website,ml,research --modes clean,broken
 ```
@@ -95,21 +105,24 @@ Run `python -m director --help` for the authoritative list.
 
 ## Self-improvement (current boundary)
 
-The 24/7 worker is deterministic and proposal-only. It can scan, generate
-prioritised improvement proposals, record approvals and heartbeats, but it
-cannot call a model, spend, edit source, merge, push or deploy. `improve apply`
-returns blocked. Autonomous self-coding requires the M2 sandbox/provider/budget/
-review gates in `docs/SELF_IMPROVEMENT.md`.
+The 24/7 worker is deterministic and proposal-only; it generates prioritized
+proposals, approvals and heartbeats without model calls or spend.
+
+A supervised execution path exists: `director selfdev` accepts an
+agent/human-authored patch, applies it in an isolated git worktree, runs the
+full offline suite, requires an independent review record and owner approval,
+then fast-forwards the merge. It never pushes/deploys. `improve apply` remains
+blocked; provider-driven autonomous authoring is not claimed.
 
 ## Release commit
 
-867bd2 on origin/main (2026-11-23).
+`f439b16` on `origin/main` (2026-11-23); earlier release `f867bd2`.
 
 ## Evidence status
 
 v0.1 is implemented and tested on this host for its controlled scope:
-- 59 offline tests pass (including a real Chromium/CDP website journey and the
-  official MCP SDK round trip).
+- 63 offline tests pass (including a real Chromium/CDP website journey, the
+  official MCP SDK round trip, and the selfdev worktree pipeline).
 - `python -m director demo ... --modes clean,broken`: all clean fixtures pass,
   all broken fixtures fail, zero model calls.
 - Independent review found false-completion/policy defects; all high/critical

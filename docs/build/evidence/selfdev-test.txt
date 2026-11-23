@@ -1,0 +1,1 @@
+{"command": ["C:\\Python314\\python.exe", "-m", "pytest", "-q"], "exit_code": 0, "timed_out": false, "duration_seconds": 99.144, "truncated": false, "stdout_tail": "...............................................................          [100%]\r\n", "stderr_tail": ""}

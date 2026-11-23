@@ -44,7 +44,7 @@ DIRECTOR code itself (subject to review).
 | Fixture code execution | ML `-I -P` + absolute trusted trainer; process-level caps |
 | ML threshold tampering | trusted evaluator constants; fixture values ignored for decisions |
 | Research calculation bypass | trusted tolerance; finite checks |
-| Self-improvement escalation | proposal-only; no model calls, spend, code writes, push/deploy |
+| Self-improvement escalation | proposals + selfdev path allowlist, isolated worktree, tests, review, owner merge; no model calls/spend/auto-push |
 | Worker runaway | lease expiry, retry cap, pause/stop flag, heartbeat/degraded status |
 
 ## Residual risks (accepted and disclosed)
@@ -87,10 +87,10 @@ merge approval, rollback and no auto-push/deploy.
 
 ## Verification
 
-- 59 offline tests including links/hardlinks/junctions, oversized frames,
+- 63 offline tests including links/hardlinks/junctions, oversized frames,
   unknown args, secret redaction, fencing, budget races, stale evidence,
   latest-fail supersession, fixture threshold tampering, ML stdlib shadowing,
-  citation/calculation abuse, and waiver revision binding.
+  citation/calculation abuse, waiver revision binding, and selfdev patch/test/review/merge.
 - Independent review found false-completion/policy defects; all high/critical
   findings were fixed and re-verified. Residual items are listed in
   `docs/BUILD_STATUS.md` and `docs/build/LIMITATIONS.md`.

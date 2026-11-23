@@ -20,7 +20,8 @@ Evidence levels are not interchangeable:
 | Website pilot | **domain-validated** | real headless Chrome 158 CDP journey on controlled fixtures; Node 24; Edge present but not separately validated |
 | ML pilot | **domain-validated** | controlled clean/leaky fixtures; pure-Python CPU; leakage/held-out/repro/slices |
 | Research/document pilot | **domain-validated** | controlled conflicting dated sources; HTML render inspected; DOCX optional |
-| Self-improvement proposals | implemented, tested | proposal-only, owner approval, no code writes, zero model calls |
+| Self-improvement proposals | implemented, tested | proposal-only, owner approval, zero model calls |
+| Supervised selfdev executor | implemented, integration tested | path allowlist, isolated worktree, full tests, independent review record, owner merge; no push; provider authoring NOT implemented |
 | 24/7 worker | implemented, integration tested | detached start/heartbeat/pause/resume/stop; requires running host |
 | Autonomous provider routing | designed only (M2) | not implemented; zero spend default |
 | Native hooks/plugins for hosts | designed only | no host plugin installed; MCP is the tested boundary |

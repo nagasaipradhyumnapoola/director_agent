@@ -13,14 +13,14 @@ milestones are designed, not shipped.
   stay authoritative.
 - Gate: keychain + budget + provider tests; no hidden fallback spend.
 
-## M2.5 — self-improvement execution (gated)
+## M2.5 - self-improvement execution
 
-- Real container/VM sandbox with narrow mounts and network policy.
-- Proposal → patch on a disposable branch/worktree.
-- Mandatory regression tests, independent review, rollback artifact.
-- Owner merge approval; no automatic push/deploy.
-- Measured improvement per accepted change (cost, defects, regressions).
-- See `docs/SELF_IMPROVEMENT.md`.
+Shipped in v0.1: patch allowlist, isolated git worktree, full offline tests,
+independent review record, owner merge, evidence receipts, no push/deploy.
+
+Still gated: provider/keychain-driven autonomous patch authoring, container/VM
+sandbox, rollback artifact, measured improvement per accepted change. See
+docs/SELF_IMPROVEMENT.md.
 
 ## M3 — measured host/upstream composition
 

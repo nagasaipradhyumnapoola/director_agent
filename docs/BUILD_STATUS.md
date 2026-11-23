@@ -20,7 +20,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 
 ## Contract decisions
 
-- State: `<project>/.director/director.db` (SQLite WAL, schema v3). Never committed.
+- State: `<project>/.director/director.db` (SQLite WAL, schema v4). Never committed.
 - Model calls = 0, cost = 0, external network off by default.
 - Evidence is bound to subject SHA-256, check name/version, params, environment,
   policy hash, contract revision and time. A newer failing/blocked result
@@ -37,7 +37,10 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 - Research uses a trusted calculation tolerance, requires source quotes,
   conflict/date handling and resolved citations in the rendered document.
 - The 24/7 worker is deterministic and proposal-only. It cannot model-call,
-  spend, edit source, push or deploy. Autonomous self-coding remains gated.
+  spend, edit source, push or deploy.
+- selfdev adds supervised self-modification: validated patch -> isolated git
+  worktree -> full tests -> independent review -> owner merge. It never pushes.
+  Provider-driven autonomous patch authoring remains gated.
 
 ## Milestones
 
@@ -50,20 +53,21 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 - [x] M1 ML pilot (manifest, leakage, held-out, reproducibility, slices, resources)
 - [x] M1 research/document pilot (claims, conflicts, calculation, render)
 - [x] Supervised self-improvement proposal engine (24/7, proposal-only)
-- [x] 59-test offline suite incl. historical defect regressions
+- [x] Supervised self-modification executor (worktree, tests, review, owner merge)
+- [x] 63-test offline suite incl. historical defect regressions and selfdev
 - [x] Independent review rounds + fixes
 - [x] Release docs, evidence report, install/uninstall
 
 ## Evidence log (exact commands)
 
-1. `python -m pytest -q` with `PYTHONPATH=src` → **59 passed**, no failures, no
+1. `python -m pytest -q` with `PYTHONPATH=src` → **63 passed**, no failures, no
    skips. Browser test and MCP SDK round-trip both executed.
 2. `python -m director demo --root . --domains general,website,ml,research --modes clean,broken`
    → `expectations: met`, `model calls: 0.0`, exit 0.
    - clean: general/website/ml/research all `pass`, 0 findings.
    - broken: general `fail` (4 findings), website `fail` (13), ML `fail` (2),
      research `fail` (8).
-   - Raw summary: `var/demo/20261123T173650Z-729e82/summary.json` (gitignored).
+   - Raw summary: `var/demo/20261123T180920Z-a315be/summary.json` (gitignored).
 3. `python -m director doctor --root var/cli-test` → all core checks ok.
 4. MCP: initialize/tools/list/tools/call over stdio + official SDK
    `ClientSession` round trip; oversized frame rejected before JSON parsing;
@@ -78,6 +82,12 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
      expiry, memory re-ingest, revision-bound waivers, ML `-I -P`, required
      citations, bounded reads, grant timeout enforcement, deterministic
      same-second grant ordering.
+7. Supervised self-modification executed end-to-end on DIRECTOR itself:
+   - patch `patch_cdc28362d02d4f2d998e82324ecc9df9` (version command + test);
+   - isolated worktree at base `85d8209`; full suite passed in 99.1s;
+   - independent reviewer PASS with patch-integrity verification;
+   - owner approval recorded; fast-forward merge commit `f439b16`;
+   - merged tree: 63/63 tests, version command works, no push by the pipeline.
 
 ## Evidence levels (per surface)
 
@@ -90,7 +100,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 | Website pilot | domain-validated on controlled fixture with real Chrome |
 | ML pilot | domain-validated on controlled clean/leaky fixtures |
 | Research pilot | domain-validated on controlled conflicting-source fixture |
-| Self-improvement | proposal engine tested; autonomous code application NOT implemented |
+| Self-improvement | proposals + supervised selfdev execution tested; provider-driven autonomous authoring NOT implemented |
 | 24/7 worker | detached lifecycle tested; requires running host |
 
 ## Known limitations
@@ -105,15 +115,19 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 - A pre-evaluator budget block records blocked evidence but may leave older
   fresh passes; acceptance still means "latest criterion evidence", not "whole
   project unchanged".
+- `selfdev` is not a kernel sandbox and does not author patches by itself;
+  provider-driven autonomous authoring, push and deploy remain gated.
 
 ## Next action
 
 M2: opt-in providers/keychain/budget routing, real sandbox, native host tests,
-and the gated self-coding pipeline described in `docs/SELF_IMPROVEMENT.md`.
+and provider-driven autonomous patch authoring on top of the existing selfdev
+worktree/test/review/owner-merge pipeline.
 
 ## Release record
 
-- Commit: 867bd2 (pushed to origin/main on 2026-11-23).
+- Commit: `f439b16` (selfdev merge) after `85d8209` (pipeline), pushed to
+  `origin/main` on 2026-11-23.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: docs/build/EVIDENCE.md (59 tests, full demo,
+- Verified release evidence: docs/build/EVIDENCE.md (63 tests, full demo,
   zero model calls, independent review fixes).

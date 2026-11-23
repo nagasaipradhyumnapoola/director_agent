@@ -1,10 +1,15 @@
 # DIRECTOR self-improvement
 
 Goal: DIRECTOR should get better over time without pretending to be more
-autonomous than it is. The v0.1 release implements the safe half of that loop:
-a **24/7 deterministic improvement engine** that observes its own evidence,
-findings and failures, records prioritised proposals, and requires owner
-decisions. It does not write or apply code on its own yet.
+autonomous than it is. v0.1 now has two layers:
+
+1. a **24/7 deterministic improvement engine** that observes evidence, findings
+   and failures and records prioritised proposals;
+2. a **supervised self-modification executor** (`director selfdev`) that accepts
+   an agent/human-authored patch, tests it in an isolated git worktree, records
+   independent review and requires owner approval before a local merge.
+
+Provider-driven autonomous patch authoring and push/deploy are still gated.
 
 ## What runs 24/7 in v0.1
 
@@ -37,16 +42,19 @@ proposal queue  (category, risk, files, required checks, zero budget)
 owner approve / reject  (durable approval record)
         |
         v
-[v0.1 stops here: no code write]
+[v0.1 supervised execution]
+validated patch -> isolated git worktree at base commit -> full offline tests
+        -> independent review -> owner merge approval -> local fast-forward
+        -> evidence receipts -> no auto-push/deploy
         |
         v  (future M2, gated)
-isolated branch/worktree -> scoped provider + budget -> tests -> independent
-review -> current evidence -> owner merge decision -> no auto-push/deploy
+provider/keychain -> autonomous patch authoring -> container/VM sandbox
 ```
 
 Proposals are stored in SQLite and mirrored as bounded JSON under
-`.director/proposals/`. Rejected proposals are not repeated. Approval records
-intent only; `director improve apply` deliberately returns `blocked`.
+`.director/proposals/`. Rejected proposals are not repeated. `director improve
+apply` remains blocked because it would bypass the selfdev gates; use
+`director selfdev` for reviewed execution.
 
 ## Commands
 
@@ -57,16 +65,36 @@ python -m director improve list
 python -m director improve show <id>
 python -m director improve approve <id> --reason "..."
 python -m director improve reject <id> --reason "..."
-python -m director improve apply <id>     # blocked in v0.1
+python -m director improve apply <id>     # blocked; use selfdev instead
+python -m director selfdev propose --file patch.diff --title "..."
+python -m director selfdev test --patch <id>
+python -m director selfdev review --patch <id> --verdict pass --reviewer "..."
+python -m director selfdev merge --patch <id>
 python -m director start                  # detached deterministic worker
 python -m director pause | resume | stop
 python -m director recover
 ```
 
-## Why autonomous self-coding is gated
+## Executed self-improvement (evidence)
 
-Making an agent edit its own code 24/7 safely requires capabilities that are not
-part of v0.1:
+The pipeline was used to modify DIRECTOR itself:
+
+- patch `patch_cdc28362d02d4f2d998e82324ecc9df9` added a read-only `version`
+  command and its test;
+- the full offline suite passed in an isolated worktree at base commit
+  `85d8209` (exit 0, ~99s);
+- an independent reviewer returned PASS and verified patch integrity;
+- owner approval was recorded, the change fast-forwarded as commit `f439b16`;
+- the merged tree then passed **63/63** tests and the four-domain demo.
+
+The author was this agent; no provider spend or automatic push occurred. This
+is real supervised self-modification, not autonomous provider-driven coding.
+
+## Why provider-driven autonomous self-coding is still gated
+
+The supervised executor exists, but making a model author and apply patches 24/7
+without a human/agent-authored diff requires capabilities that are not part of
+v0.1:
 
 1. **A real isolation boundary.** A temp directory, worktree, command allowlist
    or scrubbed environment is not a security boundary. Self-modifying code needs
@@ -86,9 +114,10 @@ part of v0.1:
    reports cannot become instructions or permission grants. Self-improvement
    must not let the agent expand its own scope.
 
-Until those exist and are tested, a "self-coding 24/7" claim would be a fake
-demo. v0.1 therefore implements the durable proposal engine, not self-modifying
-execution.
+The v0.1 executor enforces change-control (allowlisted paths, isolated worktree,
+full tests, independent review, owner merge, no push) but it is not a kernel
+sandbox and does not authorize provider spend. A fully autonomous "self-coding
+24/7" claim still requires the remaining gates.
 
 ## Learning without authority drift
 
@@ -101,15 +130,16 @@ execution.
 - Memory deletion and retention apply to derived indexes as well as sources.
 - The worker cannot edit global settings, install hooks, push, deploy or spend.
 
-## Next release gate (M2 self-improvement)
+## Next release gate (M2 provider-driven improvement)
 
-A future `v0.2-self-improving-supervised` target would add:
+Already present: worktree execution, tests, review, owner merge, evidence, no
+push. Still required:
 
 - opt-in provider/keychain and exact budget ledger;
 - container/VM-backed workspace with network disabled by default;
-- proposal-to-patch execution on a disposable branch;
-- mandatory tests, independent review and a rollback artifact;
-- owner merge approval and no automatic publication;
-- measured improvement per accepted change (cost, defect reduction, regressions).
+- autonomous proposal-to-patch authoring by an authorized model;
+- rollback artifact and measured improvement per accepted change;
+- broader native host tests.
 
-Only then can DIRECTOR honestly say it writes code to improve itself day by day.
+Only then can DIRECTOR honestly claim it writes code to improve itself 24/7
+without an agent/human author in the loop.

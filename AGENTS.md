@@ -13,12 +13,15 @@ Canonical project folder: `D:\directer agent`. Product name: **DIRECTOR**. Keep 
 ## Current build state (2026-11-23)
 
 - `v0.1-supervised-three-domain` is implemented in `src/director` with CLI, MCP,
-  lifecycle, self-improvement proposals and three controlled pilots.
+  lifecycle, self-improvement proposals, a supervised `selfdev` patch executor
+  and three controlled pilots.
 - Read `CONTEXT.md` first for the low-token map; `docs/BUILD_STATUS.md` is the
   release ledger; `docs/build/EVIDENCE.md` has exact commands/results.
-- The 24/7 worker is deterministic and proposal-only. Autonomous code writing,
-  provider spend, push/deploy and native host integration remain gated; do not
-  claim them. `director improve apply` is intentionally blocked.
+- The 24/7 worker is deterministic and proposal-only. `director selfdev` can test,
+  review and merge an agent-authored patch in an isolated worktree; it never
+  auto-pushes. Provider-driven autonomous authoring, provider spend, push/deploy
+  and native host integration remain gated; do not claim them.
+  `director improve apply` is intentionally blocked.
 - Preserve the research handoff, fixtures, licenses and evidence. Do not commit
   `.director/`, `var/`, credentials or generated browser profiles.
 

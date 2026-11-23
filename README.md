@@ -33,7 +33,7 @@ install, use `python -m pip install -e . --no-deps` (build tooling may be needed
 
 ## What works now
 
-- Durable task contracts, acceptance criteria, SQLite WAL state, schema v3.
+- Durable task contracts, acceptance criteria, SQLite WAL state, schema v4.
 - Default-deny policy gateway, owner-bound grants, atomic budget reservations.
 - Fenced investigation queue (lease token + generation), retry caps, recovery.
 - Deterministic artifact scan: secrets redacted, links/hardlinks/junctions
@@ -44,8 +44,9 @@ install, use `python -m pip install -e . --no-deps` (build tooling may be needed
 - FTS5 lexical memory with provenance, taint, deletion and re-ingest.
 - Bounded MCP stdio server (newline JSON-RPC 2.0) with strict argument validation.
 - 24/7 deterministic worker: start/stop/pause/resume, heartbeat, zero model calls.
-- Supervised self-improvement proposal engine with owner approvals; no autonomous
-  code writes.
+- Supervised self-improvement: proposal engine plus `selfdev` execution path
+  (patch → isolated git worktree → full tests → independent review → owner merge).
+  It has been used to modify DIRECTOR itself; it never auto-pushes.
 - Three controlled pilots:
   - website: static checks + real headless Chromium journey, keyboard, mobile
     overflow, console errors, external requests, accessibility tree;
@@ -61,10 +62,28 @@ install, use `python -m pip install -e . --no-deps` (build tooling may be needed
 - No native OpenCode/Claude/Codex tool-call test; MCP protocol/SDK is tested and
   adapters are generated for review.
 - No billion-token memory scale, A2A, computer-use or general domain competence.
-- No self-modifying code yet; the 24/7 engine produces proposals only.
+- No provider-driven autonomous code authoring (no model call/spend); `selfdev`
+  requires an agent/human-authored patch, tests, independent review and owner
+  merge. It never auto-pushes/deploys.
 
 Read [SELF_IMPROVEMENT.md](docs/SELF_IMPROVEMENT.md) for the gated path to
-autonomous self-coding.
+provider-driven self-coding.
+
+## Self-modification (supervised)
+
+DIRECTOR can improve its own code through a gated pipeline:
+
+```powershell
+python -m director selfdev propose --file var/selfdev/change.patch --title "Add X"
+python -m director selfdev test --patch <id>          # isolated worktree + full offline suite
+python -m director selfdev review --patch <id> --verdict pass --reviewer <name> --notes "..."
+python -m director selfdev merge --patch <id>         # owner-gated fast-forward; no push
+```
+
+The patch is validated against a path allowlist, applied in a disposable git
+worktree at a recorded base commit, tested, and bound to evidence. Merge requires
+a clean tree, unchanged HEAD, an independent review record and owner approval.
+Provider-driven autonomous authoring, push and deploy remain gated.
 
 ## Harness integration
 
@@ -89,7 +108,7 @@ See [HARNESS_INTEGRATION.md](docs/HARNESS_INTEGRATION.md).
 
 ```text
 init doctor status contract scan investigate worker findings evidence verify
-waive memory preflight budget improve adapters pilot demo mcp
+waive memory preflight budget improve selfdev adapters pilot demo mcp version
 start stop pause resume recover checkpoint
 ```
 

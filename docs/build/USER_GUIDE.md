@@ -116,7 +116,9 @@ The worker is deterministic: zero model calls, no external network. It processes
 the fenced queue, scans, and generates improvement proposals. It requires a
 running host; it does not continue after shutdown/sleep.
 
-## Self-improvement (proposal-only)
+## Self-improvement
+
+Proposals:
 
 ```powershell
 python -m director improve propose
@@ -125,11 +127,24 @@ python -m director improve list
 python -m director improve show <id>
 python -m director improve approve <id> --reason "reviewed"
 python -m director improve reject <id> --reason "..."
-python -m director improve apply <id>  # returns blocked in v0.1
+python -m director improve apply <id>  # blocked; use selfdev
 ```
 
-Approval records intent; no code is edited. Autonomous self-coding requires the
-M2 sandbox/provider gates described in `docs/SELF_IMPROVEMENT.md`.
+Supervised execution (agent/human-authored patch):
+
+```powershell
+python -m director selfdev propose --file change.patch --title "Add X"
+python -m director selfdev test --patch <id>
+python -m director selfdev review --patch <id> --verdict pass --reviewer "reviewer" --notes "..."
+python -m director selfdev merge --patch <id> --reason "owner approved"
+python -m director selfdev list
+python -m director selfdev cleanup
+```
+
+`test` applies the patch in a disposable git worktree, runs the full offline
+suite and records evidence. `merge` requires a clean tree, the same base commit,
+a passing review record and owner approval. It fast-forwards locally and never
+pushes. Provider-driven autonomous authoring remains M2 work.
 
 ## Memory and preflight
 

@@ -29,7 +29,7 @@ MCP stdio / CLI / 24/7 worker
 |---|---|
 | `security.py` | path/link/junction/hardlink rejection, bounded JSON, redaction, atomic writes |
 | `models.py` | typed `TaskContract`, requirements, criteria, budgets, permissions |
-| `store.py` | SQLite schema v3, repository, fenced queue, budgets, memory, grants, proposals |
+| `store.py` | SQLite schema v4, repository, fenced queue, budgets, memory, grants, proposals, patches |
 | `policy.py` | default-deny capability gateway and owner grants |
 | `evidence.py` | receipts, freshness verification, criterion acceptance |
 | `context.py` | bounded context packet with untrusted-content labels |
@@ -38,6 +38,7 @@ MCP stdio / CLI / 24/7 worker
 | `runner.py` | temp workspace, scrubbed env, output/time caps, process-tree kill, Windows job object |
 | `lifecycle.py` | detached worker, heartbeat, pause/resume/stop, recovery |
 | `improve.py` | deterministic self-improvement proposals (proposal-only) |
+| `selfdev.py` | patch allowlist, isolated worktree, tests, review, owner merge |
 | `mcp_server.py` | bounded newline JSON-RPC 2.0 stdio MCP server |
 | `adapter.py` / `opencode_adapter.py` | generated host configs, never auto-enabled |
 | `domains/` | pilot profiles and evaluators |
@@ -111,9 +112,14 @@ MCP tools are advisory/read-mostly plus local enqueue; they cannot grant
 permission, spend money or apply code. Process-level containment is not a kernel
 sandbox.
 
-## 24/7 improvement
+## 24/7 improvement and self-modification
 
 `director start` runs a detached deterministic worker: scans, proposal
 generation, heartbeat, recovery, zero model calls. Proposals are durable and
-owner-approved only. Autonomous code application is explicitly blocked in v0.1
-(see `docs/SELF_IMPROVEMENT.md`).
+owner-approved only.
+
+`director selfdev` is the supervised code-application path: allowlisted patch ->
+disposable git worktree at a recorded base -> full offline tests -> independent
+review record -> owner merge approval -> local fast-forward. It never pushes.
+Provider-driven autonomous patch authoring remains gated (see
+`docs/SELF_IMPROVEMENT.md`).
