@@ -1,13 +1,19 @@
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
+import threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 import pytest
 
 from director.evidence import EvidenceLedger
+from director.improve import author_patch
 from director.lifecycle import process_one
+from director.models import Budgets, PermissionPolicy
+from director.policy import PolicyGateway
 from director.security import ValidationError
 from director.selfdev import create_patch, merge_patch, record_review, test_patch as run_patch_tests
 from director.store import Store
@@ -53,7 +59,13 @@ def _repo(tmp_path: Path) -> tuple[Store, Path]:
     _git(root, "add", "-A")
     _git(root, "commit", "-m", "init")
     store = Store.open_or_create(root, "selfdev")
-    store.save_contract(make_contract(store.project_id))
+    store.save_contract(
+        make_contract(
+            store.project_id,
+            permissions=PermissionPolicy(allowed_actions=("read_artifact", "model_call_local")),
+            budgets=Budgets(max_model_calls=2, max_wall_seconds=60),
+        )
+    )
     return store, root
 
 
@@ -97,6 +109,65 @@ def test_patch_rejects_disallowed_paths_and_binary(tmp_path):
         with pytest.raises(ValidationError):
             create_patch(store, "GIT binary patch\n", "binary")
     finally:
+        store.close()
+
+
+def test_local_model_authors_a_patch_into_the_pipeline(tmp_path, monkeypatch):
+    store, _root = _repo(tmp_path)
+    responses = []
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_POST(self):
+            length = int(self.headers.get("Content-Length", "0"))
+            self.rfile.read(length)
+            body = json.dumps(
+                {
+                    "response": PATCH,
+                    "prompt_eval_count": 12,
+                    "eval_count": 24,
+                    "done": True,
+                }
+            ).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *_args):
+            return
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        monkeypatch.setenv("OLLAMA_HOST", f"http://127.0.0.1:{server.server_port}")
+        PolicyGateway(store).grant("director.model", "model_call_local", "provider:ollama", 1)
+        proposal_id = store.add_proposal(
+            signature="manual:model-author",
+            title="add extra value",
+            rationale="exercise local model authoring",
+            category="manual",
+            risk="medium",
+            expected_impact="test",
+            files=["src/x.py"],
+            required_checks=["tests"],
+        )
+        result = author_patch(
+            store,
+            proposal_id,
+            provider="ollama",
+            model="mock-coder",
+            test=True,
+        )
+        assert result["patch"]["status"] == "tested"
+        assert result["patch"]["author"].startswith("model:ollama/")
+        assert result["usage"]["model_calls"] == 1
+        assert store.model_calls_spent() == 1
+        assert (result["test"]["test"]["passed"]) is True
+    finally:
+        server.shutdown()
+        server.server_close()
         store.close()
 
 

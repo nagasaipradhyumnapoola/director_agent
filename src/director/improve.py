@@ -1,20 +1,29 @@
 ﻿"""Supervised self-improvement proposals.
 
-This is the safe 24/7 learning loop: DIRECTOR observes its own evidence,
-findings and failures, then records prioritised improvement proposals. It does
-NOT edit source code, spend money, call a model or apply changes. Approval only
-records owner intent; autonomous code application is gated behind the M2
-sandbox/provider contract.
+DIRECTOR observes its own evidence, findings and failures, records prioritised
+improvement proposals, and can ask an explicitly authorized local model to
+author a patch. The patch still has to pass the selfdev worktree/tests/review/
+owner-merge gates. Cloud providers/spend are not enabled.
 """
 
 from __future__ import annotations
 
 import json
+import uuid
 from pathlib import Path
 from typing import Any
 
 from .evidence import EvidenceLedger
-from .security import ValidationError, atomic_write_text, dump_bounded, redact_text
+from .providers import call_model
+from .security import (
+    ValidationError,
+    atomic_write_text,
+    dump_bounded,
+    ensure_within,
+    redact_text,
+    safe_read_bytes,
+    scan_secrets,
+)
 from .store import Store, utc_now
 
 MAX_PROPOSALS_PER_RUN = 25
@@ -175,6 +184,139 @@ def generate_proposals(store: Store, investigation_id: str | None = None) -> dic
         "counts": store.proposal_counts(),
         "autonomy": "proposal-only; owner approval required; no code applied; zero model calls",
         "budget": _budget(),
+    }
+
+
+def add_manual_proposal(
+    store: Store,
+    title: str,
+    rationale: str,
+    files: list[str],
+    checks: list[str],
+) -> dict[str, Any]:
+    proposal_id = store.add_proposal(
+        signature=f"manual:{uuid.uuid4().hex}",
+        title=title,
+        rationale=rationale,
+        category="manual",
+        risk="medium",
+        expected_impact="A scoped, reviewed code improvement.",
+        files=files,
+        required_checks=checks,
+    )
+    return store.get_proposal(proposal_id)
+
+
+def _author_prompt(store: Store, proposal: dict[str, Any], max_chars: int = 24_000) -> str:
+    from .selfdev import ALLOWED_FILES, ALLOWED_PREFIXES
+
+    files = []
+    try:
+        files = json.loads(proposal.get("files") or "[]")
+    except Exception:
+        files = []
+    if not isinstance(files, list):
+        files = []
+    snippets: list[str] = []
+    for rel in files[:4]:
+        rel = str(rel)
+        if not (
+            rel in ALLOWED_FILES or any(rel.startswith(prefix) for prefix in ALLOWED_PREFIXES)
+        ):
+            continue
+        try:
+            path = ensure_within(Path(store.root) / rel, Path(store.root))
+            if path.is_file():
+                text = safe_read_bytes(path, Path(store.root), max_bytes=64 * 1024).decode(
+                    "utf-8", "replace"
+                )
+                snippets.append(f"--- {rel} ---\n{text[:8000]}\n")
+        except Exception:
+            continue
+    tree: list[str] = []
+    for base in ("src/director", "tests"):
+        directory = Path(store.root) / base
+        if directory.is_dir():
+            for path in sorted(directory.rglob("*.py")):
+                tree.append(path.relative_to(Path(store.root)).as_posix())
+                if len(tree) >= 200:
+                    break
+    prompt = (
+        "You are DIRECTOR's local coding agent. Produce ONE unified git diff only. "
+        "No prose, no markdown fences, no explanation.\n\n"
+        f"PROPOSAL: {proposal['title']}\n"
+        f"RATIONALE: {proposal['rationale']}\n"
+        f"REQUIRED CHECKS: {proposal['required_checks']}\n\n"
+        "ALLOWED PATHS: src/, tests/, docs/build/, benchmarks/, examples/, integrations/ "
+        "and the exact allowed root files.\n"
+        "RULES: minimal focused change; preserve style and Python 3.11+ compatibility; "
+        "add or update tests; no secrets; no network; no dependency additions; "
+        "use 'diff --git a/path b/path' unified diff format.\n\n"
+        "REPOSITORY FILES:\n"
+        + "\n".join(tree)
+        + "\n\nRELEVANT SOURCE:\n"
+        + "\n".join(snippets)
+        + "\n\nReturn only the diff."
+    )
+    if len(prompt) > max_chars:
+        prompt = prompt[:max_chars] + "\n[TRUNCATED]"
+    return prompt
+
+
+def author_patch(
+    store: Store,
+    proposal_id: str,
+    provider: str = "ollama",
+    model: str = "qwen2.5-coder:7b",
+    test: bool = False,
+    timeout: float = 600.0,
+) -> dict[str, Any]:
+    from .selfdev import create_patch, test_patch
+
+    proposal = store.get_proposal(proposal_id)
+    prompt = _author_prompt(store, proposal)
+    result = call_model(
+        store,
+        prompt,
+        provider=provider,
+        model=model,
+        timeout=timeout,
+    )
+    raw = str(result.get("output") or "")
+    output_rel = f".director/proposals/{proposal_id}.author.txt"
+    atomic_write_text(
+        Path(store.root) / output_rel,
+        redact_text(raw)[:256 * 1024],
+        root=Path(store.root),
+    )
+    diff = raw.strip()
+    if diff.startswith("```"):
+        diff = diff.strip("`")
+        if diff.lower().startswith("diff"):
+            pass
+    start = diff.find("diff --git ")
+    if start < 0:
+        raise ValidationError("local model did not return a unified diff")
+    diff = diff[start:].strip() + "\n"
+    if scan_secrets(diff, max_hits=1):
+        raise ValidationError("model-authored patch contains secret-like content")
+    patch = create_patch(
+        store,
+        diff,
+        title=f"model: {proposal['title']}",
+        author=f"model:{provider}/{model}",
+        proposal_id=proposal_id,
+    )
+    tested = None
+    if test:
+        tested = test_patch(store, patch["id"], timeout=timeout)
+    return {
+        "proposal_id": proposal_id,
+        "patch": store.get_patch(patch["id"]),
+        "author_output_ref": output_rel,
+        "author_output_preview": redact_text(raw[:2000]),
+        "usage": result.get("usage"),
+        "test": tested,
     }
 
 

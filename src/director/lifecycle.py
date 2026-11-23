@@ -284,6 +284,35 @@ def process_claim(store: Store, claim: Claim) -> dict[str, Any]:
         proposal_result = generate_proposals(store, investigation_id=claim.id)
         store.complete_investigation(claim, proposal_result)
         return {"status": "completed", "created_proposals": proposal_result["created_count"]}
+    if action == "selfdev_author":
+        from .improve import author_patch
+
+        proposal_id = str(payload.get("proposal_id") or "")
+        if not proposal_id:
+            store.fail_investigation(claim, "missing proposal_id")
+            return {"status": "failed", "reason": "missing proposal_id"}
+        authored = author_patch(
+            store,
+            proposal_id,
+            provider=str(payload.get("provider") or "ollama"),
+            model=str(payload.get("model") or "qwen2.5-coder:7b"),
+            test=bool(payload.get("test", True)),
+            timeout=float(payload.get("timeout") or 600.0),
+        )
+        store.complete_investigation(
+            claim,
+            {
+                "proposal_id": proposal_id,
+                "patch_id": authored["patch"]["id"],
+                "patch_status": authored["patch"]["status"],
+            },
+        )
+        return {
+            "status": "completed",
+            "proposal_id": proposal_id,
+            "patch_id": authored["patch"]["id"],
+            "patch_status": authored["patch"]["status"],
+        }
     if action == "selfdev_test":
         from .selfdev import test_patch
 

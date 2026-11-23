@@ -18,7 +18,7 @@ from .context import ContextBuilder
 from .demo import build_contract, run_demo
 from .domains import PROFILES, provision_pilot_grants, run_pilot
 from .evidence import EvidenceLedger
-from .improve import apply_proposal, generate_proposals
+from .improve import add_manual_proposal, apply_proposal, author_patch, generate_proposals
 from .keychain import (
     KeychainUnavailable,
     available as keychain_available,
@@ -546,6 +546,17 @@ def cmd_improve(args: argparse.Namespace) -> int:
         if args.action == "propose":
             _emit(generate_proposals(store))
             return 0
+        if args.action == "add":
+            _emit(
+                add_manual_proposal(
+                    store,
+                    args.title,
+                    args.rationale,
+                    args.file or [],
+                    args.check or [],
+                )
+            )
+            return 0
         if args.action == "queue":
             investigation_id = store.enqueue_investigation(
                 title="Generate self-improvement proposals",
@@ -651,6 +662,19 @@ def cmd_selfdev(args: argparse.Namespace) -> int:
                 proposal_id=args.proposal or None,
             )
             _emit({"patch": patch, "next": "selfdev test, independent review, then owner merge"})
+            return 0
+        if args.action == "author":
+            _emit(
+                author_patch(
+                    store,
+                    args.proposal,
+                    provider=args.provider,
+                    model=args.model,
+                    test=args.test,
+                    timeout=args.timeout,
+                ),
+                max_bytes=128 * 1024,
+            )
             return 0
         if args.action == "test":
             if args.queue:
@@ -1023,6 +1047,12 @@ def build_parser() -> argparse.ArgumentParser:
     improve_sub = improve.add_subparsers(dest="action", required=True)
     improve_propose = improve_sub.add_parser("propose", parents=[common])
     improve_propose.set_defaults(func=cmd_improve, action="propose")
+    improve_add = improve_sub.add_parser("add", parents=[common])
+    improve_add.add_argument("--title", required=True)
+    improve_add.add_argument("--rationale", required=True)
+    improve_add.add_argument("--file", action="append")
+    improve_add.add_argument("--check", action="append")
+    improve_add.set_defaults(func=cmd_improve, action="add")
     improve_queue = improve_sub.add_parser("queue", parents=[common])
     improve_queue.set_defaults(func=cmd_improve, action="queue")
     improve_list = improve_sub.add_parser("list", parents=[common])
@@ -1081,7 +1111,7 @@ def build_parser() -> argparse.ArgumentParser:
     model_call = model_sub.add_parser("call", parents=[common])
     model_call.add_argument("--prompt", default="")
     model_call.add_argument("--prompt-file", default="")
-    model_call.add_argument("--provider", default="stub", choices=["stub", "command"])
+    model_call.add_argument("--provider", default="stub", choices=list(PROVIDERS))
     model_call.add_argument("--model", default="")
     model_call.add_argument("--command-json", default="")
     model_call.add_argument("--timeout", type=float, default=60.0)
@@ -1118,6 +1148,13 @@ def build_parser() -> argparse.ArgumentParser:
     selfdev_propose.add_argument("--author", default="agent")
     selfdev_propose.add_argument("--proposal", default="")
     selfdev_propose.set_defaults(func=cmd_selfdev, action="propose")
+    selfdev_author = selfdev_sub.add_parser("author", parents=[common])
+    selfdev_author.add_argument("--proposal", required=True)
+    selfdev_author.add_argument("--provider", default="ollama", choices=list(PROVIDERS))
+    selfdev_author.add_argument("--model", default="qwen2.5-coder:7b")
+    selfdev_author.add_argument("--test", action="store_true")
+    selfdev_author.add_argument("--timeout", type=float, default=600.0)
+    selfdev_author.set_defaults(func=cmd_selfdev, action="author")
     selfdev_test = selfdev_sub.add_parser("test", parents=[common])
     selfdev_test.add_argument("--patch", required=True)
     selfdev_test.add_argument("--timeout", type=float, default=600.0)

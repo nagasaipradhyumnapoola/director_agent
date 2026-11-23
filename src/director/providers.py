@@ -9,6 +9,10 @@ matches, and the model-call budget is available.
 
 from __future__ import annotations
 
+import json
+import os
+import urllib.parse
+import urllib.request
 import uuid
 from typing import Any, Mapping, Sequence
 
@@ -25,9 +29,53 @@ from .security import (
 )
 from .store import BudgetExceeded, Store, utc_now
 
-PROVIDERS = ("stub", "command")
-MAX_PROMPT_CHARS = 16_384
+PROVIDERS = ("stub", "command", "ollama")
+MAX_PROMPT_CHARS = 28_000
 MAX_OUTPUT_CHARS = 32_768
+MAX_HTTP_RESPONSE = 8 * 1024 * 1024
+LOCAL_HOSTS = {"127.0.0.1", "localhost", "::1"}
+
+
+def _ollama_base() -> str:
+    raw = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").strip()
+    if not raw.startswith(("http://", "https://")):
+        raw = "http://" + raw
+    parsed = urllib.parse.urlparse(raw)
+    if parsed.hostname not in LOCAL_HOSTS:
+        raise ValidationError("ollama endpoint must be loopback/local only")
+    return raw.rstrip("/")
+
+
+def _ollama_generate(base: str, model: str, prompt: str, timeout: float) -> dict[str, Any]:
+    payload = json.dumps(
+        {
+            "model": model,
+            "prompt": prompt,
+            "stream": False,
+            "options": {"temperature": 0.15, "num_predict": 4096},
+        }
+    ).encode("utf-8")
+    request = urllib.request.Request(
+        base + "/api/generate",
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    try:
+        with opener.open(request, timeout=min(max(timeout, 5.0), 600.0)) as response:
+            data = response.read(MAX_HTTP_RESPONSE + 1)
+    except Exception as exc:  # noqa: BLE001
+        raise ValidationError("local ollama request failed") from exc
+    if len(data) > MAX_HTTP_RESPONSE:
+        raise BoundsError("ollama response exceeds bound")
+    try:
+        parsed = json.loads(data.decode("utf-8"))
+    except Exception as exc:
+        raise ValidationError("ollama response was not JSON") from exc
+    if not isinstance(parsed, dict) or not isinstance(parsed.get("response"), str):
+        raise ValidationError("ollama response missing text")
+    return parsed
 
 
 def _limit(store: Store, unit: str) -> float:
@@ -69,7 +117,7 @@ def call_model(
     policy.require("director.model", "model_call_local", f"provider:{provider}", revision, payload=payload)
 
     input_tokens = estimate_tokens(prompt)
-    output_reserve = 1024
+    output_reserve = 4096 if provider == "ollama" else 1024
     reservations: list[str] = []
     try:
         reservations.append(store.reserve_budget("model_calls", 1, revision, note=f"model:{provider}"))
@@ -89,10 +137,26 @@ def call_model(
         "input_tokens_estimate": input_tokens,
         "started_at": utc_now(),
     }
+    actual_input = input_tokens
+    actual_output: int | None = None
     try:
         if provider == "stub":
             output = f"[stub:{model or 'default'}] " + prompt[:280]
             limitations = "deterministic local stub; not a real model"
+        elif provider == "ollama":
+            if not model:
+                raise ValidationError("ollama requires a model name")
+            try:
+                parsed = _ollama_generate(_ollama_base(), model, prompt, timeout)
+            except ValidationError:
+                raise
+            output = str(parsed.get("response") or "")
+            actual_output = int(parsed.get("eval_count") or estimate_tokens(output))
+            actual_input = int(parsed.get("prompt_eval_count") or input_tokens)
+            limitations = (
+                "local Ollama model; loopback HTTP only; output is untrusted and "
+                "cannot certify its own work"
+            )
         else:
             runner = Runner(default_timeout=timeout, default_max_output=128 * 1024)
             workspace = runner.create_workspace()
@@ -115,20 +179,23 @@ def call_model(
                 "the command itself must not be trusted with network/secret access"
             )
         output = redact_text(output)[:MAX_OUTPUT_CHARS]
-        output_tokens = estimate_tokens(output)
-        if output_tokens > output_reserve and _limit(store, "output_tokens") > 0:
-            # Do not exceed the reservation; record the overrun as a limitation.
-            output_tokens = output_reserve
-        for index, reservation in enumerate(reservations):
+        if actual_output is None:
+            actual_output = estimate_tokens(output)
+        if actual_output > output_reserve and _limit(store, "output_tokens") > 0:
+            # The local provider may exceed the reserved estimate; record the
+            # overrun rather than silently pretending it was free.
+            limitations += f"; output token overrun {actual_output - output_reserve}"
+        for reservation in reservations:
             unit = store.conn.execute(
                 "SELECT unit FROM budget_reservations WHERE id=?", (reservation,)
             ).fetchone()["unit"]
-            actual = 1 if unit == "model_calls" else (input_tokens if unit == "input_tokens" else output_tokens)
+            actual = 1 if unit == "model_calls" else (actual_input if unit == "input_tokens" else actual_output)
             store.settle_reservation(reservation, actual)
         event_payload.update(
             {
                 "output_sha256": sha256_text(output),
-                "output_tokens_estimate": output_tokens,
+                "input_tokens_actual": actual_input,
+                "output_tokens_actual": actual_output,
                 "outcome": "ok",
                 "finished_at": utc_now(),
             }
@@ -140,8 +207,8 @@ def call_model(
             "output": output,
             "usage": {
                 "model_calls": 1,
-                "input_tokens_estimate": input_tokens,
-                "output_tokens_estimate": output_tokens,
+                "input_tokens": actual_input,
+                "output_tokens": actual_output,
                 "cost_usd": 0.0,
             },
             "event_id": event_id,
