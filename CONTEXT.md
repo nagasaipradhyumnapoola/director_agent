@@ -101,6 +101,10 @@ cannot call a model, spend, edit source, merge, push or deploy. `improve apply`
 returns blocked. Autonomous self-coding requires the M2 sandbox/provider/budget/
 review gates in `docs/SELF_IMPROVEMENT.md`.
 
+## Release commit
+
+867bd2 on origin/main (2026-11-23).
+
 ## Evidence status
 
 v0.1 is implemented and tested on this host for its controlled scope:

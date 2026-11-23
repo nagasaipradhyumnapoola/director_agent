@@ -110,3 +110,10 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 
 M2: opt-in providers/keychain/budget routing, real sandbox, native host tests,
 and the gated self-coding pipeline described in `docs/SELF_IMPROVEMENT.md`.
+
+## Release record
+
+- Commit: 867bd2 (pushed to origin/main on 2026-11-23).
+- Remote: https://github.com/nagasaipradhyumnapoola/director_agent
+- Verified release evidence: docs/build/EVIDENCE.md (59 tests, full demo,
+  zero model calls, independent review fixes).

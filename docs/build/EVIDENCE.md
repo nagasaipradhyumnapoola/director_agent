@@ -137,3 +137,9 @@ Proven on this host, with controlled fixtures:
 Performance/quality claims are fixture-scoped; no comparative productivity study
 or broad benchmark is claimed.
 
+## Release record
+
+- Commit: 867bd2 (pushed to origin/main on 2026-11-23).
+- Remote: https://github.com/nagasaipradhyumnapoola/director_agent
+- Verified release evidence: docs/build/EVIDENCE.md (59 tests, full demo,
+  zero model calls, independent review fixes).
