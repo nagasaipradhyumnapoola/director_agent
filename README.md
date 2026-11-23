@@ -43,7 +43,11 @@ install, use `python -m pip install -e . --no-deps` (build tooling may be needed
 - Bounded context packets with untrusted-content labeling and unknown headroom.
 - FTS5 lexical memory with provenance, taint, deletion and re-ingest.
 - Bounded MCP stdio server (newline JSON-RPC 2.0) with strict argument validation.
-- 24/7 deterministic worker: start/stop/pause/resume, heartbeat, zero model calls.
+- Local model gateway: stub + owner-supplied command providers, gated by
+  contract action, owner grant, budget, secret-prompt rejection and scrubbed
+  runner; no cloud provider or external spend.
+- 24/7 deterministic worker: start/stop/pause/resume, heartbeat, zero model calls
+  (model calls are explicit CLI/owner actions, not idle work).
 - Supervised self-improvement: proposal engine plus `selfdev` execution path
   (patch → isolated git worktree → full tests → independent review → owner merge).
   It has been used to modify DIRECTOR itself; it never auto-pushes.
@@ -108,8 +112,8 @@ See [HARNESS_INTEGRATION.md](docs/HARNESS_INTEGRATION.md).
 
 ```text
 init doctor status contract scan investigate worker findings evidence verify
-waive memory preflight budget improve selfdev adapters pilot demo mcp version
-start stop pause resume recover checkpoint
+waive memory preflight budget grant model improve selfdev adapters pilot demo
+mcp version start stop pause resume recover checkpoint
 ```
 
 Run `python -m director <command> --help` for options.

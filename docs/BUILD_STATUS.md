@@ -1,7 +1,7 @@
 # DIRECTOR build ledger
 
 Release target: **v0.1-supervised-three-domain (M0 + M1)**
-Ledger updated: 2026-11-23
+Ledger updated: 2026-11-24
 Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 
 ## Host audit (observed this session)
@@ -54,20 +54,22 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 - [x] M1 research/document pilot (claims, conflicts, calculation, render)
 - [x] Supervised self-improvement proposal engine (24/7, proposal-only)
 - [x] Supervised self-modification executor (worktree, tests, review, owner merge)
-- [x] 63-test offline suite incl. historical defect regressions and selfdev
+- [x] Local model/provider gateway (stub + owner command) with grant/budget gates
+- [x] 24/7 worker can test queued selfdev patches
+- [x] 70-test offline suite incl. historical defect regressions and selfdev
 - [x] Independent review rounds + fixes
 - [x] Release docs, evidence report, install/uninstall
 
 ## Evidence log (exact commands)
 
-1. `python -m pytest -q` with `PYTHONPATH=src` → **63 passed**, no failures, no
+1. `python -m pytest -q` with `PYTHONPATH=src` → **70 passed**, no failures, no
    skips. Browser test and MCP SDK round-trip both executed.
 2. `python -m director demo --root . --domains general,website,ml,research --modes clean,broken`
    → `expectations: met`, `model calls: 0.0`, exit 0.
    - clean: general/website/ml/research all `pass`, 0 findings.
    - broken: general `fail` (4 findings), website `fail` (13), ML `fail` (2),
      research `fail` (8).
-   - Raw summary: `var/demo/20261123T180920Z-a315be/summary.json` (gitignored).
+   - Raw summary: `var/demo/20261123T183153Z-a8ace1/summary.json` (gitignored).
 3. `python -m director doctor --root var/cli-test` → all core checks ok.
 4. MCP: initialize/tools/list/tools/call over stdio + official SDK
    `ClientSession` round trip; oversized frame rejected before JSON parsing;
@@ -87,7 +89,14 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
    - isolated worktree at base `85d8209`; full suite passed in 99.1s;
    - independent reviewer PASS with patch-integrity verification;
    - owner approval recorded; fast-forward merge commit `f439b16`;
-   - merged tree: 63/63 tests, version command works, no push by the pipeline.
+   - merged tree: 70/70 tests, version command works, no push by the pipeline.
+8. Local model/provider gateway:
+   - default policy denied a local model call with zero spend;
+   - owner grant + contract `model_call_local` + model-call budget enabled the
+     deterministic stub;
+   - an owner-supplied local command ran in the scrubbed runner;
+   - secret-like prompts refused; budget cap enforced; cloud providers disabled;
+   - worker tested a queued selfdev patch (`selfdev test --queue`).
 
 ## Evidence levels (per surface)
 
@@ -101,6 +110,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 | ML pilot | domain-validated on controlled clean/leaky fixtures |
 | Research pilot | domain-validated on controlled conflicting-source fixture |
 | Self-improvement | proposals + supervised selfdev execution tested; provider-driven autonomous authoring NOT implemented |
+| Local model gateway | implemented/tested (stub + command), owner grant/budget gated; cloud NOT implemented |
 | 24/7 worker | detached lifecycle tested; requires running host |
 
 ## Known limitations
@@ -117,6 +127,8 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
   project unchanged".
 - `selfdev` is not a kernel sandbox and does not author patches by itself;
   provider-driven autonomous authoring, push and deploy remain gated.
+- The local model gateway has no cloud provider, credential/keychain path or
+  external spend; the command provider is not a sandbox.
 
 ## Next action
 
@@ -129,5 +141,5 @@ worktree/test/review/owner-merge pipeline.
 - Commit: `f439b16` (selfdev merge) after `85d8209` (pipeline), pushed to
   `origin/main` on 2026-11-23.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: docs/build/EVIDENCE.md (63 tests, full demo,
+- Verified release evidence: docs/build/EVIDENCE.md (70 tests, full demo,
   zero model calls, independent review fixes).

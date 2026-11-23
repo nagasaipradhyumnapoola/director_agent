@@ -284,6 +284,27 @@ def process_claim(store: Store, claim: Claim) -> dict[str, Any]:
         proposal_result = generate_proposals(store, investigation_id=claim.id)
         store.complete_investigation(claim, proposal_result)
         return {"status": "completed", "created_proposals": proposal_result["created_count"]}
+    if action == "selfdev_test":
+        from .selfdev import test_patch
+
+        patch_id = str(payload.get("patch_id") or "")
+        if not patch_id:
+            store.fail_investigation(claim, "missing patch_id")
+            return {"status": "failed", "reason": "missing patch_id"}
+        patch_result = test_patch(store, patch_id, timeout=600.0)
+        store.complete_investigation(
+            claim,
+            {
+                "patch_id": patch_id,
+                "status": patch_result["status"],
+                "evidence_id": patch_result.get("evidence_id"),
+            },
+        )
+        return {
+            "status": "completed",
+            "patch_id": patch_id,
+            "patch_status": patch_result["status"],
+        }
     if action == "noop":
         store.complete_investigation(claim, {"result": "noop"})
         return {"status": "completed"}
@@ -292,7 +313,7 @@ def process_claim(store: Store, claim: Claim) -> dict[str, Any]:
 
 
 def process_one(store: Store, worker: str = "worker") -> dict[str, Any]:
-    claim = store.claim_next(worker, lease_seconds=120)
+    claim = store.claim_next(worker, lease_seconds=300)
     if claim is None:
         return {"claimed": False}
     try:

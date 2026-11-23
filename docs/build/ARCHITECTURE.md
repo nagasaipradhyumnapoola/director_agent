@@ -39,6 +39,7 @@ MCP stdio / CLI / 24/7 worker
 | `lifecycle.py` | detached worker, heartbeat, pause/resume/stop, recovery |
 | `improve.py` | deterministic self-improvement proposals (proposal-only) |
 | `selfdev.py` | patch allowlist, isolated worktree, tests, review, owner merge |
+| `providers.py` | local stub/command model gateway, policy + budget gated |
 | `mcp_server.py` | bounded newline JSON-RPC 2.0 stdio MCP server |
 | `adapter.py` / `opencode_adapter.py` | generated host configs, never auto-enabled |
 | `domains/` | pilot profiles and evaluators |
@@ -115,8 +116,13 @@ sandbox.
 ## 24/7 improvement and self-modification
 
 `director start` runs a detached deterministic worker: scans, proposal
-generation, heartbeat, recovery, zero model calls. Proposals are durable and
-owner-approved only.
+generation, queued selfdev patch testing, heartbeat, recovery, zero idle model
+calls. Proposals are durable and owner-approved only.
+
+The local model gateway (`providers.py`) is explicit, not idle: the contract
+must enable `model_call_local`, an owner grant must match, and a model-call
+budget must be available. It supports a deterministic stub and an
+owner-supplied local command; cloud providers/credentials are not implemented.
 
 `director selfdev` is the supervised code-application path: allowlisted patch ->
 disposable git worktree at a recorded base -> full offline tests -> independent

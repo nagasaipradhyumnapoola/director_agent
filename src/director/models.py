@@ -23,6 +23,7 @@ KNOWN_ACTIONS = (
     "launch_browser",
     "network_read",
     "model_call",
+    "model_call_local",
     "external_send",
     "deploy",
     "delete",

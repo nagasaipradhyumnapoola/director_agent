@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from director.evidence import EvidenceLedger
+from director.lifecycle import process_one
 from director.security import ValidationError
 from director.selfdev import create_patch, merge_patch, record_review, test_patch as run_patch_tests
 from director.store import Store
@@ -45,6 +46,10 @@ def _repo(tmp_path: Path) -> tuple[Store, Path]:
     (root / ".gitignore").write_text(".director/\nvar/\n__pycache__/\n.pytest_cache/\n", encoding="utf-8")
     (root / "src").mkdir()
     (root / "src" / "x.py").write_bytes(b"value = 1\n")
+    (root / "tests").mkdir()
+    (root / "tests" / "test_smoke.py").write_text(
+        "def test_smoke():\n    assert True\n", encoding="utf-8", newline="\n"
+    )
     _git(root, "add", "-A")
     _git(root, "commit", "-m", "init")
     store = Store.open_or_create(root, "selfdev")
@@ -91,6 +96,25 @@ def test_patch_rejects_disallowed_paths_and_binary(tmp_path):
             create_patch(store, BAD_PATCH, "research edit")
         with pytest.raises(ValidationError):
             create_patch(store, "GIT binary patch\n", "binary")
+    finally:
+        store.close()
+
+
+def test_worker_can_test_a_queued_patch(tmp_path):
+    store, _root = _repo(tmp_path)
+    try:
+        patch = create_patch(store, PATCH, "worker tested patch")
+        store.enqueue_investigation(
+            "test queued patch",
+            "worktree tests decide the state",
+            payload={"action": "selfdev_test", "patch_id": patch["id"]},
+            dedupe_key="selfdev:test:worker",
+        )
+        result = process_one(store, worker="worker-test")
+        assert result["claimed"] is True
+        assert result["status"] == "completed"
+        assert store.get_patch(patch["id"])["status"] == "tested"
+        assert store.list_investigations(status="completed")
     finally:
         store.close()
 

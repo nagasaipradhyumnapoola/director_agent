@@ -20,6 +20,7 @@ Provider-driven autonomous patch authoring and push/deploy are still gated.
 - runs deterministic scans;
 - generates improvement proposals from findings, stale evidence, unmet criteria,
   blocked pilots and failed investigations;
+- tests queued `selfdev` patches in isolated worktrees (`selfdev test --queue`);
 - writes a heartbeat, honours `pause`/`resume`/`stop`, and records checkpoints;
 - survives restarts and reconciles expired leases.
 
@@ -89,6 +90,10 @@ The pipeline was used to modify DIRECTOR itself:
 
 The author was this agent; no provider spend or automatic push occurred. This
 is real supervised self-modification, not autonomous provider-driven coding.
+
+The local model gateway (stub + owner command) is the next building block for
+provider-driven authoring, but cloud providers/credentials remain disabled and
+default-denied by policy and budget.
 
 ## Why provider-driven autonomous self-coding is still gated
 

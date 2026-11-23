@@ -22,6 +22,8 @@ Evidence levels are not interchangeable:
 | Research/document pilot | **domain-validated** | controlled conflicting dated sources; HTML render inspected; DOCX optional |
 | Self-improvement proposals | implemented, tested | proposal-only, owner approval, zero model calls |
 | Supervised selfdev executor | implemented, integration tested | path allowlist, isolated worktree, full tests, independent review record, owner merge; no push; provider authoring NOT implemented |
+| Local model gateway | implemented, tested | stub + owner command provider; contract action + owner grant + budget; secret-prompt refusal; cloud providers/credentials NOT implemented |
+| 24/7 patch testing | implemented, integration tested | worker claims queued `selfdev_test` jobs and records evidence |
 | 24/7 worker | implemented, integration tested | detached start/heartbeat/pause/resume/stop; requires running host |
 | Autonomous provider routing | designed only (M2) | not implemented; zero spend default |
 | Native hooks/plugins for hosts | designed only | no host plugin installed; MCP is the tested boundary |

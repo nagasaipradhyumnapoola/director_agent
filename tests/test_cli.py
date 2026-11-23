@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 
 from director import cli
+from director.models import Budgets, PermissionPolicy
+from tests.helpers import make_contract
 
 
 def _json_output(capsys) -> dict:
@@ -48,6 +50,56 @@ def test_cli_init_scan_queue_worker_memory_adapters(tmp_path, capsys):
     assert cli.main(["adapters", "generate", "--root", str(root), "--host", "generic", "--out", ".mcp"]) == 2
     capsys.readouterr()
     assert cli.main(["verify", "--root", str(root)]) == 2
+
+
+def test_cli_model_providers_are_local_and_gated(tmp_path, capsys):
+    root = tmp_path / "model"
+    root.mkdir()
+    assert cli.main(["init", "--root", str(root), "--name", "model", "--domain", "general"]) == 0
+    capsys.readouterr()
+    assert cli.main(["model", "providers", "--root", str(root)]) == 0
+    payload = _json_output(capsys)
+    assert payload["providers"] == ["stub", "command"]
+    assert "disabled" in payload["cloud_providers"]
+
+
+def test_cli_owner_grant_then_local_stub_model(tmp_path, capsys):
+    root = tmp_path / "model-call"
+    root.mkdir()
+    contract = make_contract(
+        "PLACEHOLDER",
+        permissions=PermissionPolicy(allowed_actions=("read_artifact", "model_call_local")),
+        budgets=Budgets(max_model_calls=1, max_wall_seconds=60),
+    )
+    contract_path = root / "contract.json"
+    contract_path.write_text(json.dumps(contract.to_dict()), encoding="utf-8")
+    assert cli.main(["init", "--root", str(root), "--contract", str(contract_path)]) == 0
+    capsys.readouterr()
+    assert cli.main(["model", "call", "--root", str(root), "--prompt", "denied"]) != 0
+    capsys.readouterr()
+    assert (
+        cli.main(
+            [
+                "grant",
+                "add",
+                "--root",
+                str(root),
+                "--actor",
+                "director.model",
+                "--grant-action",
+                "model_call_local",
+                "--resource",
+                "provider:stub",
+            ]
+        )
+        == 0
+    )
+    capsys.readouterr()
+    assert cli.main(["model", "call", "--root", str(root), "--prompt", "hello", "--provider", "stub"]) == 0
+    payload = _json_output(capsys)
+    assert payload["provider"] == "stub"
+    assert "hello" in payload["output"]
+    assert payload["usage"]["model_calls"] == 1
 
 
 def test_cli_broken_project_and_improvement_gate(tmp_path, capsys):

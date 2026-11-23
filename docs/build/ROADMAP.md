@@ -12,6 +12,9 @@ milestones are designed, not shipped.
 - Model proposals remain untrusted; deterministic checks and owner decisions
   stay authoritative.
 - Gate: keychain + budget + provider tests; no hidden fallback spend.
+- Shipped partial: local stub/command gateway with contract/grant/budget gates
+  and secret-prompt refusal. Cloud providers, keychain, autonomous authoring and
+  external spend remain gated.
 
 ## M2.5 - self-improvement execution
 

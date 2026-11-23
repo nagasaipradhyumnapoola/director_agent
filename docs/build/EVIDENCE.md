@@ -1,6 +1,6 @@
 # Release evidence â€” v0.1-supervised-three-domain
 
-Date: 2026-11-23
+Date: 2026-11-24
 Platform: Windows 11, PowerShell 5.1, Python 3.14.4, SQLite 3.50.4,
 Node 24.14.1, Chrome 158.0.8127.36, `mcp` SDK 1.29.0, pytest 9.1.1.
 
@@ -15,7 +15,7 @@ Command:
 $env:PYTHONPATH="src"; python -m pytest
 ```
 
-Result: **63 passed in 89.04s**, no failures, no skips. The browser (real
+Result: **70 passed in 100.17s**, no failures, no skips. The browser (real
 Chromium/CDP) and MCP SDK tests executed; they were not skipped.
 
 Coverage highlights:
@@ -30,7 +30,9 @@ Coverage highlights:
 - ML leakage/held-out/reproducibility, fixture threshold tampering, stdlib
   shadowing;
 - research NaN/oversized tolerance, missing citations, rendered artifacts;
-- detached worker heartbeat/stop and lease recovery.
+- detached worker heartbeat/stop and lease recovery;
+- local model default deny, owner grant + budget, command provider, secret prompt;
+- selfdev patch allowlist/worktree/test/review/merge and queued patch testing.
 
 ## 2. Full controlled demo
 
@@ -50,7 +52,7 @@ Observed (`demo.txt`):
 | research | pass | fail | 8 |
 
 `expectations: met`; `model calls: 0.0`; exit 0.
-Run id `20261123T180920Z-a315be`; raw summary copied to
+Run id `20261123T183153Z-a8ace1`; raw summary copied to
 `demo-summary.json`.
 
 Discrimination details:
@@ -100,9 +102,22 @@ external network off, trust boundary checks, MCP SDK, Node, Chrome.
   99.1s (exit 0). Raw: selfdev-test.txt, diff: selfdev-version.patch.
 - Independent reviewer returned **PASS**, verified reverse-apply integrity and
   ran the targeted test; only low non-blocking notes.
-- Owner approval recorded; local fast-forward merge commit 439b16.
-- Merged tree: 63/63 tests, python -m director version --json works.
+- Owner approval recorded; local fast-forward merge commit f439b16.
+- Merged tree: 70/70 tests, python -m director version --json works.
 - The pipeline did not push; the release push was a separate owner action.
+
+## 4d. Local model/provider gateway and 24/7 patch testing
+
+- Default deny: a local model call failed policy before any budget spend.
+- Owner grant + model_call_local contract action + model-call budget enabled
+  the deterministic stub provider; usage recorded and the third call hit the
+  budget cap.
+- The command provider ran an owner-supplied local Python command in the
+  scrubbed runner (prompt -> uppercase) with no external provider.
+- Secret-like prompts are refused before any call.
+- selfdev test --queue enqueues patch testing; the worker claimed it and
+  completed the patch test with evidence.
+- Cloud providers, provider credentials and external spend remain disabled.
 
 ## 5. Independent review
 
@@ -143,7 +158,7 @@ Proven on this host, with controlled fixtures:
 - General domain support, production readiness or a security audit.
 - Kernel/container isolation; process-level containment only.
 - Native host tool-call integration for any agent.
-- Live web research freshness, provider routing/spend, A2A, computer-use.
+- Live web research freshness, cloud provider routing/spend, A2A, computer-use.
 - Billion-token memory scale or semantic memory.
 - Provider-driven autonomous patch authoring; `improve apply` is blocked and
   `selfdev` needs an agent/human-authored patch.
@@ -157,5 +172,5 @@ or broad benchmark is claimed.
 - Commits: `f439b16` (selfdev merge) after `85d8209` (pipeline), pushed to
   `origin/main` on 2026-11-23.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: 63 tests, full demo, zero model calls, independent
+- Verified release evidence: 70 tests, full demo, zero model calls, independent
   review fixes, one merged selfdev patch.

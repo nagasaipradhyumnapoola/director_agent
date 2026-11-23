@@ -17,6 +17,8 @@ from .demo import build_contract, run_demo
 from .domains import PROFILES, provision_pilot_grants, run_pilot
 from .evidence import EvidenceLedger
 from .improve import apply_proposal, generate_proposals
+from .policy import PolicyDenied, PolicyGateway
+from .providers import PROVIDERS, call_model
 from .selfdev import (
     cleanup as selfdev_cleanup,
     create_patch,
@@ -38,7 +40,7 @@ from .lifecycle import (
 )
 from .mcp_server import open_store_from_db, serve as mcp_serve
 from .memory import MemoryIndex
-from .models import SUPPORTED_DOMAINS, TaskContract
+from .models import KNOWN_ACTIONS, SUPPORTED_DOMAINS, TaskContract
 from .security import (
     BoundsError,
     SafetyError,
@@ -564,6 +566,54 @@ def cmd_improve(args: argparse.Namespace) -> int:
         store.close()
 
 
+def cmd_model(args: argparse.Namespace) -> int:
+    root = _root(args)
+    store = _open(root)
+    try:
+        if args.action == "providers":
+            _emit(
+                {
+                    "providers": list(PROVIDERS),
+                    "default": "stub",
+                    "cloud_providers": "disabled (no provider spend/credentials in v0.1)",
+                    "gate": "contract model_call_local + owner grant + model-call budget",
+                    "note": "command provider runs a local owner-supplied command in the supervised runner; not a sandbox",
+                }
+            )
+            return 0
+        if args.action != "call":
+            raise ValidationError("unknown model action")
+        if bool(args.prompt) == bool(args.prompt_file):
+            raise ValidationError("provide exactly one of --prompt or --prompt-file")
+        if args.prompt_file:
+            path = Path(args.prompt_file)
+            if not path.is_absolute():
+                path = root / path
+            st = path.stat()
+            if st.st_size > 16 * 1024:
+                raise BoundsError("prompt file exceeds 16KB")
+            prompt = path.read_text(encoding="utf-8")
+        else:
+            prompt = args.prompt
+        command = None
+        if args.command_json:
+            command = json.loads(args.command_json)
+            if not isinstance(command, list):
+                raise ValidationError("command-json must be a JSON list")
+        result = call_model(
+            store,
+            prompt,
+            provider=args.provider,
+            model=args.model or None,
+            command=command,
+            timeout=args.timeout,
+        )
+        _emit(result, max_bytes=128 * 1024)
+        return 0
+    finally:
+        store.close()
+
+
 def cmd_selfdev(args: argparse.Namespace) -> int:
     root = _root(args)
     store = _open(root)
@@ -586,6 +636,17 @@ def cmd_selfdev(args: argparse.Namespace) -> int:
             _emit({"patch": patch, "next": "selfdev test, independent review, then owner merge"})
             return 0
         if args.action == "test":
+            if args.queue:
+                investigation_id = store.enqueue_investigation(
+                    title="Test self-development patch",
+                    hypothesis="An isolated worktree test will decide whether this patch is safe to review.",
+                    domain="general",
+                    priority=0.7,
+                    payload={"action": "selfdev_test", "patch_id": args.patch},
+                    dedupe_key=f"selfdev:test:{args.patch}",
+                )
+                _emit({"investigation_id": investigation_id, "status": "queued", "patch_id": args.patch})
+                return 0
             _emit(test_patch(store, args.patch, timeout=args.timeout))
             return 0
         if args.action == "review":
@@ -632,6 +693,46 @@ def cmd_version(args: argparse.Namespace) -> int:
         }
     )
     return 0
+
+
+def cmd_grant(args: argparse.Namespace) -> int:
+    root = _root(args)
+    store = _open(root)
+    try:
+        if args.grant_command == "list":
+            _emit({"grants": store.list_grants(include_revoked=args.all)})
+            return 0
+        if args.grant_command == "revoke":
+            store.revoke_grant(args.grant)
+            _emit({"revoked": args.grant})
+            return 0
+        if args.grant_command != "add":
+            raise ValidationError("unknown grant action")
+        latest = store.latest_contract()
+        if not latest:
+            raise ValidationError("no contract saved")
+        revision = int(args.task_revision or latest[0]["revision"])
+        limits = json.loads(args.limits)
+        if not isinstance(limits, dict):
+            raise ValidationError("limits must be a JSON object")
+        payload = json.loads(args.payload_json) if args.payload_json else None
+        if payload is not None and not isinstance(payload, dict):
+            raise ValidationError("payload-json must be a JSON object")
+        grant_id = PolicyGateway(store).grant(
+            actor=args.actor,
+            action=args.grant_action,
+            resource=args.resource,
+            task_revision=revision,
+            limits=limits,
+            effect=args.effect,
+            expires_at=args.expires_at or None,
+            payload=payload,
+            approved_by="owner",
+        )
+        _emit({"grant_id": grant_id, "actor": args.actor, "action": args.grant_action, "resource": args.resource})
+        return 0
+    finally:
+        store.close()
 
 
 def cmd_mcp(args: argparse.Namespace) -> int:
@@ -828,6 +929,38 @@ def build_parser() -> argparse.ArgumentParser:
     improve_apply.add_argument("proposal")
     improve_apply.set_defaults(func=cmd_improve, action="apply")
 
+    model = sub.add_parser("model", parents=[common], help="local model/provider gateway")
+    model_sub = model.add_subparsers(dest="action", required=True)
+    model_providers = model_sub.add_parser("providers", parents=[common])
+    model_providers.set_defaults(func=cmd_model, action="providers")
+    model_call = model_sub.add_parser("call", parents=[common])
+    model_call.add_argument("--prompt", default="")
+    model_call.add_argument("--prompt-file", default="")
+    model_call.add_argument("--provider", default="stub", choices=["stub", "command"])
+    model_call.add_argument("--model", default="")
+    model_call.add_argument("--command-json", default="")
+    model_call.add_argument("--timeout", type=float, default=60.0)
+    model_call.set_defaults(func=cmd_model, action="call")
+
+    grant = sub.add_parser("grant", parents=[common], help="owner grant management")
+    grant_sub = grant.add_subparsers(dest="grant_command", required=True)
+    grant_add = grant_sub.add_parser("add", parents=[common])
+    grant_add.add_argument("--actor", required=True)
+    grant_add.add_argument("--grant-action", required=True, choices=list(KNOWN_ACTIONS))
+    grant_add.add_argument("--resource", required=True)
+    grant_add.add_argument("--effect", default="allow", choices=["allow", "deny"])
+    grant_add.add_argument("--task-revision", type=int, default=0)
+    grant_add.add_argument("--limits", default="{}")
+    grant_add.add_argument("--payload-json", default="")
+    grant_add.add_argument("--expires-at", default="")
+    grant_add.set_defaults(func=cmd_grant)
+    grant_list = grant_sub.add_parser("list", parents=[common])
+    grant_list.add_argument("--all", action="store_true")
+    grant_list.set_defaults(func=cmd_grant)
+    grant_revoke = grant_sub.add_parser("revoke", parents=[common])
+    grant_revoke.add_argument("--grant", required=True)
+    grant_revoke.set_defaults(func=cmd_grant)
+
     selfdev = sub.add_parser(
         "selfdev",
         parents=[common],
@@ -843,6 +976,7 @@ def build_parser() -> argparse.ArgumentParser:
     selfdev_test = selfdev_sub.add_parser("test", parents=[common])
     selfdev_test.add_argument("--patch", required=True)
     selfdev_test.add_argument("--timeout", type=float, default=600.0)
+    selfdev_test.add_argument("--queue", action="store_true", help="let the 24/7 worker run the test")
     selfdev_test.set_defaults(func=cmd_selfdev, action="test")
     selfdev_review = selfdev_sub.add_parser("review", parents=[common])
     selfdev_review.add_argument("--patch", required=True)
@@ -935,7 +1069,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return int(args.func(args))
-    except (ValidationError, SafetyError, StoreError, BudgetExceeded, NotFoundError, ConflictError, OSError) as exc:
+    except (ValidationError, SafetyError, StoreError, BudgetExceeded, NotFoundError, ConflictError, PolicyDenied, OSError) as exc:
         print("error: " + safe_error_message(exc), file=sys.stderr)
         return 2
     except KeyboardInterrupt:

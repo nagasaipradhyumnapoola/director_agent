@@ -135,6 +135,7 @@ Supervised execution (agent/human-authored patch):
 ```powershell
 python -m director selfdev propose --file change.patch --title "Add X"
 python -m director selfdev test --patch <id>
+python -m director selfdev test --patch <id> --queue   # 24/7 worker tests it
 python -m director selfdev review --patch <id> --verdict pass --reviewer "reviewer" --notes "..."
 python -m director selfdev merge --patch <id> --reason "owner approved"
 python -m director selfdev list
@@ -170,6 +171,29 @@ python -m director budget set --unit wall_seconds --limit 600
 ```
 
 Reservations are atomic. Exhaustion blocks work rather than over-spending.
+
+## Owner grants and local models
+
+Local model calls are default-denied. The contract must enable
+`model_call_local`, an owner grant must match, and a model-call budget must be
+available:
+
+```powershell
+python -m director grant add --actor director.model --grant-action model_call_local --resource provider:stub
+python -m director model providers
+python -m director model call --prompt "Summarize the current status" --provider stub
+```
+
+For an owner-supplied local command (no cloud provider):
+
+```powershell
+python -m director grant add --actor director.model --grant-action model_call_local --resource provider:command
+python -m director model call --prompt "hello" --provider command --command-json '["python","-c","import sys; print(sys.argv[-1].upper())"]'
+```
+
+Prompts containing secret-like values are refused. The command runs in the
+scrubbed runner with output/time caps; it is not a sandbox. Cloud providers,
+credentials and external spend are not implemented.
 
 ## MCP and host adapters
 

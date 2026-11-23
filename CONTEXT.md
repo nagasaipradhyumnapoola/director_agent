@@ -60,6 +60,7 @@ src/director/
   lifecycle.py     detached worker, heartbeat, recovery
   improve.py       proposal-only self-improvement engine
   selfdev.py       patch -> isolated worktree -> tests -> review -> owner merge
+  providers.py     local stub/command model gateway (gated, no cloud)
   domains/         base, website, ml, research pilots
 fixtures/          controlled broken/clean pilot fixtures
 tests/             offline tests (browser/MCP opt-in markers)
@@ -90,10 +91,12 @@ python -m director adapters generate --host opencode --out .opencode
 python -m director pilot run --domain website|ml|research --fixture <dir>
 python -m director improve propose
 python -m director improve list
+python -m director grant add --actor director.model --grant-action model_call_local --resource provider:stub
+python -m director model call --prompt "..." --provider stub
 python -m director start          # 24/7 deterministic worker
 python -m director stop
 python -m director selfdev propose --file patch.diff --title "..."
-python -m director selfdev test --patch <id>
+python -m director selfdev test --patch <id> [--queue]
 python -m director selfdev review --patch <id> --verdict pass --reviewer <name>
 python -m director selfdev merge --patch <id>
 python -m director version
@@ -105,14 +108,18 @@ Run `python -m director --help` for the authoritative list.
 
 ## Self-improvement (current boundary)
 
-The 24/7 worker is deterministic and proposal-only; it generates prioritized
-proposals, approvals and heartbeats without model calls or spend.
+The 24/7 worker is deterministic: it generates prioritized proposals, tests
+queued selfdev patches, writes heartbeats and never makes idle model calls.
 
 A supervised execution path exists: `director selfdev` accepts an
 agent/human-authored patch, applies it in an isolated git worktree, runs the
 full offline suite, requires an independent review record and owner approval,
-then fast-forwards the merge. It never pushes/deploys. `improve apply` remains
-blocked; provider-driven autonomous authoring is not claimed.
+then fast-forwards the merge. It never pushes/deploys.
+
+`providers.py` adds a local model gateway (deterministic stub + owner-supplied
+command) gated by contract `model_call_local`, an owner grant, budget and
+secret-prompt refusal. Cloud providers/credentials/spend remain disabled.
+Provider-driven autonomous authoring is not claimed; `improve apply` is blocked.
 
 ## Release commit
 
@@ -121,7 +128,7 @@ blocked; provider-driven autonomous authoring is not claimed.
 ## Evidence status
 
 v0.1 is implemented and tested on this host for its controlled scope:
-- 63 offline tests pass (including a real Chromium/CDP website journey, the
+- 70 offline tests pass (including a real Chromium/CDP website journey, the
   official MCP SDK round trip, and the selfdev worktree pipeline).
 - `python -m director demo ... --modes clean,broken`: all clean fixtures pass,
   all broken fixtures fail, zero model calls.
