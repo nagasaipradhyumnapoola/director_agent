@@ -169,8 +169,8 @@ or broad benchmark is claimed.
 
 ## Release record
 
-- Commits: `f439b16` (selfdev merge) after `85d8209` (pipeline), pushed to
-  `origin/main` on 2026-11-23.
+- Commits: `5606419` (local model gateway/grants) after `f439b16` (selfdev
+  merge) and `85d8209` (pipeline), pushed to `origin/main` on 2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
 - Verified release evidence: 70 tests, full demo, zero model calls, independent
   review fixes, one merged selfdev patch.

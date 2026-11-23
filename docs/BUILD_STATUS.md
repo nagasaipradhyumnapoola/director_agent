@@ -138,8 +138,8 @@ worktree/test/review/owner-merge pipeline.
 
 ## Release record
 
-- Commit: `f439b16` (selfdev merge) after `85d8209` (pipeline), pushed to
-  `origin/main` on 2026-11-23.
+- Commit: `5606419` (local model gateway/grants) after `f439b16` (selfdev
+  merge) and `85d8209` (pipeline), pushed to `origin/main` on 2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
 - Verified release evidence: docs/build/EVIDENCE.md (70 tests, full demo,
   zero model calls, independent review fixes).

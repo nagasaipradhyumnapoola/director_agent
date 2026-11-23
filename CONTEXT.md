@@ -123,7 +123,8 @@ Provider-driven autonomous authoring is not claimed; `improve apply` is blocked.
 
 ## Release commit
 
-`f439b16` on `origin/main` (2026-11-23); earlier release `f867bd2`.
+`5606419` on `origin/main` (2026-11-24); earlier `f439b16` (selfdev) and
+`f867bd2` (v0.1).
 
 ## Evidence status
 
