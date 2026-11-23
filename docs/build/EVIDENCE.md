@@ -15,7 +15,7 @@ Command:
 $env:PYTHONPATH="src"; python -m pytest
 ```
 
-Result: **70 passed in 100.17s**, no failures, no skips. The browser (real
+Result: **70 passed in 98.28s**, no failures, no skips. The browser (real
 Chromium/CDP) and MCP SDK tests executed; they were not skipped.
 
 Coverage highlights:
@@ -169,8 +169,9 @@ or broad benchmark is claimed.
 
 ## Release record
 
-- Commits: `5606419` (local model gateway/grants) after `f439b16` (selfdev
-  merge) and `85d8209` (pipeline), pushed to `origin/main` on 2026-11-24.
+- Commits: `e58dcb6` (final docs/evidence) after `5606419` (local model
+  gateway/grants), `f439b16` (selfdev) and `85d8209` (pipeline), pushed to
+  `origin/main` on 2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
 - Verified release evidence: 70 tests, full demo, zero model calls, independent
   review fixes, one merged selfdev patch.
