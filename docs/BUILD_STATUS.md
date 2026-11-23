@@ -153,8 +153,8 @@ worktree/test/review/owner-merge pipeline.
 
 ## Release record
 
-- Commit: `e58dcb6` (final docs/evidence) after `5606419` (local model
-  gateway/grants), `f439b16` (selfdev) and `85d8209` (pipeline), pushed to
+- Commit: `eac3c39` (v1.0.0 production hardening) after `5606419` (local
+  model gateway/grants), `f439b16` (selfdev) and `85d8209` (pipeline), pushed to
   `origin/main` on 2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
 - Verified release evidence: docs/build/EVIDENCE.md (73 tests, full demo,
