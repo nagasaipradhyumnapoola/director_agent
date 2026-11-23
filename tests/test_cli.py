@@ -73,3 +73,9 @@ def test_cli_broken_project_and_improvement_gate(tmp_path, capsys):
     assert applied["status"] == "blocked"
     assert applied["code_write_allowed"] is False
 
+def test_cli_version(capsys):
+    assert cli.main(["version", "--root", "."]) == 0
+    payload = _json_output(capsys)
+    assert payload["release_target"] == "v0.1-supervised-three-domain"
+    assert payload["version"]
+

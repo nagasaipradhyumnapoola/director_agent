@@ -623,6 +623,17 @@ def cmd_selfdev(args: argparse.Namespace) -> int:
         store.close()
 
 
+def cmd_version(args: argparse.Namespace) -> int:
+    _emit(
+        {
+            "version": __version__,
+            "release_target": RELEASE_TARGET,
+            "python": sys.version.split()[0],
+        }
+    )
+    return 0
+
+
 def cmd_mcp(args: argparse.Namespace) -> int:
     path = Path(args.db).resolve()
     if not path.is_file():
@@ -894,6 +905,10 @@ def build_parser() -> argparse.ArgumentParser:
     demo.add_argument("--modes", default="clean,broken")
     demo.add_argument("--json", action="store_true")
     demo.set_defaults(func=cmd_demo)
+
+    version_cmd = sub.add_parser("version", parents=[common], help="print version metadata")
+    version_cmd.add_argument("--json", action="store_true")
+    version_cmd.set_defaults(func=cmd_version)
 
     mcp = sub.add_parser("mcp", help="MCP stdio adapter")
     mcp_sub = mcp.add_subparsers(dest="action", required=True)
