@@ -1,0 +1,433 @@
+{
+  "schema": "director.benchmark.v1",
+  "created_at": "2026-11-23T19:54:10+00:00",
+  "director_version": "1.0.0",
+  "release_target": "v1.0.0-local-supervised",
+  "python": "3.14.4",
+  "platform": "win32",
+  "results": {
+    "domains": {
+      "benchmark": "domain_detection",
+      "domains": [
+        "general",
+        "ml",
+        "research",
+        "website"
+      ],
+      "modes": [
+        "clean",
+        "broken"
+      ],
+      "cases": 8,
+      "correct_discriminations": 8,
+      "accuracy": 1.0,
+      "wall_seconds": 52.891,
+      "model_calls": 0.0,
+      "run_root": "C:\\Users\\poola\\AppData\\Local\\Temp\\director-bench-zj2f6x75\\demo-repo\\var\\demo\\20261123T195410Z-dc2aa0",
+      "rows": [
+        {
+          "domain": "general",
+          "mode": "clean",
+          "status": "pass",
+          "findings": 0,
+          "duration_seconds": 0.0,
+          "checks": [
+            {
+              "key": "artifact.scan",
+              "outcome": "pass",
+              "passed": true
+            }
+          ]
+        },
+        {
+          "domain": "ml",
+          "mode": "clean",
+          "status": "pass",
+          "findings": 0,
+          "duration_seconds": 15.008,
+          "checks": [
+            {
+              "key": "ml.manifest",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "ml.leakage",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "ml.heldout",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "ml.reproducible",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "ml.slices",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "ml.resources",
+              "outcome": "pass",
+              "passed": true
+            }
+          ]
+        },
+        {
+          "domain": "research",
+          "mode": "clean",
+          "status": "pass",
+          "findings": 0,
+          "duration_seconds": 0.58,
+          "checks": [
+            {
+              "key": "research.sources",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "research.claims",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "research.calculation",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "research.conflicts",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "research.render",
+              "outcome": "pass",
+              "passed": true
+            }
+          ]
+        },
+        {
+          "domain": "website",
+          "mode": "clean",
+          "status": "pass",
+          "findings": 0,
+          "duration_seconds": 8.996,
+          "checks": [
+            {
+              "key": "website.static",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "website.journey",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "website.keyboard",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "website.mobile",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "website.network",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "website.a11y",
+              "outcome": "pass",
+              "passed": true
+            }
+          ]
+        },
+        {
+          "domain": "general",
+          "mode": "broken",
+          "status": "fail",
+          "findings": 4,
+          "duration_seconds": 0.0,
+          "checks": [
+            {
+              "key": "artifact.scan",
+              "outcome": "fail",
+              "passed": false
+            }
+          ]
+        },
+        {
+          "domain": "ml",
+          "mode": "broken",
+          "status": "fail",
+          "findings": 2,
+          "duration_seconds": 17.785,
+          "checks": [
+            {
+              "key": "ml.manifest",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "ml.leakage",
+              "outcome": "fail",
+              "passed": false
+            },
+            {
+              "key": "ml.heldout",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "ml.reproducible",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "ml.slices",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "ml.resources",
+              "outcome": "pass",
+              "passed": true
+            }
+          ]
+        },
+        {
+          "domain": "research",
+          "mode": "broken",
+          "status": "fail",
+          "findings": 8,
+          "duration_seconds": 0.131,
+          "checks": [
+            {
+              "key": "research.sources",
+              "outcome": "pass",
+              "passed": true
+            },
+            {
+              "key": "research.claims",
+              "outcome": "fail",
+              "passed": false
+            },
+            {
+              "key": "research.calculation",
+              "outcome": "fail",
+              "passed": false
+            },
+            {
+              "key": "research.conflicts",
+              "outcome": "fail",
+              "passed": false
+            },
+            {
+              "key": "research.render",
+              "outcome": "fail",
+              "passed": false
+            }
+          ]
+        },
+        {
+          "domain": "website",
+          "mode": "broken",
+          "status": "fail",
+          "findings": 13,
+          "duration_seconds": 9.783,
+          "checks": [
+            {
+              "key": "website.static",
+              "outcome": "fail",
+              "passed": false
+            },
+            {
+              "key": "website.journey",
+              "outcome": "fail",
+              "passed": false
+            },
+            {
+              "key": "website.keyboard",
+              "outcome": "fail",
+              "passed": false
+            },
+            {
+              "key": "website.mobile",
+              "outcome": "fail",
+              "passed": false
+            },
+            {
+              "key": "website.network",
+              "outcome": "fail",
+              "passed": false
+            },
+            {
+              "key": "website.a11y",
+              "outcome": "fail",
+              "passed": false
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "controlled fixtures only; not general domain competence",
+        "website depends on local Chromium/CDP"
+      ]
+    },
+    "retrieval": {
+      "benchmark": "lexical_retrieval",
+      "tiers": [
+        1000000,
+        10000000
+      ],
+      "results": [
+        {
+          "tier_tokens": 1000000,
+          "documents": 1000,
+          "ingest_seconds": 2.226,
+          "queries": 100,
+          "recall_at_5": 1.0,
+          "p50_search_ms": 0.433,
+          "p95_search_ms": 0.726,
+          "database_bytes": 22040608,
+          "deleted_sources": 1,
+          "deleted_result_count": 0
+        },
+        {
+          "tier_tokens": 10000000,
+          "documents": 10000,
+          "ingest_seconds": 24.644,
+          "queries": 100,
+          "recall_at_5": 1.0,
+          "p50_search_ms": 0.92,
+          "p95_search_ms": 1.727,
+          "database_bytes": 181848024,
+          "deleted_sources": 1,
+          "deleted_result_count": 0
+        }
+      ],
+      "limitations": [
+        "synthetic exact-marker lexical queries only",
+        "not semantic, temporal, ACL or billion-token evidence",
+        "10M tier is the largest run here; 100M/1B not run"
+      ]
+    },
+    "mcp": {
+      "benchmark": "mcp_stdio",
+      "protocol": "2025-11-25",
+      "tools": 9,
+      "calls": 20,
+      "mean_ms": 0.591,
+      "p50_ms": 0.451,
+      "p95_ms": 1.57,
+      "ping_ok": true,
+      "limitations": [
+        "local stdio only; no remote/OAuth/native tool-call test"
+      ]
+    },
+    "selfdev": {
+      "benchmark": "selfdev_pipeline",
+      "patch_apply_test_review_merge_seconds": 1.596,
+      "status": "merged",
+      "limitations": [
+        "mock test command and mock review; not a real model-authored change"
+      ]
+    },
+    "ollama": {
+      "benchmark": "local_ollama",
+      "available": true,
+      "results": [
+        {
+          "model": "qwen3:1.7b",
+          "ok": true,
+          "wall_seconds": 41.802,
+          "output_preview": "OK",
+          "usage": {
+            "model_calls": 1,
+            "input_tokens": 15,
+            "output_tokens": 209,
+            "cost_usd": 0.0
+          }
+        },
+        {
+          "model": "qwen2.5-coder:7b",
+          "ok": true,
+          "wall_seconds": 17.298,
+          "output_preview": "OK.",
+          "usage": {
+            "model_calls": 1,
+            "input_tokens": 34,
+            "output_tokens": 3,
+            "cost_usd": 0.0
+          }
+        }
+      ],
+      "limitations": [
+        "single small prompt; not coding quality or benchmark scores",
+        "local compute/energy not measured"
+      ]
+    }
+  },
+  "coverage_matrix": [
+    {
+      "tool": "DIRECTOR core",
+      "status": "measured",
+      "note": "domain/retrieval/MCP/selfdev benchmarks"
+    },
+    {
+      "tool": "OpenCode",
+      "status": "partially measured",
+      "note": "native MCP connection tested; native tool-call not"
+    },
+    {
+      "tool": "MCP",
+      "status": "measured",
+      "note": "stdio protocol/latency; remote/OAuth not"
+    },
+    {
+      "tool": "Ollama local models",
+      "status": "measured",
+      "note": "latency/token accounting; not coding quality"
+    },
+    {
+      "tool": "Headroom",
+      "status": "not run",
+      "note": "no runtime adapter installed; research only"
+    },
+    {
+      "tool": "Ponytail",
+      "status": "not run",
+      "note": "prompt/skill runtime not installed; no ablation"
+    },
+    {
+      "tool": "Superpowers",
+      "status": "not run",
+      "note": "prompt/skill runtime not installed; no ablation"
+    },
+    {
+      "tool": "ECC",
+      "status": "not run",
+      "note": "catalog not activated; no runtime ablation"
+    },
+    {
+      "tool": "Cloud providers",
+      "status": "blocked",
+      "note": "no credentials/spend authorization"
+    },
+    {
+      "tool": "Kernel/container sandbox",
+      "status": "blocked",
+      "note": "Docker daemon not running; no container test"
+    }
+  ],
+  "total_seconds": 142.789
+}

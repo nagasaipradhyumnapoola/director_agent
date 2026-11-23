@@ -139,6 +139,7 @@ docs/                research handoff + build docs + ledger
 
 - [CONTEXT.md](CONTEXT.md) — low-token context for a new session.
 - [v1 release notes](docs/build/V1_RELEASE.md)
+- [Benchmarks](docs/build/BENCHMARKS.md)
 - [Build status / evidence](docs/BUILD_STATUS.md)
 - [Architecture](docs/build/ARCHITECTURE.md)
 - [Security and threat model](docs/build/SECURITY.md)

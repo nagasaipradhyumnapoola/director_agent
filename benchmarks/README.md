@@ -1,12 +1,15 @@
 # Benchmarks
 
-These are small, reproducible smoke measurements, not product claims.
+These are small, reproducible local measurements, not product claims.
 
-- `retrieval_smoke.py` — synthetic lexical FTS5 ingestion/search latency. It is
-  not semantic memory, temporal/update/ACL evaluation, or billion-token scale.
-- The controlled pilot demo (`python -m director demo`) is the domain
-  discrimination benchmark: clean fixtures must pass, seeded broken fixtures
-  must fail, with zero model calls.
+- `run_benchmarks.py` — domain discrimination, 1M/10M lexical retrieval, MCP
+  latency, local Ollama latency/accounting, selfdev pipeline.
+- `prompt_ablation.py` — baseline vs pinned Ponytail/Superpowers/ECC/Headroom
+  **skill instructions** with one local model and one task. Runtimes are not
+  executed.
+- `retrieval_smoke.py` — small synthetic FTS5 smoke.
+
+Full methodology, results and limitations: `docs/build/BENCHMARKS.md`.
 
 Run:
 

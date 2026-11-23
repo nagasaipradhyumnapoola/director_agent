@@ -109,6 +109,8 @@ python -m director health --json
 python -m director secret set --name provider/openai   # value on stdin
 python -m director mcp serve --db <path>
 python -m director demo --domains general,website,ml,research --modes clean,broken
+python benchmarks/run_benchmarks.py --tiers 1000000,10000000
+python benchmarks/prompt_ablation.py
 ```
 
 Run `python -m director --help` for the authoritative list.
@@ -136,11 +138,15 @@ Provider-driven autonomous authoring is not claimed; `improve apply` is blocked.
 ## Evidence status
 
 v1.0.0-local-supervised is implemented and tested on this host for its local single-user scope:
-- 73 offline tests pass (including a real Chromium/CDP website journey, the
+- 74 offline tests pass (including a real Chromium/CDP website journey, the
   official MCP SDK round trip, selfdev, provider/grants, backups/keychain).
 - Native OpenCode MCP connection is verified; tool-call path is not.
 - Verified backups/restore, OS-keychain secrets and health/doctor gates are
   tested on this host.
+- Benchmarks: domain 8/8; 1M/10M lexical retrieval (p95 0.73/1.73ms); MCP p95
+  1.57ms; local Ollama latency/token accounting; prompt-level upstream skill
+  ablation. Upstream runtimes, cloud and kernel sandbox remain unmeasured or
+  blocked. See `docs/build/BENCHMARKS.md`.
 - `python -m director demo ... --modes clean,broken`: all clean fixtures pass,
   all broken fixtures fail, zero model calls.
 - Independent review found false-completion/policy defects; all high/critical

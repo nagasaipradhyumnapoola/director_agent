@@ -15,7 +15,7 @@ Command:
 $env:PYTHONPATH="src"; python -m pytest
 ```
 
-Result: **73 passed in 94.85s**, no failures, no skips. The browser (real
+Result: **74 passed in 110.97s**, no failures, no skips. The browser (real
 Chromium/CDP) and MCP SDK tests executed; they were not skipped.
 
 Coverage highlights:
@@ -104,7 +104,7 @@ ersion
 - Independent reviewer returned **PASS**, verified reverse-apply integrity and
   ran the targeted test; only low non-blocking notes.
 - Owner approval recorded; local fast-forward merge commit f439b16.
-- Merged tree: 73/73 tests, python -m director version --json works.
+- Merged tree: 74/74 tests, python -m director version --json works.
 - The pipeline did not push; the release push was a separate owner action.
 
 ## 4d. Local model/provider gateway and 24/7 patch testing
@@ -138,6 +138,25 @@ ersion
 - `health --json` reported DB quick_check, schema, worker, acceptance, budget,
   backups, keychain and disk; `doctor` includes the same gates.
 - Offline installer/uninstaller tested; wheel includes assets and selfdev.
+
+## 4g. Benchmarks
+
+Full methodology and limits: `docs/build/BENCHMARKS.md`. Raw:
+`benchmarks/results/director_bench_20261123T195633Z.json`,
+`benchmarks/results/prompt_ablation.json`.
+
+- Domain discrimination: 8/8 (4 clean pass, 4 broken fail), 52.9s including
+  real Chromium.
+- Lexical retrieval: 1M tokens (1,000 docs) ingest 2.23s, recall@5 1.0, p95
+  0.726ms; 10M tokens (10,000 docs) ingest 24.64s, recall@5 1.0, p95 1.727ms,
+  181.8MB DB; deletion returned 0. 100M/1B not run.
+- MCP: 20 calls, p95 1.57ms, ping ok.
+- Local Ollama: qwen3:1.7b 41.8s/209 output tokens; qwen2.5-coder:7b 17.3s/3.
+- Selfdev: mock 1.5s; real local-model patch tested 126.8s after recount; review
+  PASS but held as dead code.
+- Prompt ablation (one task/model/run): baseline, Ponytail, ECC, Headroom skill
+  passed; Superpowers TDD failed its added edge test; upstream runtimes not run.
+- Coverage matrix marks cloud providers and kernel/container sandbox blocked.
 
 ## 5. Independent review
 
@@ -199,5 +218,5 @@ or broad benchmark is claimed.
   model gateway/grants), `f439b16` (selfdev) and `85d8209` (pipeline), pushed to
   `origin/main` on 2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: 73 tests, full demo, zero model calls, independent
+- Verified release evidence: 74 tests, full demo, zero model calls, independent
   review fixes, one merged selfdev patch.

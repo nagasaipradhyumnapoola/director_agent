@@ -58,7 +58,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 - [x] 24/7 worker can test queued selfdev patches
 - [x] Production hardening: verified backups/restore, OS-keychain secrets,
   health/doctor gates, native OpenCode MCP connection
-- [x] 73-test offline suite incl. historical defect regressions and selfdev
+- [x] 74-test offline suite incl. historical defect regressions and selfdev
 - [x] Independent review rounds + fixes
 - [x] Release docs, evidence report, install/uninstall
 
@@ -91,7 +91,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
    - isolated worktree at base `85d8209`; full suite passed in 99.1s;
    - independent reviewer PASS with patch-integrity verification;
    - owner approval recorded; fast-forward merge commit `f439b16`;
-   - merged tree: 73/73 tests, version command works, no push by the pipeline.
+   - merged tree: 74/74 tests, version command works, no push by the pipeline.
 8. Local model/provider gateway:
    - default policy denied a local model call with zero spend;
    - owner grant + contract `model_call_local` + model-call budget enabled the
@@ -105,7 +105,15 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
      reported `director connected`;
    - native `director_*` tool call still requires a model session and is not
      claimed.
-10. Production hardening:
+10. Benchmarks (`docs/build/BENCHMARKS.md`):
+   - domain discrimination 8/8; 1M/10M lexical tiers (recall@5 1.0, p95
+     0.726ms/1.727ms, deletion 0 results);
+   - MCP 20 calls p95 1.57ms; local qwen3/qwen2.5 gateway calls 41.8s/17.3s;
+   - mock selfdev 1.5s; real local-model patch tested 126.8s, review PASS but
+     held as dead code (not merged);
+   - prompt ablation baseline/Ponytail/ECC/Headroom pass, TDD variant fail;
+     upstream runtimes not executed; cloud/sandbox blocked.
+11. Production hardening:
    - SQLite online backup -> hashed ZIP manifest -> `verify_backup` integrity
      check -> non-destructive restore to a new project; memory survived restore;
    - OS keychain (Windows Credential Locker) secret set/status/delete round trip;
@@ -157,5 +165,5 @@ worktree/test/review/owner-merge pipeline.
   model gateway/grants), `f439b16` (selfdev) and `85d8209` (pipeline), pushed to
   `origin/main` on 2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: docs/build/EVIDENCE.md (73 tests, full demo,
+- Verified release evidence: docs/build/EVIDENCE.md (74 tests, full demo,
   zero model calls, independent review fixes).

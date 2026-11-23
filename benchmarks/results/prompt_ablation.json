@@ -1,0 +1,90 @@
+{
+  "schema": "director.composition_ablation.v1",
+  "created_at": "2026-11-23T19:53:57+00:00",
+  "model": "qwen2.5-coder:7b",
+  "task": "format_bytes helper + test",
+  "runs_per_variant": 1,
+  "results": [
+    {
+      "variant": "baseline",
+      "ok": true,
+      "applied": true,
+      "test_exit": 0,
+      "wall_seconds": 107.0,
+      "usage": {
+        "model_calls": 1,
+        "input_tokens": 210,
+        "output_tokens": 334,
+        "cost_usd": 0.0
+      },
+      "output_preview": "diff --git a/src/units.py b/src/units.py\nnew file mode 100644\n--- /dev/null\n+++ b/src/units.py\n@@ -0,0 +1,18 @@\n+def format_bytes(num: int) -> str:\n+    if num < 0:\n+        return \"Invalid\"\n+    if num < 1024:\n+        return f\"{num}B\"\n+    elif num < 1048576:\n+        return f\"{num // 1024}KB\"\n+    else:\n+        return f\"{num // 1048576}MB\"\ndiff --git a/tests/test_units.py b/tests/test_units.py\nnew file mode 100644\n--- /dev/null\n+++ b/tests/test_units.py\n@@ -0,0 +1,12 @@\n+from units import fo",
+      "test_tail": ".                                                                        [100%]\n1 passed in 0.12s\n"
+    },
+    {
+      "variant": "ponytail",
+      "ok": true,
+      "applied": true,
+      "test_exit": 0,
+      "wall_seconds": 51.027,
+      "usage": {
+        "model_calls": 1,
+        "input_tokens": 1020,
+        "output_tokens": 340,
+        "cost_usd": 0.0
+      },
+      "output_preview": "diff --git a/src/units.py b/src/units.py\nnew file mode 100644\n--- /dev/null\n+++ b/src/units.py\n@@ -0,0 +1,11 @@\n+def format_bytes(num) -> str:\n+    if num < 0:\n+        return \"Invalid\"\n+    if num < 1024:\n+        return f\"{num}B\"\n+    if num < 1048576:\n+        return f\"{num // 1024}KB\"\n+    return f\"{num // 1048576}MB\"\ndiff --git a/tests/test_units.py b/tests/test_units.py\nnew file mode 100644\n--- /dev/null\n+++ b/tests/test_units.py\n@@ -0,0 +1,10 @@\n+from units import format_bytes\n+\n+def test",
+      "test_tail": ".                                                                        [100%]\n1 passed in 0.07s\n"
+    },
+    {
+      "variant": "superpowers_tdd",
+      "ok": false,
+      "applied": true,
+      "test_exit": 1,
+      "wall_seconds": 71.706,
+      "usage": {
+        "model_calls": 1,
+        "input_tokens": 2455,
+        "output_tokens": 393,
+        "cost_usd": 0.0
+      },
+      "output_preview": "diff --git a/src/units.py b/src/units.py\nnew file mode 100644\n--- /dev/null\n+++ b/src/units.py\n@@ -0,0 +1,17 @@\n+def format_bytes(num: int) -> str:\n+    if num < 0:\n+        return \"Invalid\"\n+    if num < 1024:\n+        return f\"{num}B\"\n+    if num < 1048576:\n+        return f\"{num // 1024}KB\"\n+    return f\"{num // 1048576}MB\"\ndiff --git a/tests/test_units.py b/tests/test_units.py\nnew file mode 100644\n--- /dev/null\n+++ b/tests/test_units.py\n@@ -0,0 +1,17 @@\n+from units import format_bytes\n+\n+def",
+      "test_tail": ".F                                                                       [100%]\n================================== FAILURES ===================================\n________________________ test_format_bytes_edge_cases _________________________\n\n    def test_format_bytes_edge_cases():\n        assert format_bytes(1023) == \"1023B\"\n        assert format_bytes(1024) == \"1KB\"\n        assert format_bytes(1048575) == \"1023KB\"\n        assert format_bytes(1048576) == \"1MB\"\n>       assert format_bytes(1073741824) == \"1GB\"\nE       AssertionError: assert '1024MB' == '1GB'\nE         \nE         - 1GB\nE         + 1024MB\n\ntests\\test_units.py:15: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_units.py::test_format_bytes_edge_cases - AssertionError: as...\n1 failed, 1 passed in 0.86s\n"
+    },
+    {
+      "variant": "ecc_ai_regression",
+      "ok": true,
+      "applied": true,
+      "test_exit": 0,
+      "wall_seconds": 85.264,
+      "usage": {
+        "model_calls": 1,
+        "input_tokens": 2391,
+        "output_tokens": 440,
+        "cost_usd": 0.0
+      },
+      "output_preview": "diff --git a/src/units.py b/src/units.py\nnew file mode 100644\n--- /dev/null\n+++ b/src/units.py\n@@ -0,0 +1,18 @@\n+def format_bytes(num: int) -> str:\n+    if num < 0:\n+        return \"Invalid\"\n+    if num < 1024:\n+        return f\"{num}B\"\n+    if num < 1048576:\n+        return f\"{num // 1024}KB\"\n+    if num < 1073741824:\n+        return f\"{num // 1048576}MB\"\n+    return f\"{num // 1073741824}GB\"\ndiff --git a/tests/test_units.py b/tests/test_units.py\nnew file mode 100644\n--- /dev/null\n+++ b/tests/te",
+      "test_tail": ".                                                                        [100%]\n1 passed in 0.05s\n"
+    },
+    {
+      "variant": "headroom_skill",
+      "ok": true,
+      "applied": true,
+      "test_exit": 0,
+      "wall_seconds": 45.941,
+      "usage": {
+        "model_calls": 1,
+        "input_tokens": 1078,
+        "output_tokens": 321,
+        "cost_usd": 0.0
+      },
+      "output_preview": "diff --git a/src/units.py b/src/units.py\nnew file mode 100644\n--- /dev/null\n+++ b/src/units.py\n@@ -0,0 +1,20 @@\n+def format_bytes(num: int) -> str:\n+    if num < 0:\n+        return \"Invalid\"\n+    if num < 1024:\n+        return f\"{num}B\"\n+    if num < 1048576:\n+        return f\"{num // 1024}KB\"\n+    return f\"{num // 1048576}MB\"\ndiff --git a/tests/test_units.py b/tests/test_units.py\nnew file mode 100644\n--- /dev/null\n+++ b/tests/test_units.py\n@@ -0,0 +1,12 @@\n+from units import format_bytes\n+\n+def",
+      "test_tail": ".                                                                        [100%]\n1 passed in 0.07s\n"
+    }
+  ],
+  "limitations": [
+    "prompt/skill instructions only; upstream runtimes/hooks/installers not executed",
+    "Headroom compression/proxy/caching is not measured",
+    "one small task, one local model, one run; not a leaderboard",
+    "scores are noisy and not statistically significant"
+  ]
+}

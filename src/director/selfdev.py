@@ -288,7 +288,7 @@ def test_patch(
     store.update_patch(patch_id, status="testing", worktree=worktree.relative_to(Path(store.root)).as_posix())
 
     check_code, check_out, check_err = _git_capture(
-        ["apply", "--check", str(patch_file)], worktree
+        ["apply", "--check", "--recount", str(patch_file)], worktree
     )
     if check_code != 0:
         summary = {
@@ -299,7 +299,9 @@ def test_patch(
         store.update_patch(patch_id, status="failed", test_summary=_json(summary), worktree=None)
         raise ValidationError("patch does not apply cleanly")
 
-    apply_code, _apply_out, apply_err = _git_capture(["apply", str(patch_file)], worktree)
+    apply_code, _apply_out, apply_err = _git_capture(
+        ["apply", "--recount", str(patch_file)], worktree
+    )
     if apply_code != 0:
         _cleanup_worktree(store, patch_id)
         store.update_patch(
