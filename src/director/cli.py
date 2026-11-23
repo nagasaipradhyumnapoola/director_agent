@@ -1,4 +1,4 @@
-﻿"""DIRECTOR operator CLI."""
+"""DIRECTOR operator CLI."""
 
 from __future__ import annotations
 
@@ -17,6 +17,14 @@ from .demo import build_contract, run_demo
 from .domains import PROFILES, provision_pilot_grants, run_pilot
 from .evidence import EvidenceLedger
 from .improve import apply_proposal, generate_proposals
+from .selfdev import (
+    cleanup as selfdev_cleanup,
+    create_patch,
+    merge_patch,
+    patch_diff,
+    record_review,
+    test_patch,
+)
 from .lifecycle import (
     pause as lifecycle_pause,
     process_one,
@@ -40,6 +48,7 @@ from .security import (
     dump_bounded,
     ensure_within,
     prepare_state_dir,
+    redact_text,
     safe_error_message,
     safe_state_db_path,
 )
@@ -555,6 +564,65 @@ def cmd_improve(args: argparse.Namespace) -> int:
         store.close()
 
 
+def cmd_selfdev(args: argparse.Namespace) -> int:
+    root = _root(args)
+    store = _open(root)
+    try:
+        if args.action == "propose":
+            path = Path(args.file)
+            if not path.is_absolute():
+                path = root / path
+            st = path.stat()
+            if st.st_size > 1024 * 1024:
+                raise BoundsError("patch exceeds 1MB")
+            text = path.read_text(encoding="utf-8")
+            patch = create_patch(
+                store,
+                text,
+                args.title,
+                author=args.author,
+                proposal_id=args.proposal or None,
+            )
+            _emit({"patch": patch, "next": "selfdev test, independent review, then owner merge"})
+            return 0
+        if args.action == "test":
+            _emit(test_patch(store, args.patch, timeout=args.timeout))
+            return 0
+        if args.action == "review":
+            _emit(
+                record_review(
+                    store,
+                    args.patch,
+                    args.verdict,
+                    args.reviewer,
+                    args.notes,
+                )
+            )
+            return 0
+        if args.action == "merge":
+            _emit(merge_patch(store, args.patch, reason=args.reason))
+            return 0
+        if args.action == "reject":
+            store.update_patch(
+                args.patch,
+                status="rejected",
+                review_notes=redact_text(args.reason)[:4000],
+            )
+            _emit({"patch_id": args.patch, "status": "rejected"})
+            return 0
+        if args.action == "cleanup":
+            _emit(selfdev_cleanup(store))
+            return 0
+        if args.action == "show":
+            patch = store.get_patch(args.patch)
+            _emit({"patch": patch, "diff": patch_diff(store, args.patch)})
+            return 0
+        _emit({"counts": store.patch_counts(), "patches": store.list_patches(status=args.status, limit=args.limit)})
+        return 0
+    finally:
+        store.close()
+
+
 def cmd_mcp(args: argparse.Namespace) -> int:
     path = Path(args.db).resolve()
     if not path.is_file():
@@ -748,6 +816,46 @@ def build_parser() -> argparse.ArgumentParser:
     improve_apply = improve_sub.add_parser("apply", parents=[common])
     improve_apply.add_argument("proposal")
     improve_apply.set_defaults(func=cmd_improve, action="apply")
+
+    selfdev = sub.add_parser(
+        "selfdev",
+        parents=[common],
+        help="supervised self-modification (worktree, tests, review, owner merge)",
+    )
+    selfdev_sub = selfdev.add_subparsers(dest="action", required=True)
+    selfdev_propose = selfdev_sub.add_parser("propose", parents=[common])
+    selfdev_propose.add_argument("--file", required=True)
+    selfdev_propose.add_argument("--title", required=True)
+    selfdev_propose.add_argument("--author", default="agent")
+    selfdev_propose.add_argument("--proposal", default="")
+    selfdev_propose.set_defaults(func=cmd_selfdev, action="propose")
+    selfdev_test = selfdev_sub.add_parser("test", parents=[common])
+    selfdev_test.add_argument("--patch", required=True)
+    selfdev_test.add_argument("--timeout", type=float, default=600.0)
+    selfdev_test.set_defaults(func=cmd_selfdev, action="test")
+    selfdev_review = selfdev_sub.add_parser("review", parents=[common])
+    selfdev_review.add_argument("--patch", required=True)
+    selfdev_review.add_argument("--verdict", required=True, choices=["pass", "fail"])
+    selfdev_review.add_argument("--reviewer", required=True)
+    selfdev_review.add_argument("--notes", default="")
+    selfdev_review.set_defaults(func=cmd_selfdev, action="review")
+    selfdev_merge = selfdev_sub.add_parser("merge", parents=[common])
+    selfdev_merge.add_argument("--patch", required=True)
+    selfdev_merge.add_argument("--reason", default="owner approved")
+    selfdev_merge.set_defaults(func=cmd_selfdev, action="merge")
+    selfdev_reject = selfdev_sub.add_parser("reject", parents=[common])
+    selfdev_reject.add_argument("--patch", required=True)
+    selfdev_reject.add_argument("--reason", required=True)
+    selfdev_reject.set_defaults(func=cmd_selfdev, action="reject")
+    selfdev_show = selfdev_sub.add_parser("show", parents=[common])
+    selfdev_show.add_argument("--patch", required=True)
+    selfdev_show.set_defaults(func=cmd_selfdev, action="show")
+    selfdev_cleanup = selfdev_sub.add_parser("cleanup", parents=[common])
+    selfdev_cleanup.set_defaults(func=cmd_selfdev, action="cleanup")
+    selfdev_list = selfdev_sub.add_parser("list", parents=[common])
+    selfdev_list.add_argument("--status", choices=["proposed", "testing", "tested", "failed", "reviewed", "review_failed", "merged", "rejected"])
+    selfdev_list.add_argument("--limit", type=int, default=100)
+    selfdev_list.set_defaults(func=cmd_selfdev, action="list")
 
     preflight = sub.add_parser("preflight", parents=[common], help="bounded context packet")
     preflight.add_argument("--query", default="")

@@ -33,7 +33,7 @@ from .security import (
     sha256_text,
 )
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 
 
 def utc_now() -> str:
@@ -179,8 +179,31 @@ class Store:
                   updated_at TEXT NOT NULL,
                   UNIQUE(project_id, signature)
                 );
-                CREATE INDEX IF NOT EXISTS idx_proposals_project
-                  ON proposals(project_id, status, created_at DESC);
+            CREATE INDEX IF NOT EXISTS idx_proposals_project
+              ON proposals(project_id, status, created_at DESC);
+            CREATE TABLE IF NOT EXISTS patches (
+              id TEXT PRIMARY KEY,
+              project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+              proposal_id TEXT,
+              title TEXT NOT NULL,
+              author TEXT NOT NULL,
+              base_commit TEXT NOT NULL,
+              patch_path TEXT NOT NULL,
+              patch_sha256 TEXT NOT NULL,
+              changed_files TEXT NOT NULL,
+              status TEXT NOT NULL,
+              worktree TEXT,
+              test_summary TEXT,
+              test_output_ref TEXT,
+              review_verdict TEXT,
+              reviewer TEXT,
+              review_notes TEXT,
+              merge_commit TEXT,
+              created_at TEXT NOT NULL,
+              updated_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_patches_project
+              ON patches(project_id, status, created_at DESC);
                 """
             )
         if version < 3:
@@ -196,6 +219,34 @@ class Store:
                 self.conn.execute(
                     "ALTER TABLE waivers ADD COLUMN contract_hash TEXT NOT NULL DEFAULT ''"
                 )
+        if version < 4:
+            self.conn.executescript(
+                """
+                CREATE TABLE IF NOT EXISTS patches (
+                  id TEXT PRIMARY KEY,
+                  project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+                  proposal_id TEXT,
+                  title TEXT NOT NULL,
+                  author TEXT NOT NULL,
+                  base_commit TEXT NOT NULL,
+                  patch_path TEXT NOT NULL,
+                  patch_sha256 TEXT NOT NULL,
+                  changed_files TEXT NOT NULL,
+                  status TEXT NOT NULL,
+                  worktree TEXT,
+                  test_summary TEXT,
+                  test_output_ref TEXT,
+                  review_verdict TEXT,
+                  reviewer TEXT,
+                  review_notes TEXT,
+                  merge_commit TEXT,
+                  created_at TEXT NOT NULL,
+                  updated_at TEXT NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS idx_patches_project
+                  ON patches(project_id, status, created_at DESC);
+                """
+            )
         self.conn.execute(f"PRAGMA user_version={SCHEMA_VERSION}")
 
     def _ensure_fts(self) -> None:
@@ -484,6 +535,29 @@ class Store:
             );
             CREATE INDEX IF NOT EXISTS idx_proposals_project
               ON proposals(project_id, status, created_at DESC);
+            CREATE TABLE IF NOT EXISTS patches (
+              id TEXT PRIMARY KEY,
+              project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+              proposal_id TEXT,
+              title TEXT NOT NULL,
+              author TEXT NOT NULL,
+              base_commit TEXT NOT NULL,
+              patch_path TEXT NOT NULL,
+              patch_sha256 TEXT NOT NULL,
+              changed_files TEXT NOT NULL,
+              status TEXT NOT NULL,
+              worktree TEXT,
+              test_summary TEXT,
+              test_output_ref TEXT,
+              review_verdict TEXT,
+              reviewer TEXT,
+              review_notes TEXT,
+              merge_commit TEXT,
+              created_at TEXT NOT NULL,
+              updated_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_patches_project
+              ON patches(project_id, status, created_at DESC);
             CREATE INDEX IF NOT EXISTS idx_contracts_project ON task_contracts(project_id, revision DESC);
             CREATE INDEX IF NOT EXISTS idx_investigations_state ON investigations(project_id, status, priority DESC, created_at);
             CREATE INDEX IF NOT EXISTS idx_findings_project ON findings(project_id, status, severity, created_at DESC);
@@ -1385,6 +1459,109 @@ class Store:
         ).fetchall()
         return {str(r["status"]): int(r["n"]) for r in rows}
 
+    # -- self-development patches -----------------------------------------
+    def add_patch(
+        self,
+        *,
+        title: str,
+        author: str,
+        base_commit: str,
+        patch_path: str,
+        patch_sha256: str,
+        changed_files: Sequence[str],
+        proposal_id: str | None = None,
+        status: str = "proposed",
+        patch_id: str | None = None,
+    ) -> str:
+        if not title or len(title) > 300:
+            raise ValidationError("invalid patch title")
+        if status not in {"proposed", "testing", "tested", "failed", "reviewed", "review_failed", "merged", "rejected"}:
+            raise ValidationError("invalid patch status")
+        files_text, _ = dump_bounded([str(f)[:512] for f in list(changed_files)[:200]], max_bytes=32 * 1024)
+        patch_id = patch_id or _new_id("patch_")
+        if len(patch_id) > 80:
+            raise ValidationError("invalid patch id")
+        now = utc_now()
+        with self.tx(immediate=True):
+            self.conn.execute(
+                "INSERT INTO patches(id, project_id, proposal_id, title, author, base_commit, "
+                "patch_path, patch_sha256, changed_files, status, created_at, updated_at) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+                (
+                    patch_id,
+                    self.project_id,
+                    proposal_id,
+                    redact_text(title)[:300],
+                    redact_text(author)[:200],
+                    base_commit,
+                    patch_path,
+                    patch_sha256,
+                    files_text,
+                    status,
+                    now,
+                    now,
+                ),
+            )
+        return patch_id
+
+    def get_patch(self, patch_id: str) -> dict[str, Any]:
+        row = self.conn.execute(
+            "SELECT * FROM patches WHERE id=? AND project_id=?",
+            (patch_id, self.project_id),
+        ).fetchone()
+        if not row:
+            raise NotFoundError("patch not found")
+        return dict(row)
+
+    def list_patches(self, status: str | None = None, limit: int = 100) -> list[dict[str, Any]]:
+        if status:
+            rows = self.conn.execute(
+                "SELECT * FROM patches WHERE project_id=? AND status=? "
+                "ORDER BY created_at DESC, rowid DESC LIMIT ?",
+                (self.project_id, status, min(max(limit, 1), 1000)),
+            ).fetchall()
+        else:
+            rows = self.conn.execute(
+                "SELECT * FROM patches WHERE project_id=? ORDER BY created_at DESC, rowid DESC LIMIT ?",
+                (self.project_id, min(max(limit, 1), 1000)),
+            ).fetchall()
+        return [dict(r) for r in rows]
+
+    def update_patch(self, patch_id: str, **fields: Any) -> None:
+        allowed = {
+            "status",
+            "worktree",
+            "test_summary",
+            "test_output_ref",
+            "review_verdict",
+            "reviewer",
+            "review_notes",
+            "merge_commit",
+        }
+        unknown = set(fields) - allowed
+        if unknown:
+            raise ValidationError("unknown patch field")
+        if not fields:
+            return
+        if "status" in fields and fields["status"] not in {
+            "proposed", "testing", "tested", "failed", "reviewed", "review_failed", "merged", "rejected"
+        }:
+            raise ValidationError("invalid patch status")
+        assignments = ", ".join(f"{key}=?" for key in fields)
+        values = list(fields.values()) + [utc_now(), patch_id, self.project_id]
+        with self.tx(immediate=True):
+            self.conn.execute(
+                f"UPDATE patches SET {assignments}, updated_at=? WHERE id=? AND project_id=?",
+                values,
+            )
+
+    def patch_counts(self) -> dict[str, int]:
+        rows = self.conn.execute(
+            "SELECT status, COUNT(*) AS n FROM patches WHERE project_id=? GROUP BY status",
+            (self.project_id,),
+        ).fetchall()
+        return {str(r["status"]): int(r["n"]) for r in rows}
+
     # -- grants / approvals -------------------------------------------------
     def add_grant(
         self,
@@ -1808,8 +1985,10 @@ class Store:
         investigations = self.investigation_counts()
         try:
             proposals = self.proposal_counts()
+            patches = self.patch_counts()
         except sqlite3.OperationalError:
             proposals = {}
+            patches = {}
         evidence_rows = self.conn.execute(
             "SELECT outcome, COUNT(*) AS n FROM evidence WHERE project_id=? GROUP BY outcome",
             (self.project_id,),
@@ -1830,6 +2009,7 @@ class Store:
             "findings": findings,
             "investigations": investigations,
             "proposals": proposals,
+            "patches": patches,
             "evidence": {str(r["outcome"]): int(r["n"]) for r in evidence_rows},
             "budgets": self.budget_status(),
             "model_calls_spent": self.model_calls_spent(),
