@@ -102,6 +102,12 @@ class EvidenceLedger:
         if evidence_id:
             item["id"] = evidence_id
         recorded_id = self.store.add_evidence(item)
+        try:
+            from . import audit
+
+            audit.log(self.store, collector, "evidence.record", criterion_key, outcome)
+        except Exception:
+            pass
         return self.store.get_evidence(recorded_id)
 
     def save_raw_receipt(self, name: str, payload: Mapping[str, Any] | Any) -> tuple[str, str]:

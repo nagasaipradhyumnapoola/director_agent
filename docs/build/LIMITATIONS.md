@@ -4,8 +4,9 @@
 
 - Controlled fixtures only: three pilots prove the shared evaluator contract and
   discrimination on seeded defects, not general domain competence.
-- No live web freshness, no external source verification, no model/provider
-  routing, no autonomous budget, no A2A, no computer-use.
+- No live web freshness or external source verification. Local/Ollama and
+  mock OpenAI-compatible routing exist; no real cloud call/key/spend, no
+  autonomous provider loop, no A2A or computer-use.
 - Windows 11 + Python 3.14 is the validated platform. POSIX paths exist but were
   not exercised end-to-end.
 
@@ -46,8 +47,12 @@
 
 ## Host and integration
 
-- OpenCode/Claude/Codex native tool-call paths are not tested. Only generated
-  adapter files and MCP protocol/SDK conformance are claimed.
+- OpenCode native tool-call is blocked on installed V1.19.4 (config connects,
+  run agent exposes no MCP tools to the local model); Claude/Codex native paths
+  are not tested. Only connection and MCP protocol/SDK are claimed.
+- Autostart is a per-user Startup-folder entry, not a Windows service; it needs
+  an active user logon.
+- Local model authoring can produce correct-but-dead code; review may hold it.
 - External agents can bypass DIRECTOR; enforcement covers only mediated actions.
 - 24/7 means while the host and worker run. Sleep/shutdown/budget exhaustion stop
   work; a new context window does not replenish budget.
@@ -61,8 +66,8 @@
   kernel sandbox and does not author patches by itself.
 - It requires a clean working tree, an unchanged base commit and local git; it
   never pushes/deploys.
-- Provider-driven autonomous authoring, keychain/provider budgets and broader
-  sandboxing remain M2 gates (see `docs/SELF_IMPROVEMENT.md`).
+- Provider-driven autonomous authoring exists for local Ollama; real cloud
+  authoring and broader sandboxing remain gated (see `docs/SELF_IMPROVEMENT.md`).
 
 ## Memory
 

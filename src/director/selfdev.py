@@ -383,6 +383,12 @@ def test_patch(
         test_summary=_json(summary),
         test_output_ref=output_rel,
     )
+    try:
+        from . import audit
+
+        audit.log(store, "director.selfdev", "selfdev.test", patch_id, "pass" if passed else "fail")
+    except Exception:
+        pass
     if not passed:
         _cleanup_worktree(store, patch_id)
     return {**store.get_patch(patch_id), "evidence_id": evidence["id"], "test": summary}
@@ -471,6 +477,12 @@ def merge_patch(store: Store, patch_id: str, reason: str = "owner approved") -> 
     except ValidationError:
         raise
     store.update_patch(patch_id, status="merged", merge_commit=commit)
+    try:
+        from . import audit
+
+        audit.log(store, "owner", "selfdev.merge", patch_id, "merged", {"commit": commit})
+    except Exception:
+        pass
     ledger = EvidenceLedger(store)
     evidence = ledger.record(
         criterion_key="selfdev.merge",

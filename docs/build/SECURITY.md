@@ -88,7 +88,7 @@ merge approval, rollback and no auto-push/deploy.
 
 ## Verification
 
-- 74 offline tests including links/hardlinks/junctions, oversized frames,
+- 79 offline tests including links/hardlinks/junctions, oversized frames,
   unknown args, secret redaction, fencing, budget races, stale evidence,
   latest-fail supersession, fixture threshold tampering, ML stdlib shadowing,
   citation/calculation abuse, waiver revision binding, and selfdev patch/test/review/merge.

@@ -48,14 +48,18 @@ install, use `python -m pip install -e . --no-deps` (build tooling may be needed
   plus a verified native OpenCode MCP connection.
 - Production operations: verified ZIP backups/restore, OS-keychain secrets,
   health/doctor checks, schema migrations, install/uninstall.
-- Local model gateway: stub + owner-supplied command providers, gated by
-  contract action, owner grant, budget, secret-prompt rejection and scrubbed
-  runner; no cloud provider or external spend.
+- Model gateway: stub, owner command, loopback Ollama, and OpenAI-compatible
+  HTTP with OS-keychain credentials and exact token/cost accounting. Cloud calls
+  are default-denied and untested without an owner-supplied key.
 - 24/7 deterministic worker: start/stop/pause/resume, heartbeat, zero model calls
   (model calls are explicit CLI/owner actions, not idle work).
 - Supervised self-improvement: proposal engine plus `selfdev` execution path
   (patch → isolated git worktree → full tests → independent review → owner merge).
   It has been used to modify DIRECTOR itself; it never auto-pushes.
+- Local model authoring: a loopback Ollama model can author a patch into the
+  selfdev gates; a proposal→author→test queue is available.
+- Autostart: optional per-user Startup-folder entry (no admin) starts the worker
+  at logon; still only while the user session runs.
 - Three controlled pilots:
   - website: static checks + real headless Chromium journey, keyboard, mobile
     overflow, console errors, external requests, accessibility tree;
@@ -69,8 +73,9 @@ install, use `python -m pip install -e . --no-deps` (build tooling may be needed
 - No autonomous model/provider routing or spend; no live web research.
 - No kernel/container sandbox; process-level supervision only.
 - Native OpenCode MCP **connection** is tested (`opencode mcp list` shows
-  connected); native tool-call behavior, and Claude/Codex native paths, are not
-  tested. MCP protocol/SDK is tested and adapters are generated for review.
+  connected). The installed OpenCode 1.19.4 V1 run-agent did not expose the MCP
+  tools to the local model, so native **tool-call** remains blocked; Claude/Codex
+  native paths are not tested. MCP protocol/SDK is tested.
 - No billion-token memory scale, A2A, computer-use or general domain competence.
 - No provider-driven autonomous code authoring (no model call/spend); `selfdev`
   requires an agent/human-authored patch, tests, independent review and owner
@@ -88,6 +93,12 @@ python -m director selfdev propose --file var/selfdev/change.patch --title "Add 
 python -m director selfdev test --patch <id>          # isolated worktree + full offline suite
 python -m director selfdev review --patch <id> --verdict pass --reviewer <name> --notes "..."
 python -m director selfdev merge --patch <id>         # owner-gated fast-forward; no push
+
+python -m director improve auto --proposal <id> --provider ollama \
+  --model qwen2.5-coder:7b [--queue]
+python -m director service install                    # logon autostart (Startup folder)
+python -m director service status
+python -m director service remove
 ```
 
 The patch is validated against a path allowlist, applied in a disposable git
@@ -119,7 +130,7 @@ See [HARNESS_INTEGRATION.md](docs/HARNESS_INTEGRATION.md).
 ```text
 init doctor status contract scan investigate worker findings evidence verify
 waive memory preflight budget grant secret model improve selfdev backup health
-adapters pilot demo mcp version start stop pause resume recover checkpoint
+service adapters pilot demo mcp version start stop pause resume recover checkpoint
 ```
 
 Run `python -m director <command> --help` for options.

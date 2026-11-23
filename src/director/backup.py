@@ -100,6 +100,12 @@ def create_backup(store: Store) -> dict[str, Any]:
             for path, arcname in entries:
                 archive.write(path, arcname)
         digest, size = _sha_file(target, 512 * 1024 * 1024)
+        try:
+            from . import audit
+
+            audit.log(store, "director.backup", "backup.create", target.name, "ok", {"bytes": size})
+        except Exception:
+            pass
         return {
             "backup": target.relative_to(Path(store.root)).as_posix(),
             "bytes": size,
@@ -128,6 +134,23 @@ def list_backups(store: Store) -> list[dict[str, Any]]:
             }
         )
     return out
+
+
+def prune_backups(store: Store, keep: int = 14) -> dict[str, Any]:
+    if keep < 1 or keep > 1000:
+        raise ValidationError("keep must be 1-1000")
+    directory = _state(store) / "backups"
+    if not directory.is_dir():
+        return {"deleted": [], "kept": 0}
+    backups = sorted(directory.glob("*.zip"), key=lambda p: p.stat().st_mtime, reverse=True)
+    deleted = []
+    for path in backups[keep:]:
+        try:
+            path.unlink()
+            deleted.append(path.name)
+        except OSError:
+            continue
+    return {"deleted": deleted, "kept": min(len(backups), keep)}
 
 
 def _safe_name(name: str) -> bool:

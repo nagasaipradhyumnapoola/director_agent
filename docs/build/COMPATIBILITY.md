@@ -14,7 +14,7 @@ Evidence levels are not interchangeable:
 | Context packet / memory | implemented, tested | bounded output, untrusted labels, deletion/re-ingest, project isolation |
 | MCP stdio server | **protocol tested** | official Python `mcp` 1.29.0 `ClientSession` round trip; protocol negotiated `2025-11-25`; oversized frame before parse; strict args |
 | Generic MCP config (`mcp.json`) | adapter generated | not native-host tested |
-| OpenCode adapter | **native connection tested** | current `mcp.servers`/`disabled` shape; `opencode mcp list` shows `director connected`; native `director_*` tool call still not tested |
+| OpenCode adapter | **native connection tested; tool-call blocked** | V1.19.4 connects (`director connected`), but the run agent did not expose MCP tools to the local model; no `opencode2` installed |
 | Claude adapter (`.mcp.json`) | adapter generated | not native-host tested |
 | Codex adapter (`codex.config.toml`) | adapter generated | not native-host tested |
 | Website pilot | **domain-validated** | real headless Chrome 158 CDP journey on controlled fixtures; Node 24; Edge present but not separately validated |
@@ -22,10 +22,12 @@ Evidence levels are not interchangeable:
 | Research/document pilot | **domain-validated** | controlled conflicting dated sources; HTML render inspected; DOCX optional |
 | Self-improvement proposals | implemented, tested | proposal-only, owner approval, zero model calls |
 | Supervised selfdev executor | implemented, integration tested | path allowlist, isolated worktree, full tests, independent review record, owner merge; no push; provider authoring NOT implemented |
-| Local model gateway | implemented, tested | stub + owner command provider; contract action + owner grant + budget; secret-prompt refusal; cloud providers/credentials NOT implemented |
+| Model gateway | implemented, tested | stub/command/Ollama; OpenAI-compatible HTTP with keychain and token/cost accounting; cloud path mock-tested, real cloud not called |
 | Backups/restore | implemented, tested | consistent SQLite online backup, hashed manifest, integrity verify, non-destructive restore |
 | OS keychain | implemented, tested | Windows Credential Locker round trip; no plaintext fallback |
 | Health/doctor | implemented, tested | DB/schema/worker/acceptance/backups/keychain/disk checks |
+| Autostart | implemented, tested | per-user Startup-folder fallback; requires user logon; not a Windows service |
+| Model authoring | implemented, tested | local Ollama authored a patch into selfdev; weak patch held by review |
 | 24/7 patch testing | implemented, integration tested | worker claims queued `selfdev_test` jobs and records evidence |
 | 24/7 worker | implemented, integration tested | detached start/heartbeat/pause/resume/stop; requires running host |
 | Autonomous provider routing | designed only (M2) | not implemented; zero spend default |

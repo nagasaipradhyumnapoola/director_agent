@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import json
 import sys
+import threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
 
@@ -63,6 +66,74 @@ def test_command_provider_runs_scrubbed_local_command(tmp_path):
         assert result["output"].strip() == "HELLO"
         assert result["usage"]["model_calls"] == 1
         assert store.model_calls_spent() == 1
+    finally:
+        store.close()
+
+
+def test_openai_compatible_loopback_provider(tmp_path):
+    store = _store(tmp_path)
+    responses = []
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_POST(self):
+            length = int(self.headers.get("Content-Length", "0"))
+            body = json.loads(self.rfile.read(length).decode("utf-8"))
+            responses.append(body)
+            payload = json.dumps(
+                {
+                    "choices": [{"message": {"content": "MOCK"}}],
+                    "usage": {"prompt_tokens": 12, "completion_tokens": 3},
+                }
+            ).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+        def log_message(self, *_args):
+            return
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        PolicyGateway(store).grant("director.model", "model_call_local", "provider:openai_compatible", 1)
+        result = call_model(
+            store,
+            "hello",
+            provider="openai_compatible",
+            model="mock-model",
+            base_url=f"http://127.0.0.1:{server.server_port}/v1",
+            max_tokens=16,
+            price_input_per_million=1.0,
+            price_output_per_million=2.0,
+            timeout=30,
+        )
+        assert result["output"] == "MOCK"
+        assert result["usage"]["input_tokens"] == 12
+        assert result["usage"]["output_tokens"] == 3
+        assert result["usage"]["cost_usd"] > 0
+        assert responses and responses[0]["model"] == "mock-model"
+    finally:
+        server.shutdown()
+        server.server_close()
+        store.close()
+
+
+def test_openai_external_endpoint_is_policy_denied_without_network(tmp_path):
+    store = _store(tmp_path)
+    try:
+        PolicyGateway(store).grant("director.model", "model_call_local", "provider:openai_compatible", 1)
+        with pytest.raises(PolicyDenied):
+            call_model(
+                store,
+                "hello",
+                provider="openai_compatible",
+                model="mock-model",
+                base_url="https://example.com/v1",
+            )
+        assert store.model_calls_spent() == 0
     finally:
         store.close()
 

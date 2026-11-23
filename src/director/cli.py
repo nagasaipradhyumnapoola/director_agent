@@ -12,8 +12,9 @@ from typing import Any, Sequence
 
 from . import RELEASE_TARGET, __version__
 from .adapter import SUPPORTED_HOSTS, generate as generate_adapter
+from . import audit as audit_log
 from .analysis import ArtifactScanner, ScanConfig
-from .backup import create_backup, list_backups, restore_backup, verify_backup
+from .backup import create_backup, list_backups, prune_backups, restore_backup, verify_backup
 from .context import ContextBuilder
 from .demo import build_contract, run_demo
 from .domains import PROFILES, provision_pilot_grants, run_pilot
@@ -28,6 +29,7 @@ from .keychain import (
 )
 from .policy import PolicyDenied, PolicyGateway
 from .providers import PROVIDERS, call_model
+from .service import install as service_install, remove as service_remove, status as service_status
 from .selfdev import (
     cleanup as selfdev_cleanup,
     create_patch,
@@ -557,6 +559,37 @@ def cmd_improve(args: argparse.Namespace) -> int:
                 )
             )
             return 0
+        if args.action == "auto":
+            if args.queue:
+                investigation_id = store.enqueue_investigation(
+                    title="Author patch with local model",
+                    hypothesis="A local model can propose a patch that the selfdev tests may accept.",
+                    domain="general",
+                    priority=0.8,
+                    payload={
+                        "action": "selfdev_author",
+                        "proposal_id": args.proposal,
+                        "provider": args.provider,
+                        "model": args.model,
+                        "test": True,
+                        "timeout": args.timeout,
+                    },
+                    dedupe_key=f"selfdev:author:{args.proposal}",
+                )
+                _emit({"investigation_id": investigation_id, "status": "queued", "proposal_id": args.proposal})
+                return 0
+            _emit(
+                author_patch(
+                    store,
+                    args.proposal,
+                    provider=args.provider,
+                    model=args.model,
+                    test=True,
+                    timeout=args.timeout,
+                ),
+                max_bytes=128 * 1024,
+            )
+            return 0
         if args.action == "queue":
             investigation_id = store.enqueue_investigation(
                 title="Generate self-improvement proposals",
@@ -635,6 +668,11 @@ def cmd_model(args: argparse.Namespace) -> int:
             model=args.model or None,
             command=command,
             timeout=args.timeout,
+            base_url=args.base_url or None,
+            api_key_secret=args.api_key_secret or None,
+            max_tokens=args.max_tokens,
+            price_input_per_million=args.price_input_per_million,
+            price_output_per_million=args.price_output_per_million,
         )
         _emit(result, max_bytes=128 * 1024)
         return 0
@@ -786,6 +824,9 @@ def cmd_backup(args: argparse.Namespace) -> int:
         if args.action == "list":
             _emit({"backups": list_backups(store)})
             return 0
+        if args.action == "prune":
+            _emit(prune_backups(store, keep=args.keep))
+            return 0
         if args.action == "verify":
             file_path = Path(args.file)
             if not file_path.is_absolute():
@@ -870,6 +911,31 @@ def cmd_secret(args: argparse.Namespace) -> int:
             _emit({"name": args.name, "deleted": True})
             return 0
         raise ValidationError("unknown secret action")
+    finally:
+        store.close()
+
+
+def cmd_audit(args: argparse.Namespace) -> int:
+    store = _open(_root(args))
+    try:
+        _emit({"audit": audit_log.read(store, limit=args.limit)})
+        return 0
+    finally:
+        store.close()
+
+
+def cmd_service(args: argparse.Namespace) -> int:
+    store = _open(_root(args))
+    try:
+        if args.action == "install":
+            _emit(service_install(store, start_now=args.start_now))
+        elif args.action == "status":
+            _emit(service_status(store))
+        elif args.action == "remove":
+            _emit(service_remove(store))
+        else:
+            raise ValidationError("unknown service action")
+        return 0
     finally:
         store.close()
 
@@ -1053,6 +1119,13 @@ def build_parser() -> argparse.ArgumentParser:
     improve_add.add_argument("--file", action="append")
     improve_add.add_argument("--check", action="append")
     improve_add.set_defaults(func=cmd_improve, action="add")
+    improve_auto = improve_sub.add_parser("auto", parents=[common])
+    improve_auto.add_argument("--proposal", required=True)
+    improve_auto.add_argument("--provider", default="ollama", choices=list(PROVIDERS))
+    improve_auto.add_argument("--model", default="qwen2.5-coder:7b")
+    improve_auto.add_argument("--timeout", type=float, default=900.0)
+    improve_auto.add_argument("--queue", action="store_true", help="let the 24/7 worker author/test")
+    improve_auto.set_defaults(func=cmd_improve, action="auto")
     improve_queue = improve_sub.add_parser("queue", parents=[common])
     improve_queue.set_defaults(func=cmd_improve, action="queue")
     improve_list = improve_sub.add_parser("list", parents=[common])
@@ -1080,6 +1153,9 @@ def build_parser() -> argparse.ArgumentParser:
     backup_create.set_defaults(func=cmd_backup, action="create")
     backup_list = backup_sub.add_parser("list", parents=[common])
     backup_list.set_defaults(func=cmd_backup, action="list")
+    backup_prune = backup_sub.add_parser("prune", parents=[common])
+    backup_prune.add_argument("--keep", type=int, default=14)
+    backup_prune.set_defaults(func=cmd_backup, action="prune")
     backup_verify = backup_sub.add_parser("verify", parents=[common])
     backup_verify.add_argument("--file", required=True)
     backup_verify.set_defaults(func=cmd_backup, action="verify")
@@ -1114,6 +1190,11 @@ def build_parser() -> argparse.ArgumentParser:
     model_call.add_argument("--provider", default="stub", choices=list(PROVIDERS))
     model_call.add_argument("--model", default="")
     model_call.add_argument("--command-json", default="")
+    model_call.add_argument("--base-url", default="")
+    model_call.add_argument("--api-key-secret", default="")
+    model_call.add_argument("--max-tokens", type=int, default=4096)
+    model_call.add_argument("--price-input-per-million", type=float, default=0.0)
+    model_call.add_argument("--price-output-per-million", type=float, default=0.0)
     model_call.add_argument("--timeout", type=float, default=60.0)
     model_call.set_defaults(func=cmd_model, action="call")
 
@@ -1225,6 +1306,22 @@ def build_parser() -> argparse.ArgumentParser:
     version_cmd = sub.add_parser("version", parents=[common], help="print version metadata")
     version_cmd.add_argument("--json", action="store_true")
     version_cmd.set_defaults(func=cmd_version)
+
+    audit = sub.add_parser("audit", parents=[common], help="read the redacted audit log")
+    audit_sub = audit.add_subparsers(dest="action", required=True)
+    audit_list = audit_sub.add_parser("list", parents=[common])
+    audit_list.add_argument("--limit", type=int, default=100)
+    audit_list.set_defaults(func=cmd_audit)
+
+    service = sub.add_parser("service", parents=[common], help="opt-in Windows logon task")
+    service_sub = service.add_subparsers(dest="action", required=True)
+    service_install_parser = service_sub.add_parser("install", parents=[common])
+    service_install_parser.add_argument("--start-now", action="store_true")
+    service_install_parser.set_defaults(func=cmd_service, action="install")
+    service_status_parser = service_sub.add_parser("status", parents=[common])
+    service_status_parser.set_defaults(func=cmd_service, action="status")
+    service_remove_parser = service_sub.add_parser("remove", parents=[common])
+    service_remove_parser.set_defaults(func=cmd_service, action="remove")
 
     mcp = sub.add_parser("mcp", help="MCP stdio adapter")
     mcp_sub = mcp.add_subparsers(dest="action", required=True)

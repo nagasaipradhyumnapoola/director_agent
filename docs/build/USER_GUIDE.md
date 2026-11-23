@@ -140,12 +140,31 @@ python -m director selfdev review --patch <id> --verdict pass --reviewer "review
 python -m director selfdev merge --patch <id> --reason "owner approved"
 python -m director selfdev list
 python -m director selfdev cleanup
+
+python -m director improve auto --proposal <id> --provider ollama \
+  --model qwen2.5-coder:7b [--queue]
 ```
 
 `test` applies the patch in a disposable git worktree, runs the full offline
 suite and records evidence. `merge` requires a clean tree, the same base commit,
 a passing review record and owner approval. It fast-forwards locally and never
-pushes. Provider-driven autonomous authoring remains M2 work.
+pushes.
+
+`improve auto` asks an authorized local Ollama model to author a diff, then runs
+the same gates. `--queue` lets the 24/7 worker do the authoring/testing. A model
+patch that passes tests can still be held by review for dead code or design
+issues; that is intentional.
+
+## Autostart
+
+```powershell
+python -m director service install            # at logon, current user
+python -m director service status
+python -m director service remove
+```
+
+This uses the per-user Startup folder when Task Scheduler is unavailable. It is
+not a Windows service and runs only while the user is logged in.
 
 ## Memory and preflight
 
@@ -192,8 +211,25 @@ python -m director model call --prompt "hello" --provider command --command-json
 ```
 
 Prompts containing secret-like values are refused. The command runs in the
-scrubbed runner with output/time caps; it is not a sandbox. Cloud providers,
-credentials and external spend are not implemented.
+scrubbed runner with output/time caps; it is not a sandbox.
+
+OpenAI-compatible endpoints use the same gate plus OS-keychain credentials:
+
+```powershell
+# store the key in the OS keychain (not config/stdin history)
+python -m director secret set --name provider/openai
+python -m director grant add --actor director.model --grant-action model_call `
+  --resource provider:openai_compatible
+python -m director model call --provider openai_compatible `
+  --base-url https://api.example.com/v1 --model my-model `
+  --api-key-secret provider/openai --price-input-per-million 1.0 `
+  --price-output-per-million 2.0 --prompt "hello"
+```
+
+An external endpoint requires the contract to enable network and `model_call`;
+a loopback endpoint uses `model_call_local`. The path is tested with a local
+OpenAI-compatible mock; a real cloud provider has **not** been called because no
+credentials/budget were supplied.
 
 ## Backups, secrets and health
 
@@ -227,6 +263,10 @@ python -m director adapters generate --host codex    --out .codex
 Generated configs are disabled/for-review by default. Review paths and merge
 into the host's project-scoped configuration. See
 `docs/HARNESS_INTEGRATION.md`.
+
+OpenCode 1.19.4 V1 can load the config and reports `director connected`, but its
+run agent did not expose MCP tools to the local model in testing. Native tool-call
+remains blocked on that host; use the CLI/MCP SDK path for verified execution.
 
 ## Demo (release evidence)
 

@@ -68,10 +68,10 @@ were not measured.
 |---|---|
 | Mock apply/test/review/merge | 1.518s, merged |
 | Real local-model patch `patch_32e0763…` | qwen2.5-coder:7b authored `format_bytes`; first apply failed (bad hunk count, exit 2); `git apply --recount` retest passed full suite in 126.8s |
-| Independent review | PASS on correctness/safety; **not merged** because the helper has no production caller (dead code) and uses MB vs existing MiB convention |
+| Independent review | PASS on correctness/safety; **rejected** because the helper has no production caller (dead code) and uses MB vs existing MiB convention |
 
-The gate rejected/held the weak patch rather than merging it. The proposal
-remains available for an integration patch.
+The gate rejected the weak patch rather than merging it. The proposal remains
+available for an integration patch.
 
 ## 6. Upstream skill-prompt ablation (prompt-level only)
 

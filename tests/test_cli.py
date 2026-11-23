@@ -59,7 +59,7 @@ def test_cli_model_providers_are_local_and_gated(tmp_path, capsys):
     capsys.readouterr()
     assert cli.main(["model", "providers", "--root", str(root)]) == 0
     payload = _json_output(capsys)
-    assert payload["providers"] == ["stub", "command", "ollama"]
+    assert payload["providers"] == ["stub", "command", "ollama", "openai_compatible"]
     assert "disabled" in payload["cloud_providers"]
 
 

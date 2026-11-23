@@ -19,19 +19,24 @@ sandbox, cloud autonomy or universal domain competence.
 | Verified backups + non-destructive restore | SQLite online backup, ZIP manifest hashes, integrity check, restore test |
 | OS-keychain secrets | Windows Credential Locker round trip test |
 | Health/doctor checks | DB integrity, schema, worker, acceptance, backups, keychain, disk |
-| Local model gateway | stub + owner command, contract/grant/budget/secret gates |
+| Model gateway | stub/command/Ollama + OpenAI-compatible HTTP with keychain and token/cost accounting (cloud mock-tested) |
 | Supervised self-modification | isolated worktree, full suite, independent review, owner merge |
+| Local model authoring | loopback Ollama patch authoring + 24/7 author/test queue |
+| Autostart | per-user Startup-folder install/status/remove (no admin) |
 | Native OpenCode MCP connection | `opencode mcp list` shows `director connected` (1.19.4) |
 | MCP protocol | official SDK round trip, bounded frames/args/results |
 | Three domain pilots | clean fixtures pass; seeded broken fixtures fail |
 | Packaging/install | wheel builds; offline source-path installer; uninstall |
-| Test suite | 74 offline tests, browser and MCP SDK included |
+| Test suite | 79 offline tests, browser and MCP SDK included |
 
 ## Explicit non-claims
 
 - Not a kernel/container sandbox; process-level containment only.
-- No cloud provider, provider credential, API spend or autonomous model loop.
-- Native host **tool-call** behavior is not tested; only OpenCode connection.
+- No real cloud provider call, provider credential or API spend; the
+  OpenAI-compatible path is mock-tested only. No autonomous cloud loop.
+- Native host **tool-call** is blocked on installed OpenCode 1.19.4 V1: config
+  connects, but the run agent did not expose MCP tools to the local model. No
+  `opencode2` is installed. Only the connection is claimed.
 - No multi-user auth, remote service, A2A, computer-use beyond the browser pilot.
 - No billion-token memory scale or general domain certification.
 - Python child processes and the owner command provider run with user privileges.

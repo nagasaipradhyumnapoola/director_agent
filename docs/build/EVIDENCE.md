@@ -15,7 +15,7 @@ Command:
 $env:PYTHONPATH="src"; python -m pytest
 ```
 
-Result: **74 passed in 110.97s**, no failures, no skips. The browser (real
+Result: **79 passed in 94.83s**, no failures, no skips. The browser (real
 Chromium/CDP) and MCP SDK tests executed; they were not skipped.
 
 Coverage highlights:
@@ -104,7 +104,7 @@ ersion
 - Independent reviewer returned **PASS**, verified reverse-apply integrity and
   ran the targeted test; only low non-blocking notes.
 - Owner approval recorded; local fast-forward merge commit f439b16.
-- Merged tree: 74/74 tests, python -m director version --json works.
+- Merged tree: 79/79 tests, python -m director version --json works.
 - The pipeline did not push; the release push was a separate owner action.
 
 ## 4d. Local model/provider gateway and 24/7 patch testing
@@ -139,7 +139,25 @@ ersion
   backups, keychain and disk; `doctor` includes the same gates.
 - Offline installer/uninstaller tested; wheel includes assets and selfdev.
 
-## 4g. Benchmarks
+## 4g. Native tool-call attempt and autostart
+
+- OpenCode 1.19.4 V1 loaded the corrected MCP config and showed `director
+  connected`, but its `run` agent did not expose MCP tools to `qwen3.5:4b`; the
+  model reported no tool available. `opencode2` is not installed.
+  Native tool-call is therefore **blocked**, not claimed.
+- Task Scheduler `ONLOGON` creation was denied (no admin). DIRECTOR fell back to
+  a per-user Startup-folder entry; install/status/remove passed. This is logon
+  autostart in a user session, not a Windows service.
+- `improve auto --queue` can enqueue local-model authoring/testing for the 24/7
+  worker; the synchronous path was exercised with a mock model and real
+  qwen2.5-coder:7b (patch tested 126.8s, review PASS but rejected after review as dead code).
+- OpenAI-compatible HTTP provider: loopback mock returned exact usage/cost;
+  external endpoint was policy-denied without network permission/grant;
+  keychain auth path implemented (no real cloud key used).
+- Redacted JSONL audit log records evidence/model/backup/service/selfdev actions;
+  backup prune and per-user Startup-folder autostart tested.
+
+## 4h. Benchmarks
 
 Full methodology and limits: `docs/build/BENCHMARKS.md`. Raw:
 `benchmarks/results/director_bench_20261123T195633Z.json`,
@@ -153,7 +171,7 @@ Full methodology and limits: `docs/build/BENCHMARKS.md`. Raw:
 - MCP: 20 calls, p95 1.57ms, ping ok.
 - Local Ollama: qwen3:1.7b 41.8s/209 output tokens; qwen2.5-coder:7b 17.3s/3.
 - Selfdev: mock 1.5s; real local-model patch tested 126.8s after recount; review
-  PASS but held as dead code.
+  PASS but rejected after review as dead code.
 - Prompt ablation (one task/model/run): baseline, Ponytail, ECC, Headroom skill
   passed; Superpowers TDD failed its added edge test; upstream runtimes not run.
 - Coverage matrix marks cloud providers and kernel/container sandbox blocked.
@@ -218,5 +236,5 @@ or broad benchmark is claimed.
   (v1.0.0 hardening), `1f98389` (Ollama/selfdev), `5606419` (grants), `f439b16`
   (selfdev) and `85d8209` (pipeline), pushed to `origin/main` on 2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: 74 tests, full demo, zero model calls, independent
+- Verified release evidence: 79 tests, full demo, zero model calls, independent
   review fixes, one merged selfdev patch.

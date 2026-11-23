@@ -7,9 +7,10 @@ from pathlib import Path
 
 import pytest
 
-from director import cli
-from director.backup import create_backup, restore_backup, verify_backup
+from director import audit, cli
+from director.backup import create_backup, prune_backups, restore_backup, verify_backup
 from director.keychain import available, delete_secret, get_secret, set_secret
+from director.service import install, remove, status
 from director.store import Store
 from tests.helpers import new_store
 
@@ -48,6 +49,50 @@ def test_backup_verify_and_restore_to_new_project(tmp_path):
         assert results
     finally:
         reopened.close()
+
+
+def test_backup_prune_keeps_latest(tmp_path):
+    store = new_store(tmp_path)
+    try:
+        first = create_backup(store)
+        second = create_backup(store)
+        result = prune_backups(store, keep=1)
+        assert result["kept"] == 1
+        assert len(result["deleted"]) >= 1
+        remaining = list((Path(store.root) / ".director" / "backups").glob("*.zip"))
+        assert len(remaining) == 1
+        assert first["backup"] != second["backup"]
+    finally:
+        store.close()
+
+
+def test_audit_log_redacts_and_reads(tmp_path):
+    store = new_store(tmp_path)
+    try:
+        audit.log(store, "director.test", "probe", "secret-aws AKIAABCDEFGHIJKLMNOP", "ok")
+        rows = audit.read(store, limit=10)
+        assert rows
+        assert rows[-1]["action"] == "probe"
+        assert "AKIAABCDEFGHIJKLMNOP" not in str(rows[-1])
+    finally:
+        store.close()
+
+
+def test_service_startup_folder_fallback(tmp_path, monkeypatch):
+    monkeypatch.setenv("APPDATA", str(tmp_path / "appdata"))
+    store = new_store(tmp_path)
+    try:
+        result = install(store)
+        assert result["installed"] is True
+        assert result["method"] in {"startup-folder", "task-scheduler"}
+        checked = status(store)
+        assert checked["installed"] is True
+        removed = remove(store)
+        assert removed["removed"] is True
+        assert status(store)["installed"] is False
+    finally:
+        remove(store)
+        store.close()
 
 
 def test_cli_secret_and_health(tmp_path, capsys, monkeypatch):
