@@ -105,6 +105,22 @@ def test_agent_routes_and_uses_recipe(tmp_path):
         store.close()
 
 
+def test_agent_auto_orchestrates_design_and_clarity(tmp_path):
+    store = _store(tmp_path)
+    try:
+        result = run_agent(
+            store,
+            "Design an accessible card; explain the worktree vs container tradeoff",
+            model_fn=lambda _prompt: (_ for _ in ()).throw(AssertionError("model should not be called")),
+            max_steps=1,
+        )
+        assert result["status"] == "finished"
+        assert result["mode"] == "deterministic_orchestrator"
+        assert result["transcript"][0]["observation"]["executed"] == 2
+    finally:
+        store.close()
+
+
 def test_agent_requires_model_grant(tmp_path):
     store = _store(tmp_path)
     try:

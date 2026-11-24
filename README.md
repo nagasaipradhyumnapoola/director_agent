@@ -9,7 +9,7 @@ It is not a model wrapper and not a coding-only tool. It is the layer that says
 
 It is not a promise of omniscience. It is a machine for refusing false completion.
 
-**Release:** `v1.0.0-local-supervised` · **Tests:** 112 offline · **Retrieval:** 100M
+**Release:** `v1.0.0-local-supervised` · **Tests:** 113 offline · **Retrieval:** 100M
 tokens measured · **Idle model calls:** 0 · **Merge:** owner-gated
 
 ![DIRECTOR landing page](docs/build/ui/landing.png)
@@ -268,6 +268,12 @@ merge_intervals, design 14/14, clarity 10/10, context 100% retention / 95%
 compression). The agent can also call `route` and `recipe` as tools, which is
 tested with a scripted model.
 
+Agent → orchestrator: `benchmarks/agent_orchestrate_eval.py` runs
+`run_agent("Design an accessible card; explain the worktree tradeoff")` and gets
+`mode=deterministic_orchestrator`, **2/2** graded outputs with **no model call**.
+That is the end-to-end orchestration path: agent → planner → router → recipe →
+grader.
+
 ![DIRECTOR benchmark view](docs/build/ui/benchmarks.png)
 
 ```powershell
@@ -284,7 +290,7 @@ python benchmarks/skill_report.py --verify-only   # 98/98 coverage check
 | MCP stdio | 20 calls, p95 1.57 ms |
 | Docker image | 260 MB; cold `--version` 1.66–2.01 s |
 | Container isolation | uid 65534, read-only mount, write and network denied |
-| Tests | 112 passed in 109.29 s |
+| Tests | 113 passed in 109.45 s |
 
 Method and raw JSON: [`docs/build/BENCHMARKS.md`](docs/build/BENCHMARKS.md).
 The benchmark is a directional ablation on one host, not a universal leaderboard.
@@ -406,6 +412,7 @@ docs/                research handoff + build docs + evidence
 - [v1 release notes](docs/build/V1_RELEASE.md)
 - [Benchmarks](docs/build/BENCHMARKS.md)
 - [Skill-matrix methodology](docs/build/SKILL_MATRIX.md)
+- [Agent → orchestrator evidence](docs/build/AGENT_E2E.md)
 - [Build status / evidence](docs/BUILD_STATUS.md)
 - [Architecture](docs/build/ARCHITECTURE.md)
 - [Security and threat model](docs/build/SECURITY.md)

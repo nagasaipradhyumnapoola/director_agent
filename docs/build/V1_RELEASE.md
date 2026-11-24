@@ -35,7 +35,7 @@ sandbox, cloud autonomy or universal domain competence.
 | MCP protocol | official SDK round trip, bounded frames/args/results |
 | Three domain pilots | clean fixtures pass; seeded broken fixtures fail |
 | Packaging/install | wheel builds; offline source-path installer; uninstall |
-| Test suite | 112 offline tests, browser and MCP SDK included |
+| Test suite | 113 offline tests, browser and MCP SDK included |
 | Retrieval benchmark | 1M/10M/100M lexical tiers; 100M recall@5 1.0, p95 7.13ms (container) |
 
 ## Explicit non-claims

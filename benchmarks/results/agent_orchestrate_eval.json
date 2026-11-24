@@ -1,0 +1,19 @@
+{
+  "kind": "agent_orchestrator_e2e",
+  "mode": "deterministic_orchestrator",
+  "status": "finished",
+  "steps": 2,
+  "design": {
+    "ok": true,
+    "raw": 14,
+    "max": 14
+  },
+  "clarity": {
+    "ok": true,
+    "raw": 10,
+    "max": 10
+  },
+  "passed": 2,
+  "total": 2,
+  "note": "Agent calls the deterministic orchestrator; no model call."
+}

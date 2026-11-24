@@ -44,6 +44,7 @@ TOOL_HELP = """Available tools (reply with exactly one JSON object):
 {"tool":"memory_search","query":"evidence"}
 {"tool":"remember","title":"decision","text":"..."}
 {"tool":"route","task":"Design an accessible card"}
+{"tool":"orchestrate","goal":"Design a card; explain the tradeoff"}
 {"tool":"recipe","name":"slugify","args":["Hello World",80]}
 {"tool":"propose_patch","title":"Fix X","diff":"diff --git ..."}
 {"tool":"finish","summary":"what was done and what remains"}
@@ -226,6 +227,7 @@ def run_agent(
     timeout: float = 120.0,
     allowed_commands: set[str] | None = None,
     model_fn: Callable[[str], str] | None = None,
+    auto_orchestrate: bool = True,
 ) -> dict[str, Any]:
     if not isinstance(goal, str) or not goal.strip() or len(goal) > 8000:
         raise ValidationError("goal must be 1-8000 chars")
@@ -246,6 +248,35 @@ def run_agent(
     transcript: list[dict[str, Any]] = []
     started = time.perf_counter()
     audit.log(store, "director.agent", "agent.start", run_id, "ok", {"goal": goal[:160]})
+
+    if auto_orchestrate:
+        from .orchestrator import execute as orchestrate, plan as orchestrate_plan
+
+        planned = orchestrate_plan(goal)
+        if planned and all(step["kind"] in {"design", "clarity"} for step in planned):
+            execution = orchestrate(goal)
+            if execution.get("planned", 1) == 0 and execution.get("executed") == len(planned):
+                result = {
+                    "run_id": run_id,
+                    "status": "finished",
+                    "goal": goal,
+                    "steps": 1,
+                    "summary": f"deterministic orchestrator executed {execution['executed']} step(s)",
+                    "transcript": [{"step": 1, "tool": "orchestrate", "observation": execution}],
+                    "duration_s": round(time.perf_counter() - started, 3),
+                    "model": {"provider": "deterministic", "model": "orchestrator"},
+                    "transcript_ref": f".director/agent/{run_id}/transcript.json",
+                    "mode": "deterministic_orchestrator",
+                    "note": "No model call. Deterministic design/clarity recipes executed and can be graded.",
+                }
+                atomic_write_text(
+                    run_dir / "transcript.json",
+                    json.dumps([{"step": 1, "tool": "orchestrate", "observation": execution}], indent=2, default=str),
+                    root=root,
+                )
+                atomic_write_text(run_dir / "result.json", json.dumps(result, indent=2, default=str), root=root)
+                audit.log(store, "director.agent", "agent.finish", run_id, "finished", {"mode": "deterministic"})
+                return result
 
     def call(prompt: str) -> str:
         if model_fn is not None:
@@ -270,13 +301,15 @@ def run_agent(
     )
     status = "max_steps"
     summary = ""
+    seen: set[str] = set()
     for step in range(1, max_steps + 1):
         recent = transcript[-6:]
         prompt = (
             f"GOAL:\n{goal}\n\nPROJECT: {root}\nSTEP {step}/{max_steps}\n"
             "RECENT OBSERVATIONS:\n"
             + json.dumps(recent, ensure_ascii=False, default=str)[: 12000]
-            + "\n\nSYSTEM:\n"
+            + "\n\nRULES: do not repeat a tool call that already succeeded. "
+            "If the goal is satisfied, call finish now. Otherwise choose a different tool.\n\nSYSTEM:\n"
             + system
             + "\nReply with one JSON tool call now."
         )
@@ -289,6 +322,12 @@ def run_agent(
             transcript.append({"step": step, "raw": redact_text(raw, max_chars=1200), "error": str(exc)})
             continue
         tool = action["tool"]
+        signature = tool + ":" + json.dumps({k: v for k, v in action.items() if k != "tool"}, sort_keys=True, default=str)
+        if signature in seen:
+            observation = {"error": "repeated tool call ignored; call finish or choose a different tool"}
+            transcript.append({"step": step, "tool": tool, "observation": observation})
+            continue
+        seen.add(signature)
         observation: Any
         try:
             if tool == "finish":
@@ -325,6 +364,10 @@ def run_agent(
                 from .router import route as route_task
 
                 observation = route_task(str(action.get("task") or ""))
+            elif tool == "orchestrate":
+                from .orchestrator import execute as orchestrate
+
+                observation = orchestrate(str(action.get("goal") or ""))
             elif tool == "propose_patch":
                 from .selfdev import create_patch
 
