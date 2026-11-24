@@ -178,6 +178,10 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
      context 100% retention / 95% compression);
    - agent → orchestrator: 2/2 deterministic outputs, no model call; a real
      local 7B model used recipe and finished but did not choose `route`.
+16. CI/CD (GitHub Actions):
+   - `test` (Windows/Python 3.12), `benchmarks` (recipes/orchestrator/coverage/
+     portfolio), `docker` (image + init/status), `package` (wheel + sdist);
+   - latest run `45397140725` at `3e55999` is green on all four jobs.
 
 ## Evidence levels (per surface)
 

@@ -200,6 +200,10 @@ ersion
   no model call. A real local 7B model also used the recipe tool and finished,
   but did not choose `route`; that limitation is recorded in
   `benchmarks/results/agent_e2e.json`.
+- CI (GitHub Actions run `45397140725`, commit `3e55999`): **test, benchmarks,
+  docker and package all pass**. Python 3.12 Windows venv: 113 tests pass.
+  Linux benchmark container: recipes 4/4, orchestrator 7/7, agent→orchestrator
+  2/2, coverage 98/98.
 
 ## 4h. Benchmarks
 

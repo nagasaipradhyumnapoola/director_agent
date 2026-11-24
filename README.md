@@ -402,7 +402,8 @@ docs/                research handoff + build docs + evidence
 - **docker** — build `director:ci`, version, init/status in a mounted volume.
 - **package** — build wheel + sdist and upload `director-dist`.
 
-No deploy step: this project is local-first and owner-operated.
+No deploy step: this project is local-first and owner-operated. Latest run
+(`3e55999`): **test, benchmarks, docker and package all pass**.
 
 ## What is deliberately not claimed
 
