@@ -26,7 +26,7 @@ CASES = {
         "import re\n_DURATION_UNITS = {'d': 86400, 'h': 3600, 'm': 60, 's': 1}\n_DURATION_RANK = {'d': 4, 'h': 3, 'm': 2, 's': 1}\n",
         matrix_tasks.DURATION_TEST,
     ),
-    "merge_intervals": ("merge_intervals", "", matrix_tasks.INTERVAL_TEST),
+    "merge_intervals": ("merge_intervals", "from typing import Iterable\n", matrix_tasks.INTERVAL_TEST),
 }
 
 

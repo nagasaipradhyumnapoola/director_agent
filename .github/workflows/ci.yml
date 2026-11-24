@@ -18,7 +18,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools
           python -m pip install -e . --no-deps
-          python -m pip install pytest "mcp>=1.0" python-docx
+          python -m pip install pytest "mcp>=1.0" python-docx keyring
       - name: Doctor (help)
         run: python -m director --version
       - name: Offline tests

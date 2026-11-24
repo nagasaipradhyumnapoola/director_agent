@@ -104,7 +104,8 @@ def test_mcp_sdk_roundtrip(tmp_path):
         async with stdio_client(params) as (read, write):
             async with ClientSession(read, write) as session:
                 initialized = await session.initialize()
-                assert initialized.protocolVersion
+                version = getattr(initialized, "protocol_version", None) or getattr(initialized, "protocolVersion", None)
+                assert version
                 tools = await session.list_tools()
                 assert any(tool.name == "director_status" for tool in tools.tools)
                 result = await session.call_tool("director_status", {})
