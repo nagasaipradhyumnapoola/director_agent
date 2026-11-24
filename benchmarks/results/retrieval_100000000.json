@@ -1,0 +1,14 @@
+{
+  "tokens": 100000000,
+  "docs_target": 100000,
+  "docs_done": 100000,
+  "complete": true,
+  "this_run_docs": 936,
+  "this_run_seconds": 2.543,
+  "db_bytes": 1768812648,
+  "recall_at_5": 1.0,
+  "p50_ms": 1.383,
+  "p95_ms": 2.001,
+  "max_ms": 6.725,
+  "queries": 100
+}

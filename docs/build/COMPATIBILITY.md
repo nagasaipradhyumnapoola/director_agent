@@ -21,7 +21,7 @@ Evidence levels are not interchangeable:
 | ML pilot | **domain-validated** | controlled clean/leaky fixtures; pure-Python CPU; leakage/held-out/repro/slices |
 | Research/document pilot | **domain-validated** | controlled conflicting dated sources; HTML render inspected; DOCX optional |
 | Self-improvement proposals | implemented, tested | proposal-only, owner approval, zero model calls |
-| Supervised selfdev executor | implemented, integration tested | path allowlist, isolated worktree, full tests, independent review record, owner merge; no push; provider authoring NOT implemented |
+| Supervised selfdev executor | implemented, integration tested | path allowlist, isolated worktree, full tests, independent review record, owner merge; no push; local Ollama authoring tested; cloud authoring NOT tested |
 | Model gateway | implemented, tested | stub/command/Ollama; OpenAI-compatible HTTP with keychain and token/cost accounting; cloud path mock-tested, real cloud not called |
 | Backups/restore | implemented, tested | consistent SQLite online backup, hashed manifest, integrity verify, non-destructive restore |
 | OS keychain | implemented, tested | Windows Credential Locker round trip; no plaintext fallback |
@@ -37,6 +37,7 @@ Evidence levels are not interchangeable:
 | A2A / computer-use | roadmap | not implemented |
 | POSIX | code paths present | not validated in this release |
 | Container runner | implemented, tested | Docker 29.6.2; read-only mount, no network, uid 65534, cap-drop ALL; not a hardened microVM |
+| Container image | implemented, tested | `director:local` 260MB; build + version/init/status; CI docker job |
 
 ## MCP protocol note
 

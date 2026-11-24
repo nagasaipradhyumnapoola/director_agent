@@ -386,7 +386,7 @@ def bench_selfdev_mock(tmp: Path) -> dict[str, Any]:
 def coverage_matrix() -> list[dict[str, str]]:
     return [
         {"tool": "DIRECTOR core", "status": "measured", "note": "domain/retrieval/MCP/selfdev benchmarks"},
-        {"tool": "OpenCode", "status": "partially measured", "note": "native MCP connection tested; native tool-call not"},
+        {"tool": "OpenCode", "status": "partially measured", "note": "native MCP connection + director_status tool-call tested via loopback proxy; Claude/Codex paths not"},
         {"tool": "MCP", "status": "measured", "note": "stdio protocol/latency; remote/OAuth not"},
         {"tool": "Ollama local models", "status": "measured", "note": "latency/token accounting; not coding quality"},
         {"tool": "Headroom", "status": "not run", "note": "no runtime adapter installed; research only"},
@@ -404,6 +404,9 @@ def main() -> int:
     parser.add_argument("--skip-browser", action="store_true")
     parser.add_argument("--skip-ollama", action="store_true")
     parser.add_argument("--skip-retrieval", action="store_true")
+    parser.add_argument("--skip-domains", action="store_true")
+    parser.add_argument("--skip-mcp", action="store_true")
+    parser.add_argument("--skip-selfdev", action="store_true")
     args = parser.parse_args()
     tiers = tuple(int(item) for item in args.tiers.split(",") if item.strip())
     started = time.perf_counter()
@@ -419,11 +422,14 @@ def main() -> int:
         "coverage_matrix": coverage_matrix(),
     }
     try:
-        payload["results"]["domains"] = bench_domains(tmp, browser=not args.skip_browser)
+        if not args.skip_domains:
+            payload["results"]["domains"] = bench_domains(tmp, browser=not args.skip_browser)
         if not args.skip_retrieval:
             payload["results"]["retrieval"] = bench_retrieval(tmp, tiers)
-        payload["results"]["mcp"] = bench_mcp(tmp)
-        payload["results"]["selfdev"] = bench_selfdev_mock(tmp)
+        if not args.skip_mcp:
+            payload["results"]["mcp"] = bench_mcp(tmp)
+        if not args.skip_selfdev:
+            payload["results"]["selfdev"] = bench_selfdev_mock(tmp)
         if not args.skip_ollama:
             payload["results"]["ollama"] = bench_ollama(tmp, ("qwen3:1.7b", "qwen2.5-coder:7b"))
     finally:

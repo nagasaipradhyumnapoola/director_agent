@@ -121,11 +121,13 @@ calls. Proposals are durable and owner-approved only.
 
 The local model gateway (`providers.py`) is explicit, not idle: the contract
 must enable `model_call_local`, an owner grant must match, and a model-call
-budget must be available. It supports a deterministic stub and an
-owner-supplied local command; cloud providers/credentials are not implemented.
+budget must be available. It supports a deterministic stub, an owner-supplied
+local command, loopback Ollama and OpenAI-compatible HTTP with OS-keychain
+credentials. Cloud calls are default-denied and were not exercised with a real
+cloud key.
 
 `director selfdev` is the supervised code-application path: allowlisted patch ->
 disposable git worktree at a recorded base -> full offline tests -> independent
 review record -> owner merge approval -> local fast-forward. It never pushes.
-Provider-driven autonomous patch authoring remains gated (see
+Local Ollama authoring is supported; real cloud authoring remains gated (see
 `docs/SELF_IMPROVEMENT.md`).

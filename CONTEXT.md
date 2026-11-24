@@ -154,11 +154,13 @@ v1.0.0-local-supervised is implemented and tested on this host for its local sin
   verified through a loopback OpenAI-compatible proxy.
 - Verified backups/restore, OS-keychain secrets and health/doctor gates are
   tested on this host.
-- Benchmarks: domain 8/8; 1M/10M lexical retrieval (p95 0.73/1.73ms); MCP p95
+- Benchmarks: domain 8/8; 1M/10M/100M lexical retrieval (p95
+  0.73/1.73/7.13ms container; 100M = 100k docs, 217.5s ingest, 1.78GB); MCP p95
   1.57ms; local Ollama latency/token accounting; prompt-level upstream skill
-  ablation. Upstream runtimes and real cloud remain unmeasured. The Docker
-  runner is verified but is not a hardened microVM. See
-  `docs/build/BENCHMARKS.md`.
+  ablation. 1B was attempted and stopped after 4h at ~22% (3.9GB), so it is a
+  measured scaling limit, not a result. Upstream runtimes and real cloud remain
+  unmeasured. The Docker runner/image is verified but is not a hardened microVM.
+  See `docs/build/BENCHMARKS.md`.
 - OpenAI-compatible HTTP provider is verified against a loopback proxy with
   keychain auth and exact usage; an external endpoint was denied without
   permission and grant. No real cloud spend was made.

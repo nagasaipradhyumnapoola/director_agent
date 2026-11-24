@@ -1,0 +1,10 @@
+.git
+.director
+var
+venv
+.venv
+__pycache__
+*.pyc
+*.zip
+benchmarks/results
+docs/build/evidence

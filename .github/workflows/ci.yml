@@ -23,3 +23,21 @@ jobs:
         run: python -m director --version
       - name: Offline tests
         run: python -m pytest
+
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t director:ci .
+      - name: CLI version
+        run: docker run --rm director:ci --version
+      - name: Project init/status in a mounted volume
+        run: |
+          mkdir -p project
+          chmod -R 777 project
+          docker run --rm -v "$PWD/project:/project" director:ci \
+            init --root /project --name ci --domain general
+          docker run --rm -v "$PWD/project:/project" director:ci \
+            status --root /project --json

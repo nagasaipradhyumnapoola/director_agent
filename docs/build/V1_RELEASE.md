@@ -30,6 +30,7 @@ sandbox, cloud autonomy or universal domain competence.
 | Three domain pilots | clean fixtures pass; seeded broken fixtures fail |
 | Packaging/install | wheel builds; offline source-path installer; uninstall |
 | Test suite | 85 offline tests, browser and MCP SDK included |
+| Retrieval benchmark | 1M/10M/100M lexical tiers; 100M recall@5 1.0, p95 7.13ms (container) |
 
 ## Explicit non-claims
 
@@ -42,7 +43,8 @@ sandbox, cloud autonomy or universal domain competence.
   via a loopback OpenAI-compatible proxy. Claude/Codex native paths are not
   tested. Direct cloud-provider billing was not exercised.
 - No multi-user auth, remote service, A2A, computer-use beyond the browser pilot.
-- No billion-token memory scale or general domain certification.
+- 1B retrieval did not complete (4h reached ~22% of the projected index); 100M
+  is measured. No general domain certification or billion-token attention claim.
 - Python child processes and the owner command provider run with user privileges.
 
 ## Operator runbook

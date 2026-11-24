@@ -36,11 +36,12 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
   come from DIRECTOR constants, not fixture config.
 - Research uses a trusted calculation tolerance, requires source quotes,
   conflict/date handling and resolved citations in the rendered document.
-- The 24/7 worker is deterministic and proposal-only. It cannot model-call,
-  spend, edit source, push or deploy.
+- The 24/7 worker is deterministic at idle and cannot spend, merge, push or
+  deploy. It may execute explicitly enqueued jobs: scan, proposal generation,
+  local-model author/test, and scheduled backups.
 - selfdev adds supervised self-modification: validated patch -> isolated git
   worktree -> full tests -> independent review -> owner merge. It never pushes.
-  Provider-driven autonomous patch authoring remains gated.
+  Local Ollama authoring is tested; real cloud authoring remains gated.
 
 ## Milestones
 
@@ -52,7 +53,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 - [x] M1 website pilot (static + real Chromium CDP journey)
 - [x] M1 ML pilot (manifest, leakage, held-out, reproducibility, slices, resources)
 - [x] M1 research/document pilot (claims, conflicts, calculation, render)
-- [x] Supervised self-improvement proposal engine (24/7, proposal-only)
+- [x] Supervised self-improvement proposal engine (24/7 idle = deterministic)
 - [x] Supervised self-modification executor (worktree, tests, review, owner merge)
 - [x] Local model/provider gateway (stub + owner command) with grant/budget gates
 - [x] 24/7 worker can test queued selfdev patches
@@ -112,13 +113,16 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
      `director_director_status`, received the status JSON, and replied
      `ACCEPTANCE=false`.
 10. Benchmarks (`docs/build/BENCHMARKS.md`):
-   - domain discrimination 8/8; 1M/10M lexical tiers (recall@5 1.0, p95
-     0.726ms/1.727ms, deletion 0 results);
+   - domain discrimination 8/8; 1M/10M/100M lexical tiers (recall@5 1.0, p95
+     0.726ms/1.727ms/7.134ms container, deletion 0 results);
+   - 100M: 100,000 docs, 217.5s ingest, 1.78GB index; host chunked p95 2.001ms;
+   - 1B attempted in-container: stopped after 4h at 3.9GB/~22% (95% CPU,
+     475MB RSS); no 1B result claimed — FTS5 ingest degrades at this scale;
    - MCP 20 calls p95 1.57ms; local qwen3/qwen2.5 gateway calls 41.8s/17.3s;
    - mock selfdev 1.5s; real local-model patch tested 126.8s, review PASS but
      rejected after review as dead code;
    - prompt ablation baseline/Ponytail/ECC/Headroom pass, TDD variant fail;
-     upstream runtimes not executed; container sandbox not available.
+     upstream runtimes not executed; container runner verified separately.
 11. Provider/ops extensions:
    - OpenAI-compatible HTTP provider: loopback mock returned exact usage/cost;
      external endpoint denied without network permission/grant; keychain secret
@@ -154,8 +158,10 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 
 ## Known limitations
 
-- Process-level supervision only; not a kernel/container sandbox. Fixtures are
-  controlled/trusted. Do not run untrusted repositories or training code.
+- Process-level supervision by default. The optional Docker runner is bounded
+  (read-only, no network, unprivileged) but not a hardened microVM. Fixtures are
+  controlled/trusted. Do not run untrusted repositories or training code without
+  the container runner and a deliberate policy grant.
 - Browser/ML/research pilots are fixture-scoped, not general domain claims.
 - Live web freshness, autonomous cloud provider routing, A2A and billion-token
   scale are not shipped. Native OpenCode tool-call is verified; Claude/Codex

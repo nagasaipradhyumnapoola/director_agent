@@ -194,6 +194,17 @@ the process runs as uid 65534 with all capabilities dropped and memory/CPU/pid
 bounds. It is bounded isolation, not a hardened microVM. `selfdev` itself still
 tests in a git worktree.
 
+### Build the DIRECTOR image
+
+```powershell
+docker build -t director:local .
+docker run --rm director:local --version
+docker run --rm -v "${PWD}:/project" director:local status --root /project --json
+```
+
+The image runs unprivileged and mounts the project at `/project`. It is tested by
+the `docker` CI job (build, version, init, status).
+
 ## Memory and preflight
 
 ```powershell

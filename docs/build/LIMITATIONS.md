@@ -71,7 +71,7 @@
   or spend; `improve apply` is blocked.
 - `selfdev` applies an authored patch in an isolated git worktree with full
   tests, an independent review record and owner merge. The worktree is not a
-  kernel/container sandbox.
+  container or microVM sandbox.
 - It requires a clean working tree, an unchanged base commit and local git; it
   never pushes/deploys.
 - Provider-driven autonomous authoring exists for local Ollama; real cloud
@@ -79,8 +79,9 @@
 
 ## Memory
 
-- Lexical FTS5 baseline only; no measured semantic/dense retrieval, no
-  billion-token scale, no temporal graph evaluation.
+- Lexical FTS5 baseline only; 100M tokens is measured, but 1B did not complete
+  (4h reached ~22% of the projected index), so no billion-token result is
+  claimed. No semantic/dense or temporal graph evaluation.
 - Memory is project-scoped and tainted; retrieved text never grants authority,
   but it can still influence model reasoning.
 

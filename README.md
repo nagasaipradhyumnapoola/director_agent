@@ -33,6 +33,17 @@ source-path entry (no network, no global package install); `uninstall.ps1` /
 `uninstall.sh` remove it without touching project state. If you prefer a package
 install, use `python -m pip install -e . --no-deps` (build tooling may be needed).
 
+Container image (Docker):
+
+```powershell
+docker build -t director:local .
+docker run --rm director:local --version
+docker run --rm -v "${PWD}:/project" director:local status --root /project --json
+```
+
+The image runs as uid 65534 and expects the project at `/project`. It includes
+the CLI and MCP dependency, not the browser/ML research fixtures.
+
 ## What works now
 
 - Durable task contracts, acceptance criteria, SQLite WAL state, schema v4.
@@ -81,7 +92,9 @@ install, use `python -m pip install -e . --no-deps` (build tooling may be needed
 - Native OpenCode MCP **connection and tool-call** are tested: `director
   director_status` executed through a loopback OpenAI-compatible proxy and the
   model reported the result. Claude/Codex native paths are not tested.
-- No billion-token memory scale, A2A, computer-use or general domain competence.
+- No billion-token memory completion: 100M tokens is measured; a 1B attempt
+  reached ~22% after 4h and was stopped. No A2A, computer-use or general domain
+  competence.
 - No autonomous cloud provider loop or cloud authoring without an owner key,
   grant and budget; local Ollama authoring exists and is gated.
 

@@ -103,13 +103,15 @@ def run(
         raise ValidationError("workdir does not exist")
 
     policy = PolicyGateway(store)
+    latest = store.latest_contract()
+    revision = int(latest[0]["revision"]) if latest else 1
     if network:
-        policy.require("director.container", "network_read", "container", 1)
+        policy.require("director.container", "network_read", "container", revision)
     policy.require(
         "director.container",
         "container_run",
         "container",
-        1,
+        revision,
         payload={"image": image, "network": network, "writable": writable},
     )
 

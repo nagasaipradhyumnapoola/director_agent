@@ -2,11 +2,14 @@
 
 Date: 2026-11-24 (run timestamps 2026-11-23 UTC)
 Host: Windows 11, Python 3.14.4, SQLite 3.50.4, Node 24.14.1,
-Chrome 158, Ollama 0.40.11.
+Chrome 158, Ollama 0.40.11. Container runs: Linux/Python 3.12.16,
+Docker 29.6.2, 5GB memory cap.
 
 Raw results:
 
 - `benchmarks/results/director_bench_20261123T195633Z.json` — core/domain/retrieval/MCP/local-model/selfdev
+- `benchmarks/results/director_bench_20261123T222130Z.json` — container 100M retrieval
+- `benchmarks/results/retrieval_100000000.json` — host chunked 100M retrieval
 - `benchmarks/results/prompt_ablation.json` — upstream skill-prompt ablation
 - `benchmarks/results/retrieval_smoke.json` — earlier 500-doc smoke
 
@@ -33,9 +36,20 @@ Synthetic exact-marker corpus, FTS5, 100 queries per tier.
 |---|---|---|---|---|---|---|---|
 | 1M tokens | 1,000 | 2.23s | 1.0 | 0.433ms | 0.726ms | 22.0MB | 0 results |
 | 10M tokens | 10,000 | 24.64s | 1.0 | 0.920ms | 1.727ms | 181.8MB | 0 results |
+| 100M tokens | 100,000 | 217.5s | 1.0 | 1.164ms | 7.134ms | 1.78GB | 0 results |
 
-100M and 1B were **not run**. Exact lexical markers are necessary smoke
-evidence, not semantic/temporal/ACL/billion-scale proof.
+The 100M tier was also completed in resumable host chunks (the host process
+limit killed single-process ingestion): p50 1.383ms, p95 2.001ms, max 6.725ms,
+recall 1.0. The container run above is the single-process reference.
+
+**1B was attempted and not completed.** In the same 5GB container it ran for
+4h at ~95% CPU and 475MB RSS, writing 3.9GB (about 22% of the projected 17.8GB
+index) before it was terminated. FTS5 ingestion degrades sharply at this scale;
+no 1B recall or latency number is claimed. Reaching 1B needs a different index
+strategy (sharding, bulk transactions, or external/compressed storage).
+
+Exact lexical markers are necessary smoke evidence, not semantic/temporal/ACL
+proof.
 
 ## 3. MCP stdio
 
@@ -48,7 +62,9 @@ Protocol `2025-11-25`, 9 tools, 20 `director_status` calls.
 | p95 | 1.570ms |
 | ping | ok |
 
-Local stdio only. Remote/OAuth/native tool-call not measured.
+Local stdio only. Remote/OAuth/native tool-call not measured. Native OpenCode
+`director_director_status` tool-call was verified separately (loopback proxy),
+not as a latency benchmark.
 
 ## 4. Local Ollama models
 
@@ -96,26 +112,43 @@ Superpowers/ECC hooks/controllers were **not** activated.
 | Tool/surface | Status | Evidence/limit |
 |---|---|---|
 | DIRECTOR core | measured | domain/retrieval/MCP/selfdev |
-| OpenCode | partially measured | native MCP connection connected; tool-call not |
+| OpenCode | partially measured | native MCP connection + `director_status` tool-call via loopback proxy; Claude/Codex paths and tool-call latency not measured |
 | MCP | measured | stdio latency/protocol |
 | Ollama local models | measured | latency/token accounting |
 | Headroom | prompt skill only | compression runtime not run |
 | Ponytail | prompt skill only | runtime/hooks not run |
 | Superpowers | prompt skill only | runtime/hooks not run |
 | ECC | prompt skill only | selected skill; catalog/controllers not activated |
-| Cloud providers | blocked | no credentials/spend |
-| Kernel/container sandbox | blocked | Docker daemon not running |
+| Cloud providers | partially measured | loopback OpenAI-compatible proxy with keychain/cost; no real cloud key/spend |
+| Container runner | measured | Docker 29.6.2; uid 65534, read-only mount, no network, write denied |
+| Kernel/microVM sandbox | not measured | container runner is not a hardened microVM |
+| 1B lexical retrieval | attempted, not completed | stopped after 4h at 3.9GB/~22% at 95% CPU; 100M measured |
+
+## 8. Container runner and image
+
+| Check | Result |
+|---|---|
+| Image build | `director:local`, 260MB |
+| Cold CLI (`docker run --rm ... --version`) | 2.007s / 1.662s / 1.721s (3 runs) |
+| Project init/status in a mounted volume | passed as uid 65534 |
+| Read-only source mount | write denied (`Read-only file system`) |
+| Network | disabled (`Network is unreachable`) |
+| Container 100M retrieval | 217.5s ingest, 100 queries, recall 1.0, p50 1.164ms, p95 7.134ms, 1.78GB |
+
+The image is `python:3.12-slim` plus DIRECTOR and its MCP/DOCX dependencies; it
+does not include Chrome, Node or the browser/ML fixtures. The CI `docker` job
+builds it and runs version/init/status.
 
 ## Honest conclusion
 
 DIRECTOR is fast on the measured local paths and its gates correctly reject a
 weak model-authored patch. The benchmark set does **not** establish superiority
 over Headroom, Ponytail, Superpowers or ECC, does not test cloud models, and
-does not establish 100M/1B retrieval or general domain accuracy.
+does not establish 1B retrieval or general domain accuracy.
 
 To claim more, run:
 1. multi-task, multi-seed, held-out coding tasks with human/LLM-judge calibration;
 2. actual upstream runtime/hook integration and paired ablations;
-3. 100M/1B retrieval with temporal/ACL/contradiction queries;
+3. 1B retrieval and temporal/ACL/contradiction queries (100M exact-marker is measured);
 4. cloud-provider runs with authorized keys/budgets;
-5. container/VM sandbox runs.
+5. hardened microVM/kernel sandbox runs (the Docker runner is measured).

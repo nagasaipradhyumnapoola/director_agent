@@ -15,7 +15,7 @@ Command:
 $env:PYTHONPATH="src"; python -m pytest
 ```
 
-Result: **85 passed in 115.58s**, no failures, no skips. The browser (real
+Result: **85 passed in 117.08s**, no failures, no skips. The browser (real
 Chromium/CDP) and MCP SDK tests executed; they were not skipped.
 
 Coverage highlights:
@@ -162,6 +162,8 @@ ersion
   65534, read a mounted file, failed to write (read-only mount), and could not
   open a network socket (`Network is unreachable`). Source is mounted `:ro`, caps
   dropped, `no-new-privileges`, with memory/CPU/pid/output bounds.
+- Production image: `director:local` (260MB) builds, runs `--version` in
+  1.66-2.01s, and initializes/inspects a mounted project as uid 65534.
 - Opt-in maintenance: first `maybe_run` created a backup, an immediate second run
   was skipped, and disable stopped it.
 
@@ -169,20 +171,28 @@ ersion
 
 Full methodology and limits: `docs/build/BENCHMARKS.md`. Raw:
 `benchmarks/results/director_bench_20261123T195633Z.json`,
+`benchmarks/results/director_bench_20261123T222130Z.json`,
+`benchmarks/results/retrieval_100000000.json`,
 `benchmarks/results/prompt_ablation.json`.
 
 - Domain discrimination: 8/8 (4 clean pass, 4 broken fail), 52.9s including
   real Chromium.
 - Lexical retrieval: 1M tokens (1,000 docs) ingest 2.23s, recall@5 1.0, p95
   0.726ms; 10M tokens (10,000 docs) ingest 24.64s, recall@5 1.0, p95 1.727ms,
-  181.8MB DB; deletion returned 0. 100M/1B not run.
+  181.8MB DB; **100M tokens (100,000 docs) ingest 217.5s in the container,
+  recall@5 1.0, p50 1.164ms, p95 7.134ms, 1.78GB DB**; deletion returned 0.
+  The same 100M tier in resumable host chunks measured p95 2.001ms. 1B was
+  attempted in the same container: after 4h it had written 3.9GB (~22% of the
+  projected 17.8GB) at ~95% CPU and 475MB RSS, and was terminated. No 1B
+  recall/latency is claimed; FTS5 ingestion degrades at this scale.
 - MCP: 20 calls, p95 1.57ms, ping ok.
 - Local Ollama: qwen3:1.7b 41.8s/209 output tokens; qwen2.5-coder:7b 17.3s/3.
 - Selfdev: mock 1.5s; real local-model patch tested 126.8s after recount; review
   PASS but rejected after review as dead code.
 - Prompt ablation (one task/model/run): baseline, Ponytail, ECC, Headroom skill
   passed; Superpowers TDD failed its added edge test; upstream runtimes not run.
-- Coverage matrix marks cloud providers and kernel/container sandbox blocked.
+- Coverage matrix marks real cloud spend and kernel/microVM sandboxing as not
+  measured; native OpenCode tool-call and the bounded Docker runner are verified.
 
 ## 5. Independent review
 
@@ -231,9 +241,11 @@ Proven on this host, with controlled fixtures:
 - Native host tool-call integration for any agent.
 - Live web research freshness, cloud provider routing/spend, A2A, computer-use.
 - Billion-token memory scale or semantic memory.
-- Provider-driven autonomous patch authoring; `improve apply` is blocked and
-  `selfdev` needs an agent/human-authored patch.
-- Kernel/container sandboxing; `selfdev` uses process-level isolation.
+- Provider-driven autonomous patch authoring exists for local Ollama; real cloud
+  authoring is gated and `improve apply` is blocked. `selfdev` needs an authored
+  patch (agent, human or local model).
+- Kernel/microVM sandboxing; `selfdev` uses process-level isolation or the
+  optional Docker runner, not a hardened VM boundary.
 
 Performance/quality claims are fixture-scoped; no comparative productivity study
 or broad benchmark is claimed.
