@@ -147,8 +147,8 @@
           <div class="panel-body">${ring(data.acceptance.percent)}</div></div>
         <div class="panel"><div class="panel-head"><h2>Next actions</h2><span class="badge badge--warn">owner</span></div>
           <div class="panel-body" style="display:grid;gap:.9rem">
-            <p style="margin:0;color:var(--muted);font-size:.88rem">The matrix is staged. The UI is first; benchmarks run after sign-off.</p>
-            <pre class="code">python benchmarks/skill_matrix.py --seeds 3</pre>
+            <p style="margin:0;color:var(--muted);font-size:.88rem">The matrix is complete and verified 98/98. The portfolio routes to the best specialist per task kind.</p>
+            <pre class="code">python benchmarks/router_score.py</pre>
             <a class="btn btn--sm" href="#benchmarks">Open benchmark view</a>
             <p style="margin:0;color:var(--faint);font-size:.76rem">Worker: ${esc(data.worker.status)} · heartbeat ${data.worker.heartbeat_age_seconds}s · idle model calls 0</p>
           </div></div>
@@ -205,8 +205,16 @@
   }
 
   function renderBenchmarks() {
+    const portfolio = data.portfolio;
     return `${pageHead("Benchmarks", "Measured on one host. Limits are part of the result.",
       `<a class="btn btn--sm" href="https://github.com/nagasaipradhyumnapoola/director_agent/blob/main/docs/build/BENCHMARKS.md" rel="noreferrer">Method</a>`)}
+      ${portfolio ? `<div class="panel"><div class="panel-head"><h2>DIRECTOR portfolio</h2><span class="badge badge--pass">${portfolio.overall}</span></div>
+        <div class="panel-body"><div class="kpi-grid" style="border:0">
+          <div class="kpi"><span class="label">Coding</span><span class="value">${Math.round(portfolio.coding.rate * 100)}%</span><span class="delta up">recipes ${portfolio.coding.passed}/${portfolio.coding.total}</span></div>
+          <div class="kpi"><span class="label">Design</span><span class="value">${Math.round(portfolio.design.rate * 100)}%</span><span class="delta up">${esc(portfolio.design.source)}</span></div>
+          <div class="kpi"><span class="label">Clarity</span><span class="value">${Math.round(portfolio.clarity.rate * 100)}%</span><span class="delta">${esc(portfolio.clarity.source)}</span></div>
+          <div class="kpi"><span class="label">Context</span><span class="value">${Math.round(portfolio.context.rate * 100)}%</span><span class="delta up">${esc(portfolio.context.source)}</span></div>
+        </div><p style="color:var(--faint);font-size:.76rem;margin:.8rem 0 0">Portfolio of specialists, not one prompt. Coding is deterministic and test-graded; design/context reuse the measured best procedure; clarity uses the DIRECTOR template.</p></div></div>` : ""}
       ${retrievalTable()}
       <div class="panel"><div class="panel-head"><h2>p95 retrieval latency</h2><span class="badge">100M measured</span></div>
         <div class="panel-body">${p95Chart()}</div></div>
@@ -336,6 +344,7 @@
     .then((response) => (response.ok ? response.json() : Promise.reject(new Error("no live state"))))
     .then((live) => {
       if (!live || !live.ok) return;
+      if (new URLSearchParams(location.search).get("demo") === "1") return;
       data.project = { ...data.project, ...live.project };
       data.worker = live.worker;
       data.kpis = live.kpis;

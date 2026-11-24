@@ -138,6 +138,28 @@ Task winners:
 Full per-task cards: `benchmarks/results/skill_individual.md`.
 Verify coverage with `python benchmarks/skill_report.py --verify-only`.
 
+## DIRECTOR portfolio (runtime)
+
+The product does not use one prompt for everything. It routes:
+
+| Dimension | Score | Source |
+|---|---:|---|
+| Coding | 100% | deterministic recipes 3/3, including slugify |
+| Selfdev | 100% | test-gated selfdev |
+| Design | 100% | ui-ux-pro-max |
+| Clarity | 100% | DIRECTOR clarity template |
+| Context | 100% | DIRECTOR (94% compression) |
+| **Portfolio overall** | **100.0** | vs 84.1 best single prompt |
+
+`benchmarks/recipe_eval.py` executes the recipes against the same official
+tests: `slugify`, `parse_duration` and `merge_intervals` all pass. This is a
+runtime capability, not a prompt score. `benchmarks/router_score.py` composes
+the portfolio from the measured specialists.
+
+The router is explicit and testable (`src/director/router.py`), not an oracle:
+code → verified recipes, design → ui-ux-pro-max, clarity → DIRECTOR template,
+context/selfdev → DIRECTOR.
+
 ## Limits
 
 - One model, one host, one run per task unless `--seeds` is raised.

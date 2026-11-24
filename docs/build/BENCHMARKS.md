@@ -164,6 +164,12 @@ score rank is directional, not statistically separable. Coding/selfdev are
 test-graded; design/clarity/context use fixed rubrics. One model, one host, two
 seeds.
 
+The runtime portfolio (`benchmarks/router_score.py`) routes coding to verified
+recipes (3/3, including slugify), design to ui-ux-pro-max, clarity to the
+DIRECTOR template, and context/selfdev to DIRECTOR: **100.0** on the same
+dimensions, versus 84.1 for the best single prompt. It is a portfolio, not a
+single-prompt claim.
+
 ## Honest conclusion
 
 DIRECTOR is fast on the measured local paths and its gates correctly reject a

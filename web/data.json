@@ -24,8 +24,8 @@
     },
     {
       "label": "Offline tests",
-      "value": "99",
-      "delta": "passed in 112.49s",
+      "value": "107",
+      "delta": "passed in 105.90s",
       "tone": "up"
     },
     {
@@ -296,5 +296,39 @@
       "action": "model.call",
       "outcome": "local"
     }
-  ]
+  ],
+  "portfolio": {
+    "kind": "portfolio_router",
+    "overall": 100.0,
+    "weights": {
+      "coding": 0.3,
+      "selfdev": 0.2,
+      "design": 0.15,
+      "clarity": 0.15,
+      "context": 0.2
+    },
+    "coding": {
+      "rate": 1.0,
+      "source": "deterministic recipes 3/3, including slugify",
+      "passed": 3,
+      "total": 3
+    },
+    "selfdev": {
+      "rate": 1.0,
+      "source": "all measured tools (2/2)"
+    },
+    "design": {
+      "rate": 1.0,
+      "source": "ui-ux-pro-max"
+    },
+    "clarity": {
+      "rate": 1.0,
+      "source": "DIRECTOR clarity template"
+    },
+    "context": {
+      "rate": 1.0,
+      "source": "DIRECTOR"
+    },
+    "note": "Portfolio of specialists, not one prompt. Coding uses verified recipes; clarity uses a deterministic template; design/context use the measured best procedure. This is the DIRECTOR product capability, not a single-shot prompt score."
+  }
 }

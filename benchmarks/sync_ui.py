@@ -62,6 +62,9 @@ def main() -> int:
         "metrics": ["coding", "tokens", "clarity", "design", "context", "self-improve"],
         "rows": rows,
     }
+    router_path = ROOT / "benchmarks" / "results" / "router_score.json"
+    if router_path.is_file():
+        data["portfolio"] = json.loads(router_path.read_text(encoding="utf-8"))
     data_path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     print(f"updated {data_path} with {len(rows)} rows")
     return 0

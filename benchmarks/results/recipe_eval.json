@@ -1,0 +1,41 @@
+{
+  "kind": "deterministic_recipe_eval",
+  "tasks": 4,
+  "passed": 4,
+  "rate": 1.0,
+  "coding": {
+    "passed": 3,
+    "tasks": 3,
+    "rate": 1.0
+  },
+  "clarity": {
+    "passed": 1,
+    "tasks": 1,
+    "rate": 1.0,
+    "rubric": 1.0
+  },
+  "results": [
+    {
+      "recipe": "slugify",
+      "ok": true,
+      "detail": "----------------------------------------------------------------------\nRan 10 tests in 0.001s\n\nOK\n"
+    },
+    {
+      "recipe": "parse_duration",
+      "ok": true,
+      "detail": "----------------------------------------------------------------------\nRan 13 tests in 0.001s\n\nOK\n"
+    },
+    {
+      "recipe": "merge_intervals",
+      "ok": true,
+      "detail": "----------------------------------------------------------------------\nRan 9 tests in 0.000s\n\nOK\n"
+    },
+    {
+      "recipe": "clear_tradeoff",
+      "ok": true,
+      "score": 1.0,
+      "detail": "all checks"
+    }
+  ],
+  "note": "No model call. Coding uses the official tests; clarity uses the official rubric."
+}

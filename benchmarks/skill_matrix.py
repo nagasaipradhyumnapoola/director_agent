@@ -334,6 +334,7 @@ def main() -> int:
     parser.add_argument("--tasks", default=",".join(tasks.TASKS))
     parser.add_argument("--out", default=str(ROOT / "benchmarks" / "results" / "skill_matrix.json"))
     parser.add_argument("--resume", action="store_true", help="keep successful rows, rerun empty/error rows")
+    parser.add_argument("--force-tools", default="", help="comma-separated tool ids to rerun even if successful")
     parser.add_argument("--recompute", action="store_true", help="re-summarize an existing JSON without model calls")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
@@ -379,8 +380,12 @@ def main() -> int:
         except (OSError, json.JSONDecodeError, KeyError, TypeError):
             previous = {}
     jobs: list[tuple[str, str, int]] = []
+    forced = {item.strip() for item in args.force_tools.split(",") if item.strip()}
     for job in all_jobs:
         prior = previous.get(job)
+        if job[0] in forced:
+            jobs.append(job)
+            continue
         if prior is not None and int(prior.get("output_tokens") or 0) > 0 and not str(prior.get("detail", "")).startswith(("HTTPError", "RuntimeError", "URLError")):
             runs.append(prior)
         else:

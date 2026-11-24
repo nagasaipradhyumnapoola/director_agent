@@ -112,6 +112,8 @@ python -m director secret set --name provider/openai   # value on stdin
 python -m director service install|status|remove
 python -m director autonomy enable|status|run|disable
 python -m director agent run --goal "..." --provider ollama --model qwen2.5-coder:7b
+python -m director recipe list|run --name slugify --args-json '["Hello",80]'
+python -m director route --task "..."
 python -m director ui --port 8765
 python -m director maintenance enable|status|run|disable
 python -m director container check
@@ -163,7 +165,7 @@ with exact token/cost accounting. A real cloud key/spend was not exercised;
 ## Evidence status
 
 v1.0.0-local-supervised is implemented and tested on this host for its local single-user scope:
-- 99 offline tests pass (including a real Chromium/CDP website journey, the
+- 107 offline tests pass (including a real Chromium/CDP website journey, the
   official MCP SDK round trip, selfdev, provider/grants, backups/keychain, UI,
   autonomy and the skill-matrix self-test).
 - Skill matrix (2 seeds, 98 runs, `llama-3.3-70b-fp8-fast`): DIRECTOR 84.1

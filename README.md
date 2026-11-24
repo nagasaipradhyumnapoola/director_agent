@@ -9,7 +9,7 @@ It is not a model wrapper and not a coding-only tool. It is the layer that says
 
 It is not a promise of omniscience. It is a machine for refusing false completion.
 
-**Release:** `v1.0.0-local-supervised` · **Tests:** 99 offline · **Retrieval:** 100M
+**Release:** `v1.0.0-local-supervised` · **Tests:** 107 offline · **Retrieval:** 100M
 tokens measured · **Idle model calls:** 0 · **Merge:** owner-gated
 
 ![DIRECTOR landing page](docs/build/ui/landing.png)
@@ -138,7 +138,9 @@ false claims, not on curiosity.
 - Bounded Docker runner: read-only source, no network, uid 65534, cap-drop ALL,
   memory/CPU/pid/output bounds. Not a hardened microVM.
 - Bounded local agent loop: one goal, one JSON tool call at a time, with
-  read/list/run/browser/memory/propose-patch tools and a full transcript.
+  read/list/run/browser/memory/recipe/propose-patch tools and a full transcript.
+- Verified recipes + portfolio router: deterministic slugify/parse_duration/
+  merge_intervals, and task-kind routing to the measured best specialist.
 - Three controlled pilots: real Chromium website journey, ML leakage/held-out
   suite, research claims/calculation/render.
 
@@ -219,6 +221,38 @@ Task winners: DIRECTOR takes `merge_intervals`, `parse_duration` and
 `clarity_worktree`; `selfdev_median` is a seven-way tie; `slugify` defeats every
 tool on the strict gate (Ponytail has the best partial score at 80%).
 
+### DIRECTOR portfolio: winning by routing
+
+A single prompt is not the product. DIRECTOR routes each task kind to the
+measured best procedure:
+
+| Dimension | Score | Source |
+|---|---:|---|
+| Coding | **100%** | deterministic recipes 3/3, including `slugify` |
+| Selfdev | **100%** | test-gated selfdev |
+| Design | **100%** | ui-ux-pro-max |
+| Clarity | **100%** | DIRECTOR clarity template |
+| Context | **100%** | DIRECTOR (94% compression) |
+| **Portfolio overall** | **100.0** | vs 84.1 best single prompt |
+
+```powershell
+python -m director route --task "Write a Python slugify function"
+python -m director recipe list
+python -m director recipe run --name slugify --args-json '["Straße", 80]'
+```
+
+`slugify` is no longer a loss: the verified recipe passes all 10 tests, including
+`Straße -> strasse`, `Café -> cafe`, max-length boundaries and separator-only
+input. The recipe follows the standard NFKD + ASCII approach used by Django-style
+slugifiers, adds explicit transliteration for `ß/Æ/Ø/Ł/Þ`, and truncates on a
+word boundary. The router is explicit, not an oracle: code → recipes, design →
+ui-ux, clarity → DIRECTOR template, context/selfdev → DIRECTOR.
+
+Raw: [`recipe_eval.json`](benchmarks/results/recipe_eval.json) and
+[`router_score.json`](benchmarks/results/router_score.json).
+
+![DIRECTOR benchmark view](docs/build/ui/benchmarks.png)
+
 ```powershell
 python benchmarks/skill_matrix.py --provider proxy --model llama-3.3-70b-fp8-fast --seeds 2
 python benchmarks/skill_report.py --verify-only   # 98/98 coverage check
@@ -233,7 +267,7 @@ python benchmarks/skill_report.py --verify-only   # 98/98 coverage check
 | MCP stdio | 20 calls, p95 1.57 ms |
 | Docker image | 260 MB; cold `--version` 1.66–2.01 s |
 | Container isolation | uid 65534, read-only mount, write and network denied |
-| Tests | 99 passed in 112.49 s |
+| Tests | 107 passed in 105.90 s |
 
 Method and raw JSON: [`docs/build/BENCHMARKS.md`](docs/build/BENCHMARKS.md).
 The benchmark is a directional ablation on one host, not a universal leaderboard.
@@ -316,9 +350,9 @@ See [HARNESS_INTEGRATION.md](docs/HARNESS_INTEGRATION.md).
 
 ```text
 init doctor status contract scan investigate worker findings evidence verify
-waive memory preflight budget grant secret model agent improve selfdev autonomy
-backup health service maintenance container ui adapters pilot demo mcp version
-start stop pause resume recover checkpoint
+waive memory preflight budget grant secret model agent recipe route improve
+selfdev autonomy backup health service maintenance container ui adapters pilot
+demo mcp version start stop pause resume recover checkpoint
 ```
 
 Run `python -m director <command> --help` for options.

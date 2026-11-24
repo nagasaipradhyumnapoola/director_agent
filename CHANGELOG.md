@@ -6,6 +6,8 @@
 - `director ui` preview server (loopback, no directory listing, live `/api/state`).
 - `director autonomy` continuous supervised self-improvement scheduler.
 - `director agent` bounded local action loop with tools and transcript.
+- `director recipe` verified deterministic recipes and `director route` portfolio
+  selection; `slugify` now passes the full official suite at runtime.
 - `benchmarks/skill_matrix.py` prompt-level skill ablation with a JSON/Markdown
   report and a dashboard view.
 

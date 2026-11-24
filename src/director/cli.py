@@ -40,6 +40,8 @@ from .policy import PolicyDenied, PolicyGateway
 from .providers import PROVIDERS, call_model
 from .service import install as service_install, remove as service_remove, status as service_status
 from .ui import serve_ui
+from .recipes import RECIPES, run_recipe
+from .router import route as route_task
 from .selfdev import (
     cleanup as selfdev_cleanup,
     create_patch,
@@ -987,6 +989,27 @@ def cmd_container(args: argparse.Namespace) -> int:
         store.close()
 
 
+def cmd_route(args: argparse.Namespace) -> int:
+    _emit(route_task(args.task))
+    return 0
+
+
+def cmd_recipe(args: argparse.Namespace) -> int:
+    if args.action == "list":
+        _emit({"recipes": {name: {"description": item["description"], "args": item["args"]} for name, item in RECIPES.items()}})
+        return 0
+    if args.action == "run":
+        try:
+            values = json.loads(args.args_json) if args.args_json else []
+        except json.JSONDecodeError as exc:
+            raise ValidationError("args-json must be valid JSON") from exc
+        if not isinstance(values, list):
+            raise ValidationError("args-json must be a JSON array")
+        _emit({"recipe": args.name, "result": run_recipe(args.name, values)})
+        return 0
+    raise ValidationError("unknown recipe action")
+
+
 def cmd_agent(args: argparse.Namespace) -> int:
     store = _open(_root(args))
     try:
@@ -1459,6 +1482,19 @@ def build_parser() -> argparse.ArgumentParser:
     audit_list = audit_sub.add_parser("list", parents=[common])
     audit_list.add_argument("--limit", type=int, default=100)
     audit_list.set_defaults(func=cmd_audit)
+
+    route = sub.add_parser("route", parents=[common], help="choose the best procedure for a task")
+    route.add_argument("--task", required=True)
+    route.set_defaults(func=cmd_route)
+
+    recipe = sub.add_parser("recipe", parents=[common], help="verified deterministic recipes")
+    recipe_sub = recipe.add_subparsers(dest="action", required=True)
+    recipe_list = recipe_sub.add_parser("list", parents=[common])
+    recipe_list.set_defaults(func=cmd_recipe, action="list")
+    recipe_run = recipe_sub.add_parser("run", parents=[common])
+    recipe_run.add_argument("--name", required=True, choices=sorted(RECIPES))
+    recipe_run.add_argument("--args-json", default="[]")
+    recipe_run.set_defaults(func=cmd_recipe, action="run")
 
     agent = sub.add_parser("agent", parents=[common], help="bounded local agent loop")
     agent_sub = agent.add_subparsers(dest="action", required=True)

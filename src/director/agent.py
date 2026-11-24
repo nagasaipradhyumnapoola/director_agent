@@ -43,6 +43,7 @@ TOOL_HELP = """Available tools (reply with exactly one JSON object):
 {"tool":"browser_capture","url":"http://127.0.0.1:8765/"}
 {"tool":"memory_search","query":"evidence"}
 {"tool":"remember","title":"decision","text":"..."}
+{"tool":"recipe","name":"slugify","args":["Hello World",80]}
 {"tool":"propose_patch","title":"Fix X","diff":"diff --git ..."}
 {"tool":"finish","summary":"what was done and what remains"}
 Rules: one tool per turn; no prose outside JSON; no direct project writes; never merge/push/deploy."""
@@ -311,6 +312,14 @@ def run_agent(
                 title = str(action.get("title") or "agent note")
                 source_id = MemoryIndex(store).add_text(text, title, kind="agent")
                 observation = {"source_id": source_id}
+            elif tool == "recipe":
+                from .recipes import get_recipe, run_recipe
+
+                recipe = get_recipe(str(action.get("name") or ""))
+                args = action.get("args") or []
+                if not isinstance(args, list):
+                    raise ValidationError("recipe args must be a list")
+                observation = {"name": action.get("name"), "result": run_recipe(str(action["name"]), args), "description": recipe["description"]}
             elif tool == "propose_patch":
                 from .selfdev import create_patch
 

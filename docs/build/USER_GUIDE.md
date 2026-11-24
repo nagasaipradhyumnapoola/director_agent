@@ -205,6 +205,19 @@ docker run --rm -v "${PWD}:/project" director:local status --root /project --jso
 The image runs unprivileged and mounts the project at `/project`. It is tested by
 the `docker` CI job (build, version, init, status).
 
+## Recipes and routing
+
+```powershell
+python -m director recipe list
+python -m director recipe run --name slugify --args-json '["Straße", 80]'
+python -m director route --task "Write a Python slugify function"
+```
+
+Recipes are deterministic, tested implementations for well-specified shapes
+(`slugify`, `parse_duration`, `merge_intervals`). `route` selects the best
+measured specialist for a task kind; it does not pretend one prompt wins
+everything.
+
 ## Local agent loop
 
 ```powershell

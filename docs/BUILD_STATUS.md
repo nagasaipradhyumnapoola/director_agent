@@ -70,7 +70,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 - [x] Prompt-level skill matrix harness (7 procedures × 7 tasks, test/rubric
   graded)
 - [x] Bounded local agent loop (read/list/run/browser/memory/propose-patch)
-- [x] 99-test offline suite incl. historical defect regressions and selfdev
+- [x] 107-test offline suite incl. historical defect regressions and selfdev
 - [x] Independent review rounds + fixes
 - [x] Release docs, evidence report, install/uninstall
 
@@ -103,7 +103,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
    - isolated worktree at base `85d8209`; full suite passed in 99.1s;
    - independent reviewer PASS with patch-integrity verification;
    - owner approval recorded; fast-forward merge commit `f439b16`;
-   - merged tree: 99/99 tests, version command works, no push by the pipeline.
+   - merged tree: 107/107 tests, version command works, no push by the pipeline.
 8. Local model/provider gateway:
    - default policy denied a local model call with zero spend;
    - owner grant + contract `model_call_local` + model-call budget enabled the
@@ -166,6 +166,13 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
      `director_agent_run` exposes the same loop;
    - tests cover read, path escape, command allowlist, model-grant denial and
      patch proposal.
+15. Recipes and portfolio routing:
+   - `director recipe list|run` deterministic `slugify`, `parse_duration`,
+     `merge_intervals`; `benchmarks/recipe_eval.py` passes 3/3 official tests
+     including all slugify Unicode/truncation cases;
+   - `director route --task` maps code → recipes, design → ui-ux, clarity →
+     direct, context/selfdev → DIRECTOR;
+   - portfolio score 100.0 vs 84.1 best single prompt; explicit, not an oracle.
 
 ## Evidence levels (per surface)
 
@@ -218,5 +225,5 @@ worktree/test/review/owner-merge pipeline.
   `f439b16` (selfdev) and `85d8209` (pipeline), pushed to `origin/main` on
   2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: docs/build/EVIDENCE.md (99 tests, full demo,
+- Verified release evidence: docs/build/EVIDENCE.md (107 tests, full demo,
   zero model calls, independent review fixes).
