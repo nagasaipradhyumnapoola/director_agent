@@ -40,6 +40,7 @@ Evidence levels are not interchangeable:
 | Container image | implemented, tested | `director:local` 260MB; build + version/init/status; CI docker job |
 | Control room UI | implemented, tested | static `web/`, loopback server, no directory listing, 85+ tests |
 | Continuous autonomy | implemented, tested | opt-in proposal → author/test queue; owner merge required |
+| Local agent loop | implemented, tested | read/list/run/browser/memory/propose-patch; no direct writes; model grant required |
 
 ## MCP protocol note
 

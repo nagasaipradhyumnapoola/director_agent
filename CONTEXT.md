@@ -111,6 +111,7 @@ python -m director audit list
 python -m director secret set --name provider/openai   # value on stdin
 python -m director service install|status|remove
 python -m director autonomy enable|status|run|disable
+python -m director agent run --goal "..." --provider ollama --model qwen2.5-coder:7b
 python -m director ui --port 8765
 python -m director maintenance enable|status|run|disable
 python -m director container check
@@ -132,8 +133,15 @@ backups, and (when `autonomy` is enabled) enqueues one author/test sweep per
 interval. It never makes idle model calls or merges/pushes.
 
 The control room is served by `director ui` on loopback from `web/`; it reads
-`web/data.json` in demo mode. The skill matrix harness lives in
-`benchmarks/skill_matrix.py` and writes `benchmarks/results/skill_matrix.json`.
+`web/data.json` in demo mode and `/api/state` from a live project when `--root` is
+given. The skill matrix harness lives in `benchmarks/skill_matrix.py` and writes
+`benchmarks/results/skill_matrix.json`.
+
+`director agent run` is the bounded local action loop: model proposes one JSON
+tool call, DIRECTOR validates/executes it, observations feed back. Tools are
+list/read/run-command/browser-capture/memory/propose-patch/finish. It cannot
+write project files, merge, push or grant permissions; code changes become
+selfdev patches.
 
 A supervised execution path exists: `director selfdev` accepts an
 agent/human-authored patch, applies it in an isolated git worktree, runs the
@@ -155,7 +163,7 @@ with exact token/cost accounting. A real cloud key/spend was not exercised;
 ## Evidence status
 
 v1.0.0-local-supervised is implemented and tested on this host for its local single-user scope:
-- 92 offline tests pass (including a real Chromium/CDP website journey, the
+- 97 offline tests pass (including a real Chromium/CDP website journey, the
   official MCP SDK round trip, selfdev, provider/grants, backups/keychain, UI,
   autonomy and the skill-matrix self-test).
 - Skill matrix (2 seeds, 98 runs, `llama-3.3-70b-fp8-fast`): DIRECTOR 84.1

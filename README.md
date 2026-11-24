@@ -9,7 +9,7 @@ It is not a model wrapper and not a coding-only tool. It is the layer that says
 
 It is not a promise of omniscience. It is a machine for refusing false completion.
 
-**Release:** `v1.0.0-local-supervised` · **Tests:** 92 offline · **Retrieval:** 100M
+**Release:** `v1.0.0-local-supervised` · **Tests:** 97 offline · **Retrieval:** 100M
 tokens measured · **Idle model calls:** 0 · **Merge:** owner-gated
 
 ![DIRECTOR landing page](docs/build/ui/landing.png)
@@ -137,6 +137,8 @@ false claims, not on curiosity.
 - Autostart: per-user Startup-folder entry (no admin), while the user is logged in.
 - Bounded Docker runner: read-only source, no network, uid 65534, cap-drop ALL,
   memory/CPU/pid/output bounds. Not a hardened microVM.
+- Bounded local agent loop: one goal, one JSON tool call at a time, with
+  read/list/run/browser/memory/propose-patch tools and a full transcript.
 - Three controlled pilots: real Chromium website journey, ML leakage/held-out
   suite, research claims/calculation/render.
 
@@ -209,7 +211,7 @@ python benchmarks/skill_matrix.py --provider proxy --model llama-3.3-70b-fp8-fas
 | MCP stdio | 20 calls, p95 1.57 ms |
 | Docker image | 260 MB; cold `--version` 1.66–2.01 s |
 | Container isolation | uid 65534, read-only mount, write and network denied |
-| Tests | 92 passed in 112.23 s |
+| Tests | 97 passed in 114.10 s |
 
 Method and raw JSON: [`docs/build/BENCHMARKS.md`](docs/build/BENCHMARKS.md).
 The benchmark is a directional ablation on one host, not a universal leaderboard.
@@ -240,6 +242,26 @@ python -m director selfdev test --patch <id>
 python -m director selfdev review --patch <id> --verdict pass --reviewer <name> --notes "..."
 python -m director selfdev merge --patch <id>
 ```
+
+## Local agent loop (bounded)
+
+`director agent` is the actual local action loop: one goal, one JSON tool call at
+a time, bounded by steps/time/policy. It can list/read files, run allowlisted
+commands, capture a browser page, search/remember memory, and **propose** a
+selfdev patch. It cannot write project files directly, merge, push, deploy or
+grant itself permissions.
+
+```powershell
+python -m director grant add --actor director.model --grant-action model_call_local `
+  --resource provider:ollama
+python -m director grant add --actor director.agent --grant-action run_local_subprocess `
+  --resource project
+python -m director agent run --goal "Run the tests, inspect failures, propose a patch." `
+  --provider ollama --model qwen2.5-coder:7b --steps 8
+```
+
+The transcript is stored under `.director/agent/<run-id>/`; a proposed patch enters
+the normal `selfdev test`/`review`/`merge` gates.
 
 ## Harness and browser authority
 
@@ -272,9 +294,9 @@ See [HARNESS_INTEGRATION.md](docs/HARNESS_INTEGRATION.md).
 
 ```text
 init doctor status contract scan investigate worker findings evidence verify
-waive memory preflight budget grant secret model improve selfdev autonomy backup
-health service maintenance container ui adapters pilot demo mcp version start
-stop pause resume recover checkpoint
+waive memory preflight budget grant secret model agent improve selfdev autonomy
+backup health service maintenance container ui adapters pilot demo mcp version
+start stop pause resume recover checkpoint
 ```
 
 Run `python -m director <command> --help` for options.

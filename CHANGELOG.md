@@ -3,8 +3,9 @@
 ## Unreleased — UI, autonomy and skill matrix
 
 - Landing page, loopback control room and Diro/The Conductor character.
-- `director ui` preview server (loopback, no directory listing).
+- `director ui` preview server (loopback, no directory listing, live `/api/state`).
 - `director autonomy` continuous supervised self-improvement scheduler.
+- `director agent` bounded local action loop with tools and transcript.
 - `benchmarks/skill_matrix.py` prompt-level skill ablation with a JSON/Markdown
   report and a dashboard view.
 

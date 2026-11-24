@@ -205,6 +205,22 @@ docker run --rm -v "${PWD}:/project" director:local status --root /project --jso
 The image runs unprivileged and mounts the project at `/project`. It is tested by
 the `docker` CI job (build, version, init, status).
 
+## Local agent loop
+
+```powershell
+python -m director grant add --actor director.model --grant-action model_call_local `
+  --resource provider:ollama
+python -m director grant add --actor director.agent --grant-action run_local_subprocess `
+  --resource project
+python -m director agent run --goal "Run the tests and propose a fix." `
+  --provider ollama --model qwen2.5-coder:7b --steps 8
+```
+
+One JSON tool call per turn; bounded steps/time. Tools: list/read, allowlisted
+command, browser capture, memory search/remember, propose patch, finish. It
+cannot write project files directly, merge, push or self-grant. Patches go to the
+normal selfdev gates.
+
 ## Control room
 
 ```powershell

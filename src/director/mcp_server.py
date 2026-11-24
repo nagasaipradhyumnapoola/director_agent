@@ -133,6 +133,20 @@ TOOLS: list[dict[str, Any]] = [
         "description": "Declared domain profiles and their known limits.",
         "inputSchema": _schema({}),
     },
+    {
+        "name": "director_agent_run",
+        "description": "Run the bounded local agent loop toward one goal. Model calls require an owner grant; code changes are proposals only.",
+        "inputSchema": _schema(
+            {
+                "goal": {"type": "string", "minLength": 1, "maxLength": 8000},
+                "steps": {"type": "integer", "minimum": 1, "maximum": 20},
+                "provider": {"type": "string", "enum": ["stub", "command", "ollama", "openai_compatible"]},
+                "model": {"type": "string", "maxLength": 128},
+                "timeout": {"type": "number", "minimum": 1, "maximum": 600},
+            },
+            required=["goal"],
+        ),
+    },
 ]
 
 
@@ -164,6 +178,7 @@ class ToolServer:
             "director_memory_search": self._memory_search,
             "director_investigate": self._investigate,
             "director_profiles": self._profiles,
+            "director_agent_run": self._agent_run,
         }
 
     # -- validation --------------------------------------------------------
@@ -343,6 +358,26 @@ class ToolServer:
         return {
             "supported_domains": list(SUPPORTED_DOMAINS),
             "profiles": {name: profile.to_dict() for name, profile in PROFILES.items()},
+        }
+
+    def _agent_run(self, args: Mapping[str, Any]) -> Any:
+        from .agent import run_agent
+
+        result = run_agent(
+            self.store,
+            str(args["goal"]),
+            provider=str(args.get("provider") or "ollama"),
+            model=str(args.get("model") or "") or None,
+            max_steps=int(args.get("steps") or 8),
+            timeout=float(args.get("timeout") or 120),
+        )
+        return {
+            "run_id": result["run_id"],
+            "status": result["status"],
+            "steps": result["steps"],
+            "summary": result["summary"],
+            "transcript_ref": result["transcript_ref"],
+            "note": result["note"],
         }
 
     # -- JSON-RPC ----------------------------------------------------------

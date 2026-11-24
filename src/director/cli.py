@@ -13,6 +13,7 @@ from typing import Any, Sequence
 from . import RELEASE_TARGET, __version__
 from .adapter import SUPPORTED_HOSTS, generate as generate_adapter
 from . import audit as audit_log
+from .agent import run_agent
 from .analysis import ArtifactScanner, ScanConfig
 from .autonomy import disable as autonomy_disable, enable as autonomy_enable, maybe_run as autonomy_run, status as autonomy_status
 from .backup import create_backup, list_backups, prune_backups, restore_backup, verify_backup
@@ -986,6 +987,25 @@ def cmd_container(args: argparse.Namespace) -> int:
         store.close()
 
 
+def cmd_agent(args: argparse.Namespace) -> int:
+    store = _open(_root(args))
+    try:
+        allowed = set(args.allow_command or []) or None
+        result = run_agent(
+            store,
+            args.goal,
+            provider=args.provider,
+            model=args.model or None,
+            max_steps=args.steps,
+            timeout=args.timeout,
+            allowed_commands=allowed,
+        )
+        _emit(result, max_bytes=512 * 1024)
+        return 0
+    finally:
+        store.close()
+
+
 def cmd_autonomy(args: argparse.Namespace) -> int:
     store = _open(_root(args))
     try:
@@ -1439,6 +1459,17 @@ def build_parser() -> argparse.ArgumentParser:
     audit_list = audit_sub.add_parser("list", parents=[common])
     audit_list.add_argument("--limit", type=int, default=100)
     audit_list.set_defaults(func=cmd_audit)
+
+    agent = sub.add_parser("agent", parents=[common], help="bounded local agent loop")
+    agent_sub = agent.add_subparsers(dest="action", required=True)
+    agent_run = agent_sub.add_parser("run", parents=[common])
+    agent_run.add_argument("--goal", required=True)
+    agent_run.add_argument("--provider", default="ollama", choices=list(PROVIDERS))
+    agent_run.add_argument("--model", default="")
+    agent_run.add_argument("--steps", type=int, default=8)
+    agent_run.add_argument("--timeout", type=float, default=120.0)
+    agent_run.add_argument("--allow-command", action="append", default=[])
+    agent_run.set_defaults(func=cmd_agent, action="run")
 
     autonomy = sub.add_parser("autonomy", parents=[common], help="continuous supervised self-improvement")
     autonomy_sub = autonomy.add_subparsers(dest="action", required=True)
