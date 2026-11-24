@@ -392,6 +392,18 @@ integrations/        generated adapter examples (none enabled)
 docs/                research handoff + build docs + evidence
 ```
 
+## CI/CD
+
+`.github/workflows/ci.yml` runs on every push and pull request:
+
+- **test** — Windows, Python 3.12, full offline suite.
+- **benchmarks** — recipes, orchestrator 7/7, agent → orchestrator, 98/98 skill
+  coverage, portfolio score.
+- **docker** — build `director:ci`, version, init/status in a mounted volume.
+- **package** — build wheel + sdist and upload `director-dist`.
+
+No deploy step: this project is local-first and owner-operated.
+
 ## What is deliberately not claimed
 
 - No autonomous cloud spend, provider routing or deploy. Cloud calls require an

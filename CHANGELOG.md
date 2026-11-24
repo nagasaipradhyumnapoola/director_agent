@@ -11,6 +11,8 @@
 - `director orchestrate` plan → route → execute → grade; 7/7 end-to-end.
 - `benchmarks/skill_matrix.py` prompt-level skill ablation with a JSON/Markdown
   report and a dashboard view.
+- CI jobs for Windows tests, recipes/orchestrator/coverage, Docker image, and
+  wheel/sdist packaging.
 
 ## v1.0.0-local-supervised — 2026-11-24
 

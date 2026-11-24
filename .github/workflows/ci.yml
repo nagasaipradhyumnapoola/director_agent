@@ -41,3 +41,44 @@ jobs:
             init --root /project --name ci --domain general
           docker run --rm -v "$PWD/project:/project" director:ci \
             status --root /project --json
+
+  benchmarks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip setuptools
+          python -m pip install -e . --no-deps
+      - name: Recipes and slugify
+        run: python benchmarks/recipe_eval.py
+      - name: Orchestrator end-to-end
+        run: python benchmarks/orchestrate_eval.py
+      - name: Agent → orchestrator
+        run: python benchmarks/agent_orchestrate_eval.py
+      - name: Skill matrix coverage
+        run: python benchmarks/skill_report.py --verify-only
+      - name: Portfolio score
+        run: python benchmarks/router_score.py
+
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build wheel and sdist
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: director-dist
+          path: dist/*

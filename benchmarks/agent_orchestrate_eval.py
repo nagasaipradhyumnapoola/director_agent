@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,12 +13,15 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "benchmarks"))
 
 from director.agent import run_agent  # noqa: E402
+from director.demo import build_contract  # noqa: E402
 from director.store import Store  # noqa: E402
 from benchmarks import matrix_tasks  # noqa: E402
 
 
 def main() -> int:
-    store = Store.open(ROOT)
+    project_root = Path(tempfile.mkdtemp(prefix="director-agent-e2e-"))
+    store = Store.open_or_create(project_root, "ci-agent")
+    store.save_contract(build_contract(store.project_id, ["general"]))
     try:
         result = run_agent(
             store,
