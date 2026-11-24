@@ -148,7 +148,7 @@ with exact token/cost accounting. A real cloud key/spend was not exercised;
 
 ## Release commit
 
-`e057fd6` (Docker runner, scheduled backups, native tool-call) on `origin/main`
+`747d532` (Docker runner, scheduled backups, native tool-call) on `origin/main`
 (2026-11-24); earlier `2384476` (ops/provider/audit), `e04817d` (benchmarks),
 `eac3c39` (v1.0.0 hardening), `5606419` (grants), `f867bd2` (v0.1).
 

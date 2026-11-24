@@ -200,7 +200,7 @@ worktree/test/review/owner-merge pipeline.
 
 ## Release record
 
-- Commit: `e057fd6` (Docker runner, scheduled backups, native tool-call) after
+- Commit: `747d532` (Docker runner, scheduled backups, native tool-call) after
   `2384476` (ops/provider/audit), `e04817d` (benchmarks + local-model authoring),
   `eac3c39` (v1.0.0 hardening), `1f98389` (Ollama/selfdev), `5606419` (grants),
   `f439b16` (selfdev) and `85d8209` (pipeline), pushed to `origin/main` on
