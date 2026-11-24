@@ -8,6 +8,7 @@
 - `director agent` bounded local action loop with tools and transcript.
 - `director recipe` verified deterministic recipes and `director route` portfolio
   selection; `slugify` now passes the full official suite at runtime.
+- `director orchestrate` plan → route → execute → grade; 7/7 end-to-end.
 - `benchmarks/skill_matrix.py` prompt-level skill ablation with a JSON/Markdown
   report and a dashboard view.
 

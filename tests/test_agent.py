@@ -84,6 +84,27 @@ def test_agent_command_allowlist_blocks(tmp_path):
         store.close()
 
 
+def test_agent_routes_and_uses_recipe(tmp_path):
+    store = _store(tmp_path)
+    try:
+        result = run_agent(
+            store,
+            "dispatch the work",
+            model_fn=_actions(
+                json.dumps({"tool": "route", "task": "Design an accessible card"}),
+                json.dumps({"tool": "recipe", "name": "slugify", "args": ["Café"]}),
+                json.dumps({"tool": "finish", "summary": "dispatched"}),
+            ),
+            max_steps=4,
+        )
+        transcript = json.dumps(result["transcript"])
+        assert "ui-ux-pro-max" in transcript
+        assert "cafe" in transcript
+        assert result["status"] == "finished"
+    finally:
+        store.close()
+
+
 def test_agent_requires_model_grant(tmp_path):
     store = _store(tmp_path)
     try:

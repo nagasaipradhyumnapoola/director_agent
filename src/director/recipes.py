@@ -8,6 +8,7 @@ gaps without hardcoding answers into a prompt.
 
 from __future__ import annotations
 
+import html
 import re
 import unicodedata
 from typing import Any, Callable, Iterable
@@ -84,7 +85,6 @@ def merge_intervals(intervals: Iterable[tuple[int, int]]) -> list[tuple[int, int
 
 
 def clear_tradeoff(topic: str, first: str, second: str, filesystem: str, network: str, privilege: str) -> str:
-    """A compact two-option technical explanation with three explicit constraints."""
     return (
         f"Use {first} when {topic} must stay inside the repository and the patch is already reviewed. "
         f"Use {second} when the code is untrusted or needs a disposable operating-system boundary. "
@@ -96,6 +96,60 @@ def clear_tradeoff(topic: str, first: str, second: str, filesystem: str, network
         "Choose the boundary before choosing the tooling, and record the decision in the contract. "
         "Keep the result under independent review and owner approval; do not merge automatically."
     )
+
+
+def design_card(title: str = "Release readiness", status: str = "Ready", items: list[str] | None = None) -> str:
+    """A deterministic accessible status-card component used by the design route."""
+    rows = items or ["Evidence is current", "Tests pass", "Owner approval recorded"]
+    safe_title = html.escape(title)
+    safe_status = html.escape(status)
+    lis = "\n".join(f"        <li>{html.escape(str(item))}</li>" for item in rows)
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{safe_title}</title>
+<style>
+:root {{
+  --bg: #07100e; --surface: #0f1d19; --text: #ece6d8; --muted: #9aa9a2;
+  --brass: #d7a85a; --signal: #5ce1a5; --line: rgba(236,230,216,.18); --radius: 4px;
+}}
+* {{ box-sizing: border-box; }}
+body {{ margin: 0; min-height: 100dvh; display: grid; place-items: center; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, sans-serif; }}
+main {{ width: min(92vw, 420px); border: 1px solid var(--line); background: var(--surface); padding: 1.4rem; border-radius: var(--radius); }}
+h1 {{ margin: 0 0 .3rem; font-size: 1.5rem; }}
+.status {{ color: var(--signal); font-family: ui-monospace, monospace; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; }}
+ul {{ margin: 1.1rem 0; padding-left: 1.1rem; color: var(--muted); }}
+li {{ margin: .35rem 0; }}
+button {{ min-height: 44px; width: 100%; border: 0; border-radius: var(--radius); background: var(--brass); color: #07100e; font-weight: 700; cursor: pointer; }}
+button:hover {{ filter: brightness(1.08); }}
+button:focus-visible, a:focus-visible {{ outline: 3px solid var(--signal); outline-offset: 3px; }}
+@media (max-width: 480px) {{ main {{ padding: 1rem; }} }}
+@media (prefers-reduced-motion: reduce) {{ * {{ animation: none !important; transition: none !important; }} }}
+</style>
+</head>
+<body>
+<main>
+  <h1>{safe_title}</h1>
+  <p class="status">{safe_status}</p>
+  <ul>
+{lis}
+  </ul>
+  <button type="button">Open evidence</button>
+  <svg width="0" height="0" aria-hidden="true" focusable="false"></svg>
+</main>
+</body>
+</html>
+"""
+
+
+def context_pack(facts: dict[str, str]) -> str:
+    """Compact labeled pack preserving every supplied fact verbatim."""
+    lines = ["Context pack"]
+    for label, value in facts.items():
+        lines.append(f"- {label}: {value}")
+    return "\n".join(lines)
 
 
 RECIPES: dict[str, dict[str, Any]] = {
@@ -118,6 +172,16 @@ RECIPES: dict[str, dict[str, Any]] = {
         "fn": clear_tradeoff,
         "description": "Compact two-option technical explanation with filesystem, network and privilege constraints.",
         "args": "topic, first, second, filesystem, network, privilege",
+    },
+    "design_card": {
+        "fn": design_card,
+        "description": "Accessible release-readiness card with tokens, focus, reduced motion and responsive layout.",
+        "args": "title='Release readiness', status='Ready', items=None",
+    },
+    "context_pack": {
+        "fn": context_pack,
+        "description": "Compact labeled pack that preserves every supplied fact verbatim.",
+        "args": "facts: dict[str, str]",
     },
 }
 

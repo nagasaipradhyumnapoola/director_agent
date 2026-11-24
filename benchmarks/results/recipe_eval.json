@@ -28,7 +28,7 @@
     {
       "recipe": "merge_intervals",
       "ok": true,
-      "detail": "----------------------------------------------------------------------\nRan 9 tests in 0.000s\n\nOK\n"
+      "detail": "----------------------------------------------------------------------\nRan 9 tests in 0.001s\n\nOK\n"
     },
     {
       "recipe": "clear_tradeoff",

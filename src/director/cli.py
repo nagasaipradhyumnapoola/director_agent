@@ -41,6 +41,7 @@ from .providers import PROVIDERS, call_model
 from .service import install as service_install, remove as service_remove, status as service_status
 from .ui import serve_ui
 from .recipes import RECIPES, run_recipe
+from .orchestrator import execute as orchestrate_execute
 from .router import route as route_task
 from .selfdev import (
     cleanup as selfdev_cleanup,
@@ -989,6 +990,19 @@ def cmd_container(args: argparse.Namespace) -> int:
         store.close()
 
 
+def cmd_orchestrate(args: argparse.Namespace) -> int:
+    payloads = None
+    if args.payload_json:
+        try:
+            payloads = json.loads(args.payload_json)
+        except json.JSONDecodeError as exc:
+            raise ValidationError("payload-json must be valid JSON") from exc
+        if not isinstance(payloads, list):
+            raise ValidationError("payload-json must be a JSON array")
+    _emit(orchestrate_execute(args.goal, payloads))
+    return 0
+
+
 def cmd_route(args: argparse.Namespace) -> int:
     _emit(route_task(args.task))
     return 0
@@ -1482,6 +1496,11 @@ def build_parser() -> argparse.ArgumentParser:
     audit_list = audit_sub.add_parser("list", parents=[common])
     audit_list.add_argument("--limit", type=int, default=100)
     audit_list.set_defaults(func=cmd_audit)
+
+    orchestrate = sub.add_parser("orchestrate", parents=[common], help="plan, route and execute a goal")
+    orchestrate.add_argument("--goal", required=True)
+    orchestrate.add_argument("--payload-json", default="[]")
+    orchestrate.set_defaults(func=cmd_orchestrate)
 
     route = sub.add_parser("route", parents=[common], help="choose the best procedure for a task")
     route.add_argument("--task", required=True)

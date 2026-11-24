@@ -218,6 +218,14 @@ Recipes are deterministic, tested implementations for well-specified shapes
 measured specialist for a task kind; it does not pretend one prompt wins
 everything.
 
+```powershell
+python -m director orchestrate --goal "Implement slugify; design a card; explain the tradeoff"
+```
+
+The orchestrator plans, routes, executes deterministic recipes/templates and
+grades the result. Open-ended work is returned as a plan for `director agent` or
+the model.
+
 ## Local agent loop
 
 ```powershell

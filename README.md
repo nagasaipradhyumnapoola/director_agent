@@ -9,7 +9,7 @@ It is not a model wrapper and not a coding-only tool. It is the layer that says
 
 It is not a promise of omniscience. It is a machine for refusing false completion.
 
-**Release:** `v1.0.0-local-supervised` · **Tests:** 107 offline · **Retrieval:** 100M
+**Release:** `v1.0.0-local-supervised` · **Tests:** 112 offline · **Retrieval:** 100M
 tokens measured · **Idle model calls:** 0 · **Merge:** owner-gated
 
 ![DIRECTOR landing page](docs/build/ui/landing.png)
@@ -141,6 +141,8 @@ false claims, not on curiosity.
   read/list/run/browser/memory/recipe/propose-patch tools and a full transcript.
 - Verified recipes + portfolio router: deterministic slugify/parse_duration/
   merge_intervals, and task-kind routing to the measured best specialist.
+- Orchestrator: plan → route → execute → grade, 7/7 end-to-end on the measured
+  task shapes; models/agents handle open-ended work.
 - Three controlled pilots: real Chromium website journey, ML leakage/held-out
   suite, research claims/calculation/render.
 
@@ -193,7 +195,7 @@ runtime execution.
   retention. It does not beat DIRECTOR on coding.
 - ECC is a catalog, not a single procedure; its breadth is not captured by these
   seven tasks, and it scored lowest on clarity here.
-- Coding is hard for every tool: the strict `slugify` suite failed all seven.
+- In the prompt-level matrix, coding is hard for every tool: the strict `slugify` suite failed all seven.
   Differences are directional, not statistical.
 
 Raw: [`benchmarks/results/skill_matrix.json`](benchmarks/results/skill_matrix.json)
@@ -218,7 +220,7 @@ seeds = **98/98**). Full per-task cards:
 
 Task winners: DIRECTOR takes `merge_intervals`, `parse_duration` and
 `context_pack`; ui-ux-pro-max takes `design_card`; Direct takes
-`clarity_worktree`; `selfdev_median` is a seven-way tie; `slugify` defeats every
+`clarity_worktree`; `selfdev_median` is a seven-way tie; in the prompt-level matrix, `slugify` defeats every
 tool on the strict gate (Ponytail has the best partial score at 80%).
 
 ### DIRECTOR portfolio: winning by routing
@@ -251,6 +253,21 @@ ui-ux, clarity → DIRECTOR template, context/selfdev → DIRECTOR.
 Raw: [`recipe_eval.json`](benchmarks/results/recipe_eval.json) and
 [`router_score.json`](benchmarks/results/router_score.json).
 
+### End-to-end orchestrator
+
+`director orchestrate` takes one goal, plans it into task kinds, routes each,
+executes the deterministic recipe/template, and grades the result:
+
+```powershell
+python -m director orchestrate --goal "Implement slugify; design an accessible card; explain the worktree tradeoff"
+python benchmarks/orchestrate_eval.py
+```
+
+`orchestrate_eval.py`: **7/7** end-to-end (slugify ×2, parse_duration,
+merge_intervals, design 14/14, clarity 10/10, context 100% retention / 95%
+compression). The agent can also call `route` and `recipe` as tools, which is
+tested with a scripted model.
+
 ![DIRECTOR benchmark view](docs/build/ui/benchmarks.png)
 
 ```powershell
@@ -267,7 +284,7 @@ python benchmarks/skill_report.py --verify-only   # 98/98 coverage check
 | MCP stdio | 20 calls, p95 1.57 ms |
 | Docker image | 260 MB; cold `--version` 1.66–2.01 s |
 | Container isolation | uid 65534, read-only mount, write and network denied |
-| Tests | 107 passed in 105.90 s |
+| Tests | 112 passed in 109.29 s |
 
 Method and raw JSON: [`docs/build/BENCHMARKS.md`](docs/build/BENCHMARKS.md).
 The benchmark is a directional ablation on one host, not a universal leaderboard.
@@ -350,7 +367,7 @@ See [HARNESS_INTEGRATION.md](docs/HARNESS_INTEGRATION.md).
 
 ```text
 init doctor status contract scan investigate worker findings evidence verify
-waive memory preflight budget grant secret model agent recipe route improve
+waive memory preflight budget grant secret model agent orchestrate recipe route improve
 selfdev autonomy backup health service maintenance container ui adapters pilot
 demo mcp version start stop pause resume recover checkpoint
 ```

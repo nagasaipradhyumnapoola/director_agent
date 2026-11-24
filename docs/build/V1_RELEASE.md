@@ -29,12 +29,13 @@ sandbox, cloud autonomy or universal domain competence.
 | Continuous autonomy | opt-in proposal → local author/test; owner merge required |
 | Skill matrix | 7 procedures × 7 tasks; DIRECTOR 84.1, tied top with 14% fewer tokens |
 | Local agent loop | bounded tools, transcript, model grant required, patches only |
-| Recipes/router | 3/3 verified recipes incl. slugify; portfolio score 97.0 |
+| Recipes/router | 3/3 verified recipes incl. slugify; portfolio score 100.0 |
+| Orchestrator | plan → route → execute → grade 7/7 end-to-end |
 | Native OpenCode MCP connection | `opencode mcp list` shows `director connected` (1.19.4) |
 | MCP protocol | official SDK round trip, bounded frames/args/results |
 | Three domain pilots | clean fixtures pass; seeded broken fixtures fail |
 | Packaging/install | wheel builds; offline source-path installer; uninstall |
-| Test suite | 107 offline tests, browser and MCP SDK included |
+| Test suite | 112 offline tests, browser and MCP SDK included |
 | Retrieval benchmark | 1M/10M/100M lexical tiers; 100M recall@5 1.0, p95 7.13ms (container) |
 
 ## Explicit non-claims
