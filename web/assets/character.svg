@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 520" role="img" aria-labelledby="title desc">
+  <title id="title">The Conductor, the DIRECTOR character</title>
+  <desc id="desc">A geometric figure in a dark coat with a brass halo, a glowing ledger and a conductor's baton.</desc>
+  <style>
+    .halo { transform-origin: 210px 150px; animation: turn 28s linear infinite; }
+    .pulse { animation: pulse 4.8s ease-in-out infinite; }
+    @keyframes turn { to { transform: rotate(360deg); } }
+    @keyframes pulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .halo, .pulse { animation: none; } }
+  </style>
+  <defs>
+    <linearGradient id="coat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#142622"/>
+      <stop offset="1" stop-color="#081311"/>
+    </linearGradient>
+    <linearGradient id="brass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f0c987"/>
+      <stop offset=".55" stop-color="#d7a85a"/>
+      <stop offset="1" stop-color="#9d7130"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#5ce1a5" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#5ce1a5" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <ellipse cx="210" cy="480" rx="120" ry="14" fill="#000" opacity=".35"/>
+  <circle cx="210" cy="150" r="128" fill="url(#glow)" opacity=".7"/>
+
+  <g class="halo" fill="none" stroke="url(#brass)" stroke-width="1.4" opacity=".55">
+    <circle cx="210" cy="150" r="112" stroke-dasharray="2 9"/>
+    <circle cx="210" cy="150" r="122" stroke-dasharray="36 220"/>
+  </g>
+
+  <path d="M132 276 L210 218 L288 276 L300 474 L120 474 Z" fill="url(#coat)" stroke="#2c443d" stroke-width="1.6"/>
+  <path d="M210 218 V474" stroke="#d7a85a" stroke-width="1" opacity=".38"/>
+  <path d="M156 280 L210 330 L264 280" fill="none" stroke="#d7a85a" stroke-width="1.6" opacity=".7"/>
+  <path d="M178 218 L210 246 L242 218" fill="none" stroke="#d7a85a" stroke-width="1.6" opacity=".7"/>
+
+  <circle cx="210" cy="150" r="78" fill="#0b1714" stroke="url(#brass)" stroke-width="2.2"/>
+  <rect x="192" y="118" width="36" height="8" rx="4" fill="#d7a85a" opacity=".9"/>
+  <circle class="pulse" cx="190" cy="150" r="4.5" fill="#5ce1a5"/>
+  <circle class="pulse" cx="230" cy="150" r="4.5" fill="#5ce1a5"/>
+  <path d="M196 168 q14 9 28 0" fill="none" stroke="#d7a85a" stroke-width="2.4" stroke-linecap="round"/>
+
+  <g transform="rotate(-18 210 150)" opacity=".9">
+    <path d="M210 72 q54 6 54 54" fill="none" stroke="#f2ead9" stroke-width="1.2" opacity=".35"/>
+  </g>
+
+  <g transform="translate(126 322)">
+    <rect x="0" y="0" width="62" height="82" rx="2" fill="#f2ead9" opacity=".94"/>
+    <path d="M10 16 H52 M10 30 H52 M10 44 H40 M10 58 H48" stroke="#0b1714" stroke-width="2" opacity=".55"/>
+    <path d="M10 72 H30" stroke="#2f8f6b" stroke-width="4"/>
+    <path d="M42 66 l6 6 10 -12" fill="none" stroke="#2f8f6b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <g>
+    <path d="M292 300 L376 222" stroke="url(#brass)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="379" cy="219" r="8" fill="#5ce1a5"/>
+    <circle cx="379" cy="219" r="15" fill="none" stroke="#5ce1a5" opacity=".35"/>
+    <path d="M292 300 L300 292" stroke="#f2ead9" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <g fill="#d7a85a" opacity=".55">
+    <circle cx="86" cy="120" r="2"/>
+    <circle cx="332" cy="96" r="2"/>
+    <circle cx="350" cy="360" r="2"/>
+    <circle cx="76" cy="312" r="2"/>
+  </g>
+</svg>

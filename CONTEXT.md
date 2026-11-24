@@ -110,6 +110,8 @@ python -m director health --json
 python -m director audit list
 python -m director secret set --name provider/openai   # value on stdin
 python -m director service install|status|remove
+python -m director autonomy enable|status|run|disable
+python -m director ui --port 8765
 python -m director maintenance enable|status|run|disable
 python -m director container check
 python -m director container run --image python:3.12-slim -- ...
@@ -126,7 +128,12 @@ Run `python -m director --help` for the authoritative list.
 
 The 24/7 worker is deterministic: it generates prioritized proposals, tests
 queued selfdev patches, runs enqueued local-model authoring, performs scheduled
-backups and writes heartbeats. It never makes idle model calls or merges/pushes.
+backups, and (when `autonomy` is enabled) enqueues one author/test sweep per
+interval. It never makes idle model calls or merges/pushes.
+
+The control room is served by `director ui` on loopback from `web/`; it reads
+`web/data.json` in demo mode. The skill matrix harness lives in
+`benchmarks/skill_matrix.py` and writes `benchmarks/results/skill_matrix.json`.
 
 A supervised execution path exists: `director selfdev` accepts an
 agent/human-authored patch, applies it in an isolated git worktree, runs the
@@ -148,8 +155,12 @@ with exact token/cost accounting. A real cloud key/spend was not exercised;
 ## Evidence status
 
 v1.0.0-local-supervised is implemented and tested on this host for its local single-user scope:
-- 85 offline tests pass (including a real Chromium/CDP website journey, the
-  official MCP SDK round trip, selfdev, provider/grants, backups/keychain).
+- 91 offline tests pass (including a real Chromium/CDP website journey, the
+  official MCP SDK round trip, selfdev, provider/grants, backups/keychain, UI,
+  autonomy and the skill-matrix self-test).
+- Skill matrix (2 seeds, 98 runs, `llama-3.3-70b-fp8-fast`): DIRECTOR 84.1
+  (4,514 tokens), Ponytail 84.1 (5,244), ui-ux-pro-max 81.2 (design 100%),
+  Direct 80.4, Headroom 79.9, Superpowers 79.1, ECC 78.4. Prompt-level only.
 - Native OpenCode MCP connection and `director_director_status` tool-call are
   verified through a loopback OpenAI-compatible proxy.
 - Verified backups/restore, OS-keychain secrets and health/doctor gates are

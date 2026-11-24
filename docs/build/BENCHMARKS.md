@@ -10,6 +10,7 @@ Raw results:
 - `benchmarks/results/director_bench_20261123T195633Z.json` — core/domain/retrieval/MCP/local-model/selfdev
 - `benchmarks/results/director_bench_20261123T222130Z.json` — container 100M retrieval
 - `benchmarks/results/retrieval_100000000.json` — host chunked 100M retrieval
+- `benchmarks/results/skill_matrix.json` — 7-tool prompt-level matrix (2 seeds)
 - `benchmarks/results/prompt_ablation.json` — upstream skill-prompt ablation
 - `benchmarks/results/retrieval_smoke.json` — earlier 500-doc smoke
 
@@ -138,6 +139,27 @@ Superpowers/ECC hooks/controllers were **not** activated.
 The image is `python:3.12-slim` plus DIRECTOR and its MCP/DOCX dependencies; it
 does not include Chrome, Node or the browser/ML fixtures. The CI `docker` job
 builds it and runs version/init/status.
+
+## 9. Skill matrix (prompt-level)
+
+Model: `llama-3.3-70b-fp8-fast`; 2 seeds; 98 runs; same tasks and graders.
+Full method and raw data: `docs/build/SKILL_MATRIX.md` and
+`benchmarks/results/skill_matrix.json`.
+
+| Rank | Tool | Coding | Selfdev | Design | Clarity | Context | Tokens | Overall |
+|---:|---|---:|---:|---:|---:|---:|---:|---:|
+| 1 | **DIRECTOR** | 4/6 | 2/2 | 86% | 75% | 100% | 4,514 | **84.1** |
+| 2 | Ponytail | 4/6 | 2/2 | 86% | 75% | 100% | 5,244 | 84.1 |
+| 3 | ui-ux-pro-max | 3/6 | 2/2 | 100% | 75% | 100% | 5,529 | 81.2 |
+| 4 | Direct model | 3/6 | 2/2 | 89% | 80% | 100% | 5,131 | 80.4 |
+| 5 | Headroom | 3/6 | 2/2 | 86% | 80% | 100% | 4,742 | 79.9 |
+| 6 | Superpowers | 3/6 | 2/2 | 86% | 75% | 100% | 4,791 | 79.1 |
+| 7 | ECC | 3/6 | 2/2 | 86% | 70% | 100% | 4,446 | 78.4 |
+
+This is a prompt-level ablation, not an upstream runtime/hook benchmark. DIRECTOR
+ties Ponytail on score with 14% fewer output tokens; ui-ux-pro-max wins design.
+Coding/selfdev are test-graded; design/clarity/context use fixed rubrics. One
+model, one host, two seeds: directional, not a universal leaderboard.
 
 ## Honest conclusion
 

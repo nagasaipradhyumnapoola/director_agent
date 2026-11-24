@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — UI, autonomy and skill matrix
+
+- Landing page, loopback control room and Diro/The Conductor character.
+- `director ui` preview server (loopback, no directory listing).
+- `director autonomy` continuous supervised self-improvement scheduler.
+- `benchmarks/skill_matrix.py` prompt-level skill ablation with a JSON/Markdown
+  report and a dashboard view.
+
 ## v1.0.0-local-supervised — 2026-11-24
 
 Local, single-user, supervised project supervisor.

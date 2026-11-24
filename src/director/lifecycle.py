@@ -391,6 +391,12 @@ def worker_loop(store: Store, token: str, poll_seconds: float = 1.0, once: bool 
                 maybe_run(store)
             except Exception:
                 pass
+            try:
+                from .autonomy import maybe_run as maybe_improve
+
+                maybe_improve(store)
+            except Exception:
+                pass
         result = process_one(store, worker=f"worker:{os.getpid()}")
         if not result.get("claimed"):
             time.sleep(max(0.2, poll_seconds))

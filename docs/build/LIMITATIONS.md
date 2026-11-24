@@ -57,6 +57,10 @@
   tested.
 - Autostart is a per-user Startup-folder entry, not a Windows service; it needs
   an active user logon.
+- Continuous autonomy is opt-in and bounded (one author/test sweep per interval,
+  max per day). It stops at review; it never merges or pushes.
+- The control room is a static demo reader (`web/data.json`); it is not a
+  multi-user authenticated console.
 - Local model authoring can produce correct-but-dead code; review may hold it.
 - No direct cloud-provider key/spend was exercised; the loopback proxy is not a
   cloud-billing guarantee.

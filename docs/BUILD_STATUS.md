@@ -64,7 +64,12 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
   (local mock tested; real cloud not called)
 - [x] Local Ollama authoring + 24/7 author/test queue
 - [x] Per-user autostart (Startup folder) install/status/remove
-- [x] 85-test offline suite incl. historical defect regressions and selfdev
+- [x] Landing page + control-room UI (loopback, no build step) + Diro character
+- [x] Continuous supervised self-improvement scheduler (proposal → author/test,
+  never merge)
+- [x] Prompt-level skill matrix harness (7 procedures × 7 tasks, test/rubric
+  graded)
+- [x] 91-test offline suite incl. historical defect regressions and selfdev
 - [x] Independent review rounds + fixes
 - [x] Release docs, evidence report, install/uninstall
 
@@ -97,7 +102,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
    - isolated worktree at base `85d8209`; full suite passed in 99.1s;
    - independent reviewer PASS with patch-integrity verification;
    - owner approval recorded; fast-forward merge commit `f439b16`;
-   - merged tree: 85/85 tests, version command works, no push by the pipeline.
+   - merged tree: 91/91 tests, version command works, no push by the pipeline.
 8. Local model/provider gateway:
    - default policy denied a local model call with zero spend;
    - owner grant + contract `model_call_local` + model-call budget enabled the
@@ -138,6 +143,16 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
    - OS keychain (Windows Credential Locker) secret set/status/delete round trip;
    - `health` and `doctor` report DB/schema/worker/acceptance/backup/keychain/disk;
    - offline installer and uninstaller tested; wheel build includes assets.
+13. UI, autonomy and skill matrix:
+   - `web/` landing page + control room, Diro/The Conductor SVG, `director ui`
+     loopback server with blocked directory listing and security headers;
+   - `director autonomy` opt-in scheduler: proposals -> one local author/test job
+     per interval, owner merge still required;
+   - `benchmarks/skill_matrix.py` 7 procedures × 7 tasks, test/rubric graded,
+     JSON/Markdown report and control-room table;
+   - result (2 seeds, llama-3.3-70b-fp8-fast): DIRECTOR 84.1 tied with Ponytail
+     but 4,514 vs 5,244 output tokens; ui-ux-pro-max design 100%; prompt-level,
+     not upstream runtime execution.
 
 ## Evidence levels (per surface)
 
@@ -190,5 +205,5 @@ worktree/test/review/owner-merge pipeline.
   `f439b16` (selfdev) and `85d8209` (pipeline), pushed to `origin/main` on
   2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: docs/build/EVIDENCE.md (85 tests, full demo,
+- Verified release evidence: docs/build/EVIDENCE.md (91 tests, full demo,
   zero model calls, independent review fixes).

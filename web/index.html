@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#07100e">
+  <meta name="description" content="DIRECTOR is a local-first supervisor for work that has to be true: contracts, evidence, gates, and supervised self-improvement.">
+  <title>DIRECTOR — work that can prove itself</title>
+  <link rel="icon" href="assets/character.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-nav">
+    <div class="wrap">
+      <a class="brand" href="index.html" aria-label="DIRECTOR home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        DIRECTOR
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#loop">How it works</a>
+        <a href="#capabilities">Capabilities</a>
+        <a href="#benchmarks">Benchmarks</a>
+        <a href="#character">Character</a>
+        <a href="https://github.com/nagasaipradhyumnapoola/director_agent" rel="noreferrer">Source</a>
+      </nav>
+      <button class="icon-btn" data-theme-toggle aria-label="Switch color theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg>
+      </button>
+      <a class="btn btn--primary nav-cta" href="app.html">
+        Open the console
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <span class="eyebrow">Local-first supervision</span>
+          <h1>
+            <span class="line">Work that can</span>
+            <span class="line"><em>prove</em> itself.</span>
+          </h1>
+          <p class="lede">
+            DIRECTOR holds a project to a written contract, demands current evidence,
+            and refuses to call a task complete just because an agent said so.
+            No idle model calls. No silent spend. No auto-push.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn--primary" href="app.html">
+              See the control room
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a class="btn" href="#benchmarks">Read the numbers</a>
+          </div>
+          <p class="hero-note">91 offline tests · 100M-token retrieval · 0 idle model calls</p>
+        </div>
+
+        <figure class="hero-figure">
+          <img src="assets/character.svg" width="420" height="520" alt="The Conductor: a geometric figure with a brass halo, a ledger and a baton.">
+          <dl class="contract-card" aria-label="Live contract summary">
+            <div class="row"><dt>Contract</dt><dd>rev 1 · general</dd></div>
+            <div class="row"><dt>Evidence</dt><dd><span class="status-dot" aria-hidden="true"></span>8 current</dd></div>
+            <div class="row"><dt>Worker</dt><dd>deterministic</dd></div>
+            <div class="row"><dt>Merge</dt><dd>owner-gated</dd></div>
+          </dl>
+        </figure>
+      </div>
+    </section>
+
+    <section class="ticker" aria-label="Release facts">
+      <div class="wrap">
+        <div class="ticker-item"><span class="ticker-num">8/8</span><span class="ticker-label">Pilot expectations met</span></div>
+        <div class="ticker-item"><span class="ticker-num">100M</span><span class="ticker-label">Tokens indexed · recall 1.0</span></div>
+        <div class="ticker-item"><span class="ticker-num">91</span><span class="ticker-label">Offline tests passing</span></div>
+        <div class="ticker-item"><span class="ticker-num">0</span><span class="ticker-label">Idle model calls · default deny</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="loop">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">The loop</span>
+            <h2>From intent to evidence,<br>without the hand-wave.</h2>
+          </div>
+          <p class="lede">
+            Every task starts as a durable contract with acceptance criteria.
+            Checks run first; model reasoning is optional and bounded. A newer
+            failure supersedes an older pass. Completion is a state, not a claim.
+          </p>
+        </div>
+
+        <div class="loop reveal">
+          <article class="loop-step">
+            <span class="num">01 / CONTRACT</span>
+            <h3>Write the target down</h3>
+            <p>Intent, deliverables, constraints, criteria, budgets, and the exact permissions the task may use.</p>
+          </article>
+          <article class="loop-step">
+            <span class="num">02 / EXECUTE</span>
+            <h3>Do the smallest real work</h3>
+            <p>Deterministic checks first. Browser, ML, research, document, and container runners are scoped and bounded.</p>
+          </article>
+          <article class="loop-step">
+            <span class="num">03 / PROVE</span>
+            <h3>Bind evidence to state</h3>
+            <p>Receipts carry hashes, evaluator versions, limitations, freshness, and the contract revision they belong to.</p>
+          </article>
+          <article class="loop-step">
+            <span class="num">04 / IMPROVE</span>
+            <h3>Change only through gates</h3>
+            <p>Patch allowlist, isolated worktree, full tests, independent review, owner merge. The pipeline never pushes.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="capabilities">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Capabilities</span>
+            <h2>One supervisor.<br>Several hard jobs.</h2>
+          </div>
+          <p class="lede">
+            DIRECTOR is not a chat wrapper. It is the layer that decides whether
+            work is allowed, measured, reproducible, and safe to merge.
+          </p>
+        </div>
+
+        <div class="card-grid reveal">
+          <article class="cap-card">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h6M9 16h6"/></svg>
+            <h3>State-bound evidence</h3>
+            <p>Freshness, supersession, contract revision, hashes, and explicit limitations on every receipt.</p>
+            <span class="tag">No stale green</span>
+          </article>
+          <article class="cap-card">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h7"/><circle cx="18" cy="17" r="3"/></svg>
+            <h3>Bounded retrieval</h3>
+            <p>FTS5 lexical memory with exact-marker recall measured at 1M, 10M, and 100M tokens.</p>
+            <span class="tag">100M measured</span>
+          </article>
+          <article class="cap-card">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M8 5l-5 7 5 7M16 5l5 7-5 7M13 4l-2 16"/></svg>
+            <h3>Supervised self-modification</h3>
+            <p>Local models can author patches, but only the test gate, review record, and owner merge can accept them.</p>
+            <span class="tag">Never auto-push</span>
+          </article>
+          <article class="cap-card">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18M8 4v5"/></svg>
+            <h3>Three working pilots</h3>
+            <p>A real Chromium journey, an ML leakage/held-out suite, and a research claim/calculation renderer.</p>
+            <span class="tag">Clean passes · broken fails</span>
+          </article>
+          <article class="cap-card">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-5"/></svg>
+            <h3>Default deny</h3>
+            <p>Contract actions, owner grants, budgets, OS-keychain credentials, and redacted audit logs.</p>
+            <span class="tag">Zero cloud spend by default</span>
+          </article>
+          <article class="cap-card">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 6h16v12H4zM8 10l2 2-2 2M13 14h3"/></svg>
+            <h3>Real isolation options</h3>
+            <p>A git worktree for selfdev, plus an optional Docker runner with read-only source, no network, and uid 65534.</p>
+            <span class="tag">Bounded, not a microVM</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="benchmarks">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Benchmarks</span>
+            <h2>Numbers with the<br>limits attached.</h2>
+          </div>
+          <p class="lede">
+            Retrieval is measured, not projected. The 1B attempt is recorded as a
+            wall, not a win. The skill matrix is queued until the UI is signed off.
+          </p>
+        </div>
+
+        <div class="bench-wrap" role="region" aria-label="Retrieval benchmarks" tabindex="0">
+          <table>
+            <caption>Lexical retrieval · exact markers · 100 queries per tier</caption>
+            <thead>
+              <tr><th>Tier</th><th class="num">Docs</th><th class="num">Ingest</th><th class="num">Recall@5</th><th class="num">p50</th><th class="num">p95</th><th class="num">Index</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1M tokens</td><td class="num">1,000</td><td class="num">2.23 s</td><td class="num">1.0</td><td class="num">0.433 ms</td><td class="num">0.726 ms</td><td class="num">22 MB</td></tr>
+              <tr><td>10M tokens</td><td class="num">10,000</td><td class="num">24.64 s</td><td class="num">1.0</td><td class="num">0.920 ms</td><td class="num">1.727 ms</td><td class="num">182 MB</td></tr>
+              <tr><td>100M tokens</td><td class="num">100,000</td><td class="num">217.5 s</td><td class="num">1.0</td><td class="num">1.164 ms</td><td class="num">7.134 ms</td><td class="num">1.78 GB</td></tr>
+              <tr><td>1B attempt</td><td class="num">—</td><td class="num">stopped 4h</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">3.9 GB / 22%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bench-wrap reveal" style="margin-top:1.2rem" role="region" aria-label="Skill benchmark matrix" tabindex="0">
+          <table>
+            <caption>Skill matrix · 2 seeds · 98 runs · prompt-level · llama-3.3-70b-fp8-fast</caption>
+            <thead>
+              <tr><th>Tool</th><th>Kind</th><th class="num">Coding</th><th class="num">Tokens</th><th class="num">Clarity</th><th class="num">Design</th><th class="num">Context</th><th class="num">Self-improve</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>DIRECTOR</strong></td><td>supervisor</td><td class="num">67%</td><td class="num">4,514</td><td class="num">75%</td><td class="num">86%</td><td class="num">100%</td><td class="num">100%</td></tr>
+              <tr><td>Ponytail</td><td>simplicity</td><td class="num">67%</td><td class="num">5,244</td><td class="num">75%</td><td class="num">86%</td><td class="num">100%</td><td class="num">100%</td></tr>
+              <tr><td>ui-ux-pro-max</td><td>design</td><td class="num">50%</td><td class="num">5,529</td><td class="num">75%</td><td class="num">100%</td><td class="num">100%</td><td class="num">100%</td></tr>
+              <tr><td>Direct model</td><td>baseline</td><td class="num">50%</td><td class="num">5,131</td><td class="num">80%</td><td class="num">89%</td><td class="num">100%</td><td class="num">100%</td></tr>
+              <tr><td>Headroom</td><td>compression</td><td class="num">50%</td><td class="num">4,742</td><td class="num">80%</td><td class="num">86%</td><td class="num">100%</td><td class="num">100%</td></tr>
+              <tr><td>Superpowers</td><td>procedure</td><td class="num">50%</td><td class="num">4,791</td><td class="num">75%</td><td class="num">86%</td><td class="num">100%</td><td class="num">100%</td></tr>
+              <tr><td>ECC</td><td>catalog</td><td class="num">50%</td><td class="num">4,446</td><td class="num">70%</td><td class="num">86%</td><td class="num">100%</td><td class="num">100%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="color:var(--faint);font-size:.78rem;margin:.7rem 0 0">Status: <span class="badge badge--pass">complete</span> · DIRECTOR ties Ponytail on score and uses 14% fewer output tokens; ui-ux-pro-max wins design. Prompt-level, not runtime execution. Raw: <code>benchmarks/results/skill_matrix.json</code>.</p>
+      </div>
+    </section>
+
+    <section class="section" id="character">
+      <div class="wrap character-section">
+        <figure class="character-figure reveal">
+          <img src="assets/character.svg" width="420" height="520" alt="The Conductor, the DIRECTOR mascot.">
+          <figcaption>The Conductor / keeper of the line</figcaption>
+        </figure>
+        <div class="character-copy">
+          <span class="eyebrow">The character</span>
+          <h2>Meet The Conductor.</h2>
+          <p>
+            The Conductor does not do the work for you. It keeps the score: one
+            baton for direction, one ledger for evidence, and a brass ring that
+            never lets a claim outrun its proof.
+          </p>
+          <ul class="principles">
+            <li><span class="pnum">01</span><div><strong>Hold the line.</strong><span>A failing check is information. It is never a branding problem.</span></div></li>
+            <li><span class="pnum">02</span><div><strong>Keep the receipt.</strong><span>If it is not bound to state, it did not happen.</span></div></li>
+            <li><span class="pnum">03</span><div><strong>Earn the merge.</strong><span>Self-modification is supervised, reviewed, and owner-gated.</span></div></li>
+            <li><span class="pnum">04</span><div><strong>Stay local.</strong><span>Default deny, zero idle calls, no silent network.</span></div></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div class="wrap">
+        <div>
+          <span class="eyebrow">Ready</span>
+          <h2>Open the control room.</h2>
+        </div>
+        <a class="btn btn--primary" href="app.html">
+          Launch the console
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span>DIRECTOR · v1.0.0-local-supervised · local-first, default-deny.</span>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="app.html">Console</a>
+        <a href="https://github.com/nagasaipradhyumnapoola/director_agent" rel="noreferrer">GitHub</a>
+        <a href="https://github.com/nagasaipradhyumnapoola/director_agent/blob/main/docs/build/BENCHMARKS.md" rel="noreferrer">Benchmarks</a>
+        <a href="#main">Back to top</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

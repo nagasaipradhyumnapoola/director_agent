@@ -25,11 +25,14 @@ sandbox, cloud autonomy or universal domain competence.
 | Autostart | per-user Startup-folder install/status/remove (no admin) |
 | Container runner | Docker, read-only mount, no network, uid 65534, cap-drop ALL, resource bounds |
 | Scheduled maintenance | opt-in worker backup + prune on an interval |
+| UI | landing page + control room + Diro character; loopback server |
+| Continuous autonomy | opt-in proposal → local author/test; owner merge required |
+| Skill matrix | 7 procedures × 7 tasks; DIRECTOR 84.1, tied top with 14% fewer tokens |
 | Native OpenCode MCP connection | `opencode mcp list` shows `director connected` (1.19.4) |
 | MCP protocol | official SDK round trip, bounded frames/args/results |
 | Three domain pilots | clean fixtures pass; seeded broken fixtures fail |
 | Packaging/install | wheel builds; offline source-path installer; uninstall |
-| Test suite | 85 offline tests, browser and MCP SDK included |
+| Test suite | 91 offline tests, browser and MCP SDK included |
 | Retrieval benchmark | 1M/10M/100M lexical tiers; 100M recall@5 1.0, p95 7.13ms (container) |
 
 ## Explicit non-claims

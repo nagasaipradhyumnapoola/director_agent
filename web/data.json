@@ -1,0 +1,277 @@
+{
+  "generated_at": "2026-11-24T00:00:00Z",
+  "demo": true,
+  "project": {
+    "name": "director-agent",
+    "id": "ad92f90ecedc475d8124849365369cfb",
+    "status": "active",
+    "release": "v1.0.0-local-supervised",
+    "commit": "HEAD",
+    "domain": "general"
+  },
+  "worker": {
+    "status": "running",
+    "pid": 24184,
+    "heartbeat_age_seconds": 2,
+    "model_calls_idle": 0
+  },
+  "kpis": [
+    {
+      "label": "Acceptance",
+      "value": "100%",
+      "delta": "8/8 criteria current",
+      "tone": "up"
+    },
+    {
+      "label": "Offline tests",
+      "value": "91",
+      "delta": "passed in 121.72s",
+      "tone": "up"
+    },
+    {
+      "label": "Model calls",
+      "value": "0",
+      "delta": "idle worker, zero spend",
+      "tone": ""
+    },
+    {
+      "label": "Retrieval",
+      "value": "100M",
+      "delta": "p95 7.13ms \u00b7 recall 1.0",
+      "tone": "up"
+    }
+  ],
+  "acceptance": {
+    "complete": true,
+    "percent": 100,
+    "criteria": [
+      {
+        "key": "artifact.scan",
+        "label": "Static artifact scan",
+        "state": "pass",
+        "evidence": "ev_8449a1"
+      },
+      {
+        "key": "website.journey",
+        "label": "Real browser journey",
+        "state": "pass",
+        "evidence": "ev_35cbb5"
+      },
+      {
+        "key": "website.a11y",
+        "label": "Keyboard + accessibility tree",
+        "state": "pass",
+        "evidence": "ev_f86f5f"
+      },
+      {
+        "key": "ml.heldout",
+        "label": "Held-out accuracy",
+        "state": "pass",
+        "evidence": "ev_fea1b0"
+      },
+      {
+        "key": "ml.leakage",
+        "label": "Split/target leakage",
+        "state": "pass",
+        "evidence": "ev_13f2e5"
+      },
+      {
+        "key": "research.claims",
+        "label": "Claims map to sources",
+        "state": "pass",
+        "evidence": "ev_382d17"
+      },
+      {
+        "key": "research.calculation",
+        "label": "Calculation recheck",
+        "state": "pass",
+        "evidence": "ev_0f7c9d"
+      },
+      {
+        "key": "research.render",
+        "label": "Resolved citations",
+        "state": "pass",
+        "evidence": "ev_c5b009"
+      }
+    ]
+  },
+  "retrieval": [
+    {
+      "tier": "1M",
+      "docs": 1000,
+      "ingest_s": 2.23,
+      "recall": 1.0,
+      "p50_ms": 0.433,
+      "p95_ms": 0.726,
+      "db_mb": 22.0
+    },
+    {
+      "tier": "10M",
+      "docs": 10000,
+      "ingest_s": 24.64,
+      "recall": 1.0,
+      "p50_ms": 0.92,
+      "p95_ms": 1.727,
+      "db_mb": 181.8
+    },
+    {
+      "tier": "100M",
+      "docs": 100000,
+      "ingest_s": 217.5,
+      "recall": 1.0,
+      "p50_ms": 1.164,
+      "p95_ms": 7.134,
+      "db_mb": 1783.7
+    }
+  ],
+  "skill_matrix": {
+    "status": "complete",
+    "note": "Prompt-level ablation \u00b7 llama-3.3-70b-fp8-fast \u00b7 2 seed(s) \u00b7 248.7s. Upstream runtimes not executed.",
+    "metrics": [
+      "coding",
+      "tokens",
+      "clarity",
+      "design",
+      "context",
+      "self-improve"
+    ],
+    "rows": [
+      {
+        "tool": "DIRECTOR",
+        "kind": "supervisor",
+        "scores": [
+          67,
+          4514,
+          75,
+          86,
+          100,
+          100
+        ]
+      },
+      {
+        "tool": "Ponytail",
+        "kind": "simplicity",
+        "scores": [
+          67,
+          5244,
+          75,
+          86,
+          100,
+          100
+        ]
+      },
+      {
+        "tool": "ui-ux-pro-max",
+        "kind": "design",
+        "scores": [
+          50,
+          5529,
+          75,
+          100,
+          100,
+          100
+        ]
+      },
+      {
+        "tool": "Direct model",
+        "kind": "baseline",
+        "scores": [
+          50,
+          5131,
+          80,
+          89,
+          100,
+          100
+        ]
+      },
+      {
+        "tool": "Headroom",
+        "kind": "compression",
+        "scores": [
+          50,
+          4742,
+          80,
+          86,
+          100,
+          100
+        ]
+      },
+      {
+        "tool": "Superpowers",
+        "kind": "procedure",
+        "scores": [
+          50,
+          4791,
+          75,
+          86,
+          100,
+          100
+        ]
+      },
+      {
+        "tool": "ECC",
+        "kind": "catalog",
+        "scores": [
+          50,
+          4446,
+          70,
+          86,
+          100,
+          100
+        ]
+      }
+    ]
+  },
+  "patches": [
+    {
+      "id": "patch_cdc28362",
+      "title": "Add version command",
+      "status": "merged",
+      "detail": "full suite + independent review + owner merge"
+    },
+    {
+      "id": "patch_32e07638",
+      "title": "model: byte formatting helper",
+      "status": "rejected",
+      "detail": "review PASS on correctness, no production caller"
+    },
+    {
+      "id": "patch_305bc55f",
+      "title": "model: release metadata helper",
+      "status": "failed",
+      "detail": "did not pass the test gate"
+    }
+  ],
+  "audit": [
+    {
+      "at": "12:04:11",
+      "actor": "director.worker",
+      "action": "heartbeat",
+      "outcome": "ok"
+    },
+    {
+      "at": "12:03:58",
+      "actor": "director.evidence",
+      "action": "evidence.record",
+      "outcome": "website.a11y"
+    },
+    {
+      "at": "12:03:41",
+      "actor": "director.selfdev",
+      "action": "selfdev.test",
+      "outcome": "pass"
+    },
+    {
+      "at": "12:02:19",
+      "actor": "director.container",
+      "action": "container.run",
+      "outcome": "ok"
+    },
+    {
+      "at": "12:01:02",
+      "actor": "director.model",
+      "action": "model.call",
+      "outcome": "local"
+    }
+  ]
+}

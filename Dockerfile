@@ -8,6 +8,7 @@ WORKDIR /app
 
 COPY pyproject.toml README.md ./
 COPY src ./src
+COPY web ./web
 
 RUN pip install --no-cache-dir -e . --no-deps \
     && pip install --no-cache-dir "mcp>=1.0" python-docx
@@ -15,6 +16,7 @@ RUN pip install --no-cache-dir -e . --no-deps \
 # Run as an unprivileged user (65534 is the image's nobody account).
 USER 65534:65534
 WORKDIR /project
+ENV DIRECTOR_WEB_DIR=/app/web
 
 ENTRYPOINT ["python", "-m", "director"]
 CMD ["--help"]

@@ -38,6 +38,8 @@ Evidence levels are not interchangeable:
 | POSIX | code paths present | not validated in this release |
 | Container runner | implemented, tested | Docker 29.6.2; read-only mount, no network, uid 65534, cap-drop ALL; not a hardened microVM |
 | Container image | implemented, tested | `director:local` 260MB; build + version/init/status; CI docker job |
+| Control room UI | implemented, tested | static `web/`, loopback server, no directory listing, 85+ tests |
+| Continuous autonomy | implemented, tested | opt-in proposal → author/test queue; owner merge required |
 
 ## MCP protocol note
 

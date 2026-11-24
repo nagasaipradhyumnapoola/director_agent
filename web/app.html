@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#07100e">
+  <meta name="description" content="DIRECTOR control room: contracts, acceptance, evidence, benchmarks, supervised self-improvement and audit.">
+  <title>Control room · DIRECTOR</title>
+  <link rel="icon" href="assets/character.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="assets/app.js" defer></script>
+</head>
+<body class="app-body">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="mobile-bar">
+    <a class="brand" href="index.html" aria-label="DIRECTOR home"><span class="brand-mark" aria-hidden="true"></span>DIRECTOR</a>
+    <span class="status-pill"><span class="status-dot" aria-hidden="true"></span>Worker running</span>
+    <button class="icon-btn" data-theme-toggle aria-label="Switch color theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg>
+    </button>
+  </div>
+
+  <div class="shell">
+    <aside class="sidebar" aria-label="Project navigation">
+      <a class="brand" href="index.html" aria-label="DIRECTOR home"><span class="brand-mark" aria-hidden="true"></span>DIRECTOR</a>
+
+      <div class="project-switch">
+        <span class="label">Active project</span>
+        <strong id="project-name">director-agent</strong>
+        <span class="meta"><span id="project-release">v1.0.0-local-supervised</span> · <span id="project-domain">general</span></span>
+      </div>
+
+      <nav class="side-nav" aria-label="Views">
+        <a href="#overview" data-view-link="overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Overview
+        </a>
+        <a href="#contracts" data-view-link="contracts">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h6M9 16h6"/></svg>
+          Contract
+        </a>
+        <a href="#evidence" data-view-link="evidence">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 11l2 2 4-4"/><path d="M12 3l8 4v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7z"/></svg>
+          Evidence
+        </a>
+        <a href="#benchmarks" data-view-link="benchmarks">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 19V5M10 19V9M16 19v-7M22 19V3"/></svg>
+          Benchmarks
+        </a>
+        <a href="#selfdev" data-view-link="selfdev">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8 5l-5 7 5 7M16 5l5 7-5 7M13 4l-2 16"/></svg>
+          Selfdev
+        </a>
+        <a href="#audit" data-view-link="audit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h10"/></svg>
+          Audit
+        </a>
+      </nav>
+
+      <div class="side-section">Workspace</div>
+      <nav class="side-nav" aria-label="Workspace links">
+        <a href="https://github.com/nagasaipradhyumnapoola/director_agent/blob/main/docs/build/BENCHMARKS.md" rel="noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5"/></svg>
+          Benchmark notes
+        </a>
+        <a href="https://github.com/nagasaipradhyumnapoola/director_agent/blob/main/README.md" rel="noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 19V5a2 2 0 012-2h13v18H6a2 2 0 01-2-2z"/><path d="M8 7h7M8 11h7"/></svg>
+          README
+        </a>
+        <a href="index.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>
+          Landing page
+        </a>
+      </nav>
+
+      <div class="side-footer">
+        <span class="worker"><span class="status-dot" aria-hidden="true"></span><span id="worker-status">Worker running</span></span>
+        <span class="worker" id="worker-heartbeat">heartbeat 2s ago</span>
+        <button class="btn btn--ghost btn--sm" type="button" data-theme-toggle>Theme</button>
+      </div>
+    </aside>
+
+    <main class="main" id="main">
+      <header class="topbar">
+        <div class="crumbs" aria-label="Breadcrumb">
+          <span>director-agent</span><span class="sep">/</span><span id="crumb">overview</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="search-trigger" type="button" id="open-command" aria-haspopup="dialog">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+            Jump to
+            <kbd>Ctrl K</kbd>
+          </button>
+          <span class="status-pill"><span class="status-dot" aria-hidden="true"></span>Worker running</span>
+          <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch color theme">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="content" id="view" aria-live="polite"></div>
+      <noscript><p class="content">This console needs JavaScript. The CLI and MCP server do not.</p></noscript>
+    </main>
+  </div>
+
+  <div class="commandk" id="commandk" role="dialog" aria-modal="true" aria-labelledby="commandk-title">
+    <div class="commandk-box">
+      <h2 id="commandk-title" class="mono" style="padding:.8rem 1rem 0;color:var(--faint);font-size:.6rem">Jump to</h2>
+      <input id="commandk-input" type="search" placeholder="Overview, evidence, benchmarks…" autocomplete="off" aria-label="Filter destinations">
+      <ul class="commandk-list" id="commandk-list"></ul>
+    </div>
+  </div>
+
+  <script>
+    // Works when the file is opened directly; the live path is web/serve.py.
+    window.DIRECTOR_FALLBACK = {
+      project: { name: "director-agent", release: "v1.0.0-local-supervised", domain: "general", commit: "8f5b1de" },
+      worker: { status: "running", heartbeat_age_seconds: 2 },
+      kpis: [
+        { label: "Acceptance", value: "100%", delta: "8/8 criteria current", tone: "up" },
+        { label: "Offline tests", value: "85", delta: "passed in 117.08s", tone: "up" },
+        { label: "Model calls", value: "0", delta: "idle worker, zero spend" },
+        { label: "Retrieval", value: "100M", delta: "p95 7.13ms · recall 1.0", tone: "up" }
+      ],
+      acceptance: { complete: true, percent: 100, criteria: [] },
+      retrieval: [],
+      skill_matrix: { status: "queued", note: "Open this page through web/serve.py to load the full dataset.", rows: [] },
+      patches: [], audit: []
+    };
+  </script>
+</body>
+</html>

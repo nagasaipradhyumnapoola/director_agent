@@ -14,6 +14,7 @@ from . import RELEASE_TARGET, __version__
 from .adapter import SUPPORTED_HOSTS, generate as generate_adapter
 from . import audit as audit_log
 from .analysis import ArtifactScanner, ScanConfig
+from .autonomy import disable as autonomy_disable, enable as autonomy_enable, maybe_run as autonomy_run, status as autonomy_status
 from .backup import create_backup, list_backups, prune_backups, restore_backup, verify_backup
 from .container import available as container_available, run as container_run
 from .maintenance import (
@@ -37,6 +38,7 @@ from .keychain import (
 from .policy import PolicyDenied, PolicyGateway
 from .providers import PROVIDERS, call_model
 from .service import install as service_install, remove as service_remove, status as service_status
+from .ui import serve_ui
 from .selfdev import (
     cleanup as selfdev_cleanup,
     create_patch,
@@ -984,6 +986,40 @@ def cmd_container(args: argparse.Namespace) -> int:
         store.close()
 
 
+def cmd_autonomy(args: argparse.Namespace) -> int:
+    store = _open(_root(args))
+    try:
+        if args.action == "enable":
+            _emit(
+                autonomy_enable(
+                    store,
+                    interval_minutes=args.interval_minutes,
+                    max_per_day=args.max_per_day,
+                    provider=args.provider,
+                    model=args.model,
+                )
+            )
+        elif args.action == "status":
+            _emit(autonomy_status(store))
+        elif args.action == "disable":
+            _emit(autonomy_disable(store))
+        elif args.action == "run":
+            _emit({"result": autonomy_run(store), "status": autonomy_status(store)})
+        else:
+            raise ValidationError("unknown autonomy action")
+        return 0
+    finally:
+        store.close()
+
+
+def cmd_ui(args: argparse.Namespace) -> int:
+    return serve_ui(
+        port=args.port,
+        open_browser=not args.no_open,
+        web_dir=args.web_dir or None,
+    )
+
+
 def cmd_service(args: argparse.Namespace) -> int:
     store = _open(_root(args))
     try:
@@ -1402,6 +1438,27 @@ def build_parser() -> argparse.ArgumentParser:
     audit_list = audit_sub.add_parser("list", parents=[common])
     audit_list.add_argument("--limit", type=int, default=100)
     audit_list.set_defaults(func=cmd_audit)
+
+    autonomy = sub.add_parser("autonomy", parents=[common], help="continuous supervised self-improvement")
+    autonomy_sub = autonomy.add_subparsers(dest="action", required=True)
+    autonomy_enable_parser = autonomy_sub.add_parser("enable", parents=[common])
+    autonomy_enable_parser.add_argument("--interval-minutes", type=float, default=60.0)
+    autonomy_enable_parser.add_argument("--max-per-day", type=int, default=4)
+    autonomy_enable_parser.add_argument("--provider", default="ollama", choices=list(PROVIDERS))
+    autonomy_enable_parser.add_argument("--model", default="qwen2.5-coder:7b")
+    autonomy_enable_parser.set_defaults(func=cmd_autonomy, action="enable")
+    autonomy_status_parser = autonomy_sub.add_parser("status", parents=[common])
+    autonomy_status_parser.set_defaults(func=cmd_autonomy, action="status")
+    autonomy_disable_parser = autonomy_sub.add_parser("disable", parents=[common])
+    autonomy_disable_parser.set_defaults(func=cmd_autonomy, action="disable")
+    autonomy_run_parser = autonomy_sub.add_parser("run", parents=[common])
+    autonomy_run_parser.set_defaults(func=cmd_autonomy, action="run")
+
+    ui = sub.add_parser("ui", parents=[common], help="serve the landing page + console on loopback")
+    ui.add_argument("--port", type=int, default=8765)
+    ui.add_argument("--no-open", action="store_true")
+    ui.add_argument("--web-dir", default="")
+    ui.set_defaults(func=cmd_ui)
 
     service = sub.add_parser("service", parents=[common], help="opt-in Windows logon task")
     service_sub = service.add_subparsers(dest="action", required=True)

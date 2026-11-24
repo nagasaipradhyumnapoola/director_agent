@@ -15,7 +15,7 @@ Command:
 $env:PYTHONPATH="src"; python -m pytest
 ```
 
-Result: **85 passed in 117.08s**, no failures, no skips. The browser (real
+Result: **91 passed in 121.72s**, no failures, no skips. The browser (real
 Chromium/CDP) and MCP SDK tests executed; they were not skipped.
 
 Coverage highlights:
@@ -104,7 +104,7 @@ ersion
 - Independent reviewer returned **PASS**, verified reverse-apply integrity and
   ran the targeted test; only low non-blocking notes.
 - Owner approval recorded; local fast-forward merge commit f439b16.
-- Merged tree: 85/85 tests, python -m director version --json works.
+- Merged tree: 91/91 tests, python -m director version --json works.
 - The pipeline did not push; the release push was a separate owner action.
 
 ## 4d. Local model/provider gateway and 24/7 patch testing
@@ -166,6 +166,15 @@ ersion
   1.66-2.01s, and initializes/inspects a mounted project as uid 65534.
 - Opt-in maintenance: first `maybe_run` created a backup, an immediate second run
   was skipped, and disable stopped it.
+- UI: `director ui` served the landing page and control room on loopback; the
+  server blocked directory listing and sent nosniff/DENY headers. `tests/test_ui.py`
+  covers assets and server behavior.
+- Autonomy: enabling at 60 minutes enqueued one `selfdev_author` job with
+  `test=true`; a second sweep was not due; disable stopped it.
+- Skill matrix (2 seeds, 98 runs, `llama-3.3-70b-fp8-fast`):
+  DIRECTOR 84.1 (4,514 output tokens), Ponytail 84.1 (5,244), ui-ux-pro-max 81.2
+  with design 100%, Direct 80.4, Headroom 79.9, Superpowers 79.1, ECC 78.4.
+  Prompt-level procedure ablation; upstream runtimes/hooks not executed.
 
 ## 4h. Benchmarks
 
@@ -256,5 +265,5 @@ or broad benchmark is claimed.
   (v1.0.0 hardening), `1f98389` (Ollama/selfdev), `5606419` (grants), `f439b16`
   (selfdev) and `85d8209` (pipeline), pushed to `origin/main` on 2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: 85 tests, full demo, zero model calls, independent
+- Verified release evidence: 91 tests, full demo, zero model calls, independent
   review fixes, one merged selfdev patch.
