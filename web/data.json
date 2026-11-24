@@ -24,8 +24,8 @@
     },
     {
       "label": "Offline tests",
-      "value": "97",
-      "delta": "passed in 114.10s",
+      "value": "99",
+      "delta": "passed in 112.49s",
       "tone": "up"
     },
     {
@@ -139,6 +139,11 @@
       {
         "tool": "DIRECTOR",
         "kind": "supervisor",
+        "best_at": [
+          "coding",
+          "compression",
+          "token efficiency"
+        ],
         "scores": [
           67,
           4514,
@@ -151,6 +156,9 @@
       {
         "tool": "Ponytail",
         "kind": "simplicity",
+        "best_at": [
+          "coding (tied 4/6)"
+        ],
         "scores": [
           67,
           5244,
@@ -163,6 +171,9 @@
       {
         "tool": "ui-ux-pro-max",
         "kind": "design",
+        "best_at": [
+          "design"
+        ],
         "scores": [
           50,
           5529,
@@ -175,6 +186,9 @@
       {
         "tool": "Direct model",
         "kind": "baseline",
+        "best_at": [
+          "clarity"
+        ],
         "scores": [
           50,
           5131,
@@ -187,6 +201,9 @@
       {
         "tool": "Headroom",
         "kind": "compression",
+        "best_at": [
+          "clarity (tied 80%)"
+        ],
         "scores": [
           50,
           4742,
@@ -199,6 +216,9 @@
       {
         "tool": "Superpowers",
         "kind": "procedure",
+        "best_at": [
+          "no outright lead; strongest is design (86%)"
+        ],
         "scores": [
           50,
           4791,
@@ -211,6 +231,9 @@
       {
         "tool": "ECC",
         "kind": "catalog",
+        "best_at": [
+          "no outright lead; strongest is design (86%)"
+        ],
         "scores": [
           50,
           4446,

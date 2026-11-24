@@ -163,7 +163,7 @@ with exact token/cost accounting. A real cloud key/spend was not exercised;
 ## Evidence status
 
 v1.0.0-local-supervised is implemented and tested on this host for its local single-user scope:
-- 97 offline tests pass (including a real Chromium/CDP website journey, the
+- 99 offline tests pass (including a real Chromium/CDP website journey, the
   official MCP SDK round trip, selfdev, provider/grants, backups/keychain, UI,
   autonomy and the skill-matrix self-test).
 - Skill matrix (2 seeds, 98 runs, `llama-3.3-70b-fp8-fast`): DIRECTOR 84.1

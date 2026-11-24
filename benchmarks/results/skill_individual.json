@@ -1,0 +1,755 @@
+{
+  "coverage": {
+    "runs": 98,
+    "tools": 7,
+    "tasks": 7,
+    "seeds": 2
+  },
+  "leaders": {
+    "coding": {
+      "tool": "director",
+      "display": "DIRECTOR",
+      "value": 4,
+      "total": 6,
+      "detail": 0.8
+    },
+    "selfdev": {
+      "tool": "*",
+      "display": "All tools",
+      "value": "2/2"
+    },
+    "design": {
+      "tool": "ui_ux",
+      "display": "ui-ux-pro-max",
+      "value": 1.0
+    },
+    "clarity": {
+      "tool": "direct",
+      "display": "Direct model",
+      "value": 0.8
+    },
+    "context": {
+      "tool": "*",
+      "display": "All tools",
+      "value": "100%"
+    },
+    "compression": {
+      "tool": "director",
+      "display": "DIRECTOR",
+      "value": 0.9392
+    },
+    "token_efficiency": {
+      "tool": "director",
+      "display": "DIRECTOR",
+      "value": 18.63
+    }
+  },
+  "task_winners": [
+    {
+      "task": "clarity_worktree",
+      "winner": "Direct model",
+      "passed": "2/2",
+      "score": 0.8,
+      "tokens": 236,
+      "retention": null,
+      "compression": null
+    },
+    {
+      "task": "context_pack",
+      "winner": "DIRECTOR",
+      "passed": "2/2",
+      "score": 1.0,
+      "tokens": 437,
+      "retention": 1.0,
+      "compression": 0.9392
+    },
+    {
+      "task": "design_card",
+      "winner": "ui-ux-pro-max",
+      "passed": "2/2",
+      "score": 1.0,
+      "tokens": 2400,
+      "retention": null,
+      "compression": null
+    },
+    {
+      "task": "merge_intervals",
+      "winner": "DIRECTOR",
+      "passed": "2/2",
+      "score": 1.0,
+      "tokens": 492,
+      "retention": null,
+      "compression": null
+    },
+    {
+      "task": "parse_duration",
+      "winner": "DIRECTOR",
+      "passed": "2/2",
+      "score": 1.0,
+      "tokens": 1056,
+      "retention": null,
+      "compression": null
+    },
+    {
+      "task": "selfdev_median",
+      "winner": "All tools",
+      "passed": "2/2",
+      "score": 1.0,
+      "tokens": 226,
+      "retention": null,
+      "compression": null
+    },
+    {
+      "task": "slugify",
+      "winner": "Ponytail",
+      "passed": "0/2",
+      "score": 0.8,
+      "tokens": 462,
+      "retention": null,
+      "compression": null
+    }
+  ],
+  "best_at": {
+    "direct": [
+      "clarity"
+    ],
+    "director": [
+      "coding",
+      "compression",
+      "token efficiency"
+    ],
+    "ecc": [
+      "no outright lead; strongest is design (86%)"
+    ],
+    "headroom": [
+      "clarity (tied 80%)"
+    ],
+    "ponytail": [
+      "coding (tied 4/6)"
+    ],
+    "superpowers": [
+      "no outright lead; strongest is design (86%)"
+    ],
+    "ui_ux": [
+      "design"
+    ]
+  },
+  "scorecards": {
+    "direct": {
+      "tool": "direct",
+      "display": "Direct model",
+      "tasks": {
+        "clarity_worktree": {
+          "runs": 2,
+          "passed": 2,
+          "score": 0.8,
+          "partial": 1.0,
+          "tokens": 236,
+          "latency_s": 4.45,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "context_pack": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 448,
+          "latency_s": 6.76,
+          "retention": 1.0,
+          "compression": 0.9321
+        },
+        "design_card": {
+          "runs": 2,
+          "passed": 2,
+          "score": 0.8928,
+          "partial": 1.0,
+          "tokens": 1949,
+          "latency_s": 23.01,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "merge_intervals": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 592,
+          "latency_s": 6.91,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "parse_duration": {
+          "runs": 2,
+          "passed": 1,
+          "score": 0.5,
+          "partial": 0.6923,
+          "tokens": 1178,
+          "latency_s": 13.78,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "selfdev_median": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 230,
+          "latency_s": 3.27,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "slugify": {
+          "runs": 2,
+          "passed": 0,
+          "score": 0.0,
+          "partial": 0.8,
+          "tokens": 498,
+          "latency_s": 7.79,
+          "retention": 0.0,
+          "compression": 0.0
+        }
+      },
+      "coding_pass": 3,
+      "coding_total": 6,
+      "selfdev_pass": 2,
+      "selfdev_total": 2,
+      "design": 0.8928,
+      "clarity": 0.8,
+      "context": 1.0,
+      "compression": 0.9321,
+      "tokens": 5131,
+      "overall": 80.4,
+      "efficiency": 15.67,
+      "latency_s": 66.0
+    },
+    "director": {
+      "tool": "director",
+      "display": "DIRECTOR",
+      "tasks": {
+        "clarity_worktree": {
+          "runs": 2,
+          "passed": 1,
+          "score": 0.75,
+          "partial": 0.5,
+          "tokens": 240,
+          "latency_s": 5.45,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "context_pack": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 437,
+          "latency_s": 6.37,
+          "retention": 1.0,
+          "compression": 0.9392
+        },
+        "design_card": {
+          "runs": 2,
+          "passed": 2,
+          "score": 0.8571,
+          "partial": 1.0,
+          "tokens": 1579,
+          "latency_s": 23.63,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "merge_intervals": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 492,
+          "latency_s": 6.1,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "parse_duration": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 1056,
+          "latency_s": 14.14,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "selfdev_median": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 230,
+          "latency_s": 3.71,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "slugify": {
+          "runs": 2,
+          "passed": 0,
+          "score": 0.0,
+          "partial": 0.8,
+          "tokens": 480,
+          "latency_s": 6.07,
+          "retention": 0.0,
+          "compression": 0.0
+        }
+      },
+      "coding_pass": 4,
+      "coding_total": 6,
+      "selfdev_pass": 2,
+      "selfdev_total": 2,
+      "design": 0.8571,
+      "clarity": 0.75,
+      "context": 1.0,
+      "compression": 0.9392,
+      "tokens": 4514,
+      "overall": 84.1,
+      "efficiency": 18.63,
+      "latency_s": 65.5
+    },
+    "ecc": {
+      "tool": "ecc",
+      "display": "ECC",
+      "tasks": {
+        "clarity_worktree": {
+          "runs": 2,
+          "passed": 0,
+          "score": 0.7,
+          "partial": 0.0,
+          "tokens": 231,
+          "latency_s": 4.33,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "context_pack": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 504,
+          "latency_s": 7.22,
+          "retention": 1.0,
+          "compression": 0.9171
+        },
+        "design_card": {
+          "runs": 2,
+          "passed": 2,
+          "score": 0.8571,
+          "partial": 1.0,
+          "tokens": 1397,
+          "latency_s": 16.5,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "merge_intervals": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 608,
+          "latency_s": 7.02,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "parse_duration": {
+          "runs": 2,
+          "passed": 1,
+          "score": 0.5,
+          "partial": 0.8462,
+          "tokens": 986,
+          "latency_s": 14.7,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "selfdev_median": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 230,
+          "latency_s": 3.47,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "slugify": {
+          "runs": 2,
+          "passed": 0,
+          "score": 0.0,
+          "partial": 0.8,
+          "tokens": 490,
+          "latency_s": 8.34,
+          "retention": 0.0,
+          "compression": 0.0
+        }
+      },
+      "coding_pass": 3,
+      "coding_total": 6,
+      "selfdev_pass": 2,
+      "selfdev_total": 2,
+      "design": 0.8571,
+      "clarity": 0.7,
+      "context": 1.0,
+      "compression": 0.9171,
+      "tokens": 4446,
+      "overall": 78.4,
+      "efficiency": 17.62,
+      "latency_s": 61.6
+    },
+    "headroom": {
+      "tool": "headroom",
+      "display": "Headroom",
+      "tasks": {
+        "clarity_worktree": {
+          "runs": 2,
+          "passed": 2,
+          "score": 0.8,
+          "partial": 1.0,
+          "tokens": 278,
+          "latency_s": 5.33,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "context_pack": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 452,
+          "latency_s": 7.13,
+          "retention": 1.0,
+          "compression": 0.9317
+        },
+        "design_card": {
+          "runs": 2,
+          "passed": 2,
+          "score": 0.8571,
+          "partial": 1.0,
+          "tokens": 1729,
+          "latency_s": 19.7,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "merge_intervals": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 586,
+          "latency_s": 7.16,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "parse_duration": {
+          "runs": 2,
+          "passed": 1,
+          "score": 0.5,
+          "partial": 0.9615,
+          "tokens": 967,
+          "latency_s": 13.85,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "selfdev_median": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 230,
+          "latency_s": 3.36,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "slugify": {
+          "runs": 2,
+          "passed": 0,
+          "score": 0.0,
+          "partial": 0.8,
+          "tokens": 500,
+          "latency_s": 6.37,
+          "retention": 0.0,
+          "compression": 0.0
+        }
+      },
+      "coding_pass": 3,
+      "coding_total": 6,
+      "selfdev_pass": 2,
+      "selfdev_total": 2,
+      "design": 0.8571,
+      "clarity": 0.8,
+      "context": 1.0,
+      "compression": 0.9317,
+      "tokens": 4742,
+      "overall": 79.9,
+      "efficiency": 16.84,
+      "latency_s": 62.9
+    },
+    "ponytail": {
+      "tool": "ponytail",
+      "display": "Ponytail",
+      "tasks": {
+        "clarity_worktree": {
+          "runs": 2,
+          "passed": 1,
+          "score": 0.75,
+          "partial": 0.5,
+          "tokens": 270,
+          "latency_s": 5.46,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "context_pack": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 440,
+          "latency_s": 6.19,
+          "retention": 1.0,
+          "compression": 0.93
+        },
+        "design_card": {
+          "runs": 2,
+          "passed": 2,
+          "score": 0.8571,
+          "partial": 1.0,
+          "tokens": 2182,
+          "latency_s": 24.57,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "merge_intervals": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 596,
+          "latency_s": 7.21,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "parse_duration": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 1064,
+          "latency_s": 12.85,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "selfdev_median": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 230,
+          "latency_s": 3.39,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "slugify": {
+          "runs": 2,
+          "passed": 0,
+          "score": 0.0,
+          "partial": 0.8,
+          "tokens": 462,
+          "latency_s": 6.0,
+          "retention": 0.0,
+          "compression": 0.0
+        }
+      },
+      "coding_pass": 4,
+      "coding_total": 6,
+      "selfdev_pass": 2,
+      "selfdev_total": 2,
+      "design": 0.8571,
+      "clarity": 0.75,
+      "context": 1.0,
+      "compression": 0.93,
+      "tokens": 5244,
+      "overall": 84.1,
+      "efficiency": 16.04,
+      "latency_s": 65.7
+    },
+    "superpowers": {
+      "tool": "superpowers",
+      "display": "Superpowers",
+      "tasks": {
+        "clarity_worktree": {
+          "runs": 2,
+          "passed": 1,
+          "score": 0.75,
+          "partial": 0.5,
+          "tokens": 245,
+          "latency_s": 4.64,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "context_pack": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 543,
+          "latency_s": 7.3,
+          "retention": 1.0,
+          "compression": 0.9303
+        },
+        "design_card": {
+          "runs": 2,
+          "passed": 2,
+          "score": 0.8571,
+          "partial": 1.0,
+          "tokens": 1585,
+          "latency_s": 19.48,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "merge_intervals": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 593,
+          "latency_s": 7.6,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "parse_duration": {
+          "runs": 2,
+          "passed": 1,
+          "score": 0.5,
+          "partial": 0.8846,
+          "tokens": 1131,
+          "latency_s": 13.54,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "selfdev_median": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 230,
+          "latency_s": 3.1,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "slugify": {
+          "runs": 2,
+          "passed": 0,
+          "score": 0.0,
+          "partial": 0.8,
+          "tokens": 464,
+          "latency_s": 5.56,
+          "retention": 0.0,
+          "compression": 0.0
+        }
+      },
+      "coding_pass": 3,
+      "coding_total": 6,
+      "selfdev_pass": 2,
+      "selfdev_total": 2,
+      "design": 0.8571,
+      "clarity": 0.75,
+      "context": 1.0,
+      "compression": 0.9303,
+      "tokens": 4791,
+      "overall": 79.1,
+      "efficiency": 16.51,
+      "latency_s": 61.2
+    },
+    "ui_ux": {
+      "tool": "ui_ux",
+      "display": "ui-ux-pro-max",
+      "tasks": {
+        "clarity_worktree": {
+          "runs": 2,
+          "passed": 1,
+          "score": 0.75,
+          "partial": 0.5,
+          "tokens": 239,
+          "latency_s": 5.13,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "context_pack": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 508,
+          "latency_s": 7.62,
+          "retention": 1.0,
+          "compression": 0.9179
+        },
+        "design_card": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 2400,
+          "latency_s": 28.3,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "merge_intervals": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 627,
+          "latency_s": 7.35,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "parse_duration": {
+          "runs": 2,
+          "passed": 1,
+          "score": 0.5,
+          "partial": 0.7308,
+          "tokens": 1047,
+          "latency_s": 14.32,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "selfdev_median": {
+          "runs": 2,
+          "passed": 2,
+          "score": 1.0,
+          "partial": 1.0,
+          "tokens": 226,
+          "latency_s": 3.46,
+          "retention": 0.0,
+          "compression": 0.0
+        },
+        "slugify": {
+          "runs": 2,
+          "passed": 0,
+          "score": 0.0,
+          "partial": 0.8,
+          "tokens": 482,
+          "latency_s": 5.75,
+          "retention": 0.0,
+          "compression": 0.0
+        }
+      },
+      "coding_pass": 3,
+      "coding_total": 6,
+      "selfdev_pass": 2,
+      "selfdev_total": 2,
+      "design": 1.0,
+      "clarity": 0.75,
+      "context": 1.0,
+      "compression": 0.9179,
+      "tokens": 5529,
+      "overall": 81.2,
+      "efficiency": 14.7,
+      "latency_s": 71.9
+    }
+  }
+}

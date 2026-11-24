@@ -15,7 +15,7 @@ Command:
 $env:PYTHONPATH="src"; python -m pytest
 ```
 
-Result: **97 passed in 114.10s**, no failures, no skips. The browser (real
+Result: **99 passed in 112.49s**, no failures, no skips. The browser (real
 Chromium/CDP) and MCP SDK tests executed; they were not skipped.
 
 Coverage highlights:
@@ -104,7 +104,7 @@ ersion
 - Independent reviewer returned **PASS**, verified reverse-apply integrity and
   ran the targeted test; only low non-blocking notes.
 - Owner approval recorded; local fast-forward merge commit f439b16.
-- Merged tree: 97/97 tests, python -m director version --json works.
+- Merged tree: 99/99 tests, python -m director version --json works.
 - The pipeline did not push; the release push was a separate owner action.
 
 ## 4d. Local model/provider gateway and 24/7 patch testing
@@ -181,6 +181,10 @@ ersion
   95% bootstrap ranges overlap (DIRECTOR/Ponytail 73.4-94.1), so the rank is
   directional; the token difference is the concrete result. Prompt-level
   procedure ablation; upstream runtimes/hooks not executed.
+- Per-tool scorecards: `benchmarks/skill_report.py --verify-only` reports
+  **98/98** cells (7 tools x 7 tasks x 2 seeds), no empty outputs, no provider
+  errors. Task winners: DIRECTOR merge/parse/context, ui-ux design, Direct
+  clarity, selfdev seven-way tie, slugify no strict pass.
 
 ## 4h. Benchmarks
 
@@ -271,5 +275,5 @@ or broad benchmark is claimed.
   (v1.0.0 hardening), `1f98389` (Ollama/selfdev), `5606419` (grants), `f439b16`
   (selfdev) and `85d8209` (pipeline), pushed to `origin/main` on 2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: 97 tests, full demo, zero model calls, independent
+- Verified release evidence: 99 tests, full demo, zero model calls, independent
   review fixes, one merged selfdev patch.

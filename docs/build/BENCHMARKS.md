@@ -11,6 +11,7 @@ Raw results:
 - `benchmarks/results/director_bench_20261123T222130Z.json` — container 100M retrieval
 - `benchmarks/results/retrieval_100000000.json` — host chunked 100M retrieval
 - `benchmarks/results/skill_matrix.json` — 7-tool prompt-level matrix (2 seeds)
+- `benchmarks/results/skill_individual.md` — per-tool task scorecards and winners
 - `benchmarks/results/prompt_ablation.json` — upstream skill-prompt ablation
 - `benchmarks/results/retrieval_smoke.json` — earlier 500-doc smoke
 

@@ -9,7 +9,7 @@ It is not a model wrapper and not a coding-only tool. It is the layer that says
 
 It is not a promise of omniscience. It is a machine for refusing false completion.
 
-**Release:** `v1.0.0-local-supervised` · **Tests:** 97 offline · **Retrieval:** 100M
+**Release:** `v1.0.0-local-supervised` · **Tests:** 99 offline · **Retrieval:** 100M
 tokens measured · **Idle model calls:** 0 · **Merge:** owner-gated
 
 ![DIRECTOR landing page](docs/build/ui/landing.png)
@@ -198,8 +198,30 @@ Raw: [`benchmarks/results/skill_matrix.json`](benchmarks/results/skill_matrix.js
 and [`skill_matrix.md`](benchmarks/results/skill_matrix.md). Method and limits:
 [`docs/build/SKILL_MATRIX.md`](docs/build/SKILL_MATRIX.md).
 
+### Individual scorecards
+
+Every tool × task × seed cell is present and succeeded (7 tools × 7 tasks × 2
+seeds = **98/98**). Full per-task cards:
+[`benchmarks/results/skill_individual.md`](benchmarks/results/skill_individual.md).
+
+| Tool | Best at | Strict coding | Design | Clarity | Context | Compression | Tokens |
+|---|---|---:|---:|---:|---:|---:|---:|
+| **DIRECTOR** | coding, compression, token efficiency | 4/6 | 86% | 75% | 100% | 94% | 4,514 |
+| Ponytail | coding (tied 4/6) | 4/6 | 86% | 75% | 100% | 93% | 5,244 |
+| ui-ux-pro-max | design (100%) | 3/6 | 100% | 75% | 100% | 92% | 5,529 |
+| Direct model | clarity (80%) | 3/6 | 89% | 80% | 100% | 93% | 5,131 |
+| Headroom | clarity (tied 80%) | 3/6 | 86% | 80% | 100% | 93% | 4,742 |
+| Superpowers | no outright lead; strongest coding partial 89% | 3/6 | 86% | 75% | 100% | 93% | 4,791 |
+| ECC | no outright lead; strongest coding partial 88% | 3/6 | 86% | 70% | 100% | 92% | 4,446 |
+
+Task winners: DIRECTOR takes `merge_intervals`, `parse_duration` and
+`context_pack`; ui-ux-pro-max takes `design_card`; Direct takes
+`clarity_worktree`; `selfdev_median` is a seven-way tie; `slugify` defeats every
+tool on the strict gate (Ponytail has the best partial score at 80%).
+
 ```powershell
 python benchmarks/skill_matrix.py --provider proxy --model llama-3.3-70b-fp8-fast --seeds 2
+python benchmarks/skill_report.py --verify-only   # 98/98 coverage check
 ```
 <!-- SKILL_MATRIX_END -->
 
@@ -211,7 +233,7 @@ python benchmarks/skill_matrix.py --provider proxy --model llama-3.3-70b-fp8-fas
 | MCP stdio | 20 calls, p95 1.57 ms |
 | Docker image | 260 MB; cold `--version` 1.66–2.01 s |
 | Container isolation | uid 65534, read-only mount, write and network denied |
-| Tests | 97 passed in 114.10 s |
+| Tests | 99 passed in 112.49 s |
 
 Method and raw JSON: [`docs/build/BENCHMARKS.md`](docs/build/BENCHMARKS.md).
 The benchmark is a directional ablation on one host, not a universal leaderboard.

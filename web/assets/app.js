@@ -109,14 +109,14 @@
     const matrix = data.skill_matrix || { status: "queued", rows: [] };
     const rows = matrix.rows || [];
     const body = rows.length
-      ? rows.map((row) => `<tr><td><strong>${esc(row.tool)}</strong></td><td>${esc(row.kind)}</td>${(row.scores || []).map((score, index) => `<td class="num">${score === null || score === undefined ? "—" : index === 1 ? Number(score).toLocaleString() : `${esc(score)}%`}</td>`).join("")}</tr>`).join("")
-      : `<tr><td colspan="8" class="empty">No matrix rows yet.</td></tr>`;
+      ? rows.map((row) => `<tr><td><strong>${esc(row.tool)}</strong></td><td>${esc(row.kind)}</td><td>${esc((row.best_at || []).join(" · "))}</td>${(row.scores || []).map((score, index) => `<td class="num">${score === null || score === undefined ? "—" : index === 1 ? Number(score).toLocaleString() : `${esc(score)}%`}</td>`).join("")}</tr>`).join("")
+      : `<tr><td colspan="9" class="empty">No matrix rows yet.</td></tr>`;
     return `<div class="panel">
       <div class="panel-head"><h2>Skill matrix</h2>${badge(matrix.status || "queued")}</div>
       <div class="panel-body flush">
         <div class="bench-wrap" style="border:0;border-top:1px solid var(--line)">
           <table><caption>2 seeds · 98 runs · prompt-level · upstream runtimes not executed</caption>
-          <thead><tr><th>Tool</th><th>Kind</th><th class="num">Coding</th><th class="num">Tokens</th><th class="num">Clarity</th><th class="num">Design</th><th class="num">Context</th><th class="num">Self-improve</th></tr></thead>
+          <thead><tr><th>Tool</th><th>Kind</th><th>Best at</th><th class="num">Coding</th><th class="num">Tokens</th><th class="num">Clarity</th><th class="num">Design</th><th class="num">Context</th><th class="num">Self-improve</th></tr></thead>
           <tbody>${body}</tbody></table>
         </div>
         <p style="padding:.8rem 1rem;color:var(--faint);font-size:.76rem;margin:0">${esc(matrix.note || "")}</p>

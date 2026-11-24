@@ -70,7 +70,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
 - [x] Prompt-level skill matrix harness (7 procedures × 7 tasks, test/rubric
   graded)
 - [x] Bounded local agent loop (read/list/run/browser/memory/propose-patch)
-- [x] 97-test offline suite incl. historical defect regressions and selfdev
+- [x] 99-test offline suite incl. historical defect regressions and selfdev
 - [x] Independent review rounds + fixes
 - [x] Release docs, evidence report, install/uninstall
 
@@ -103,7 +103,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
    - isolated worktree at base `85d8209`; full suite passed in 99.1s;
    - independent reviewer PASS with patch-integrity verification;
    - owner approval recorded; fast-forward merge commit `f439b16`;
-   - merged tree: 97/97 tests, version command works, no push by the pipeline.
+   - merged tree: 99/99 tests, version command works, no push by the pipeline.
 8. Local model/provider gateway:
    - default policy denied a local model call with zero spend;
    - owner grant + contract `model_call_local` + model-call budget enabled the
@@ -154,7 +154,10 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
      JSON/Markdown report and control-room table;
    - result (2 seeds, llama-3.3-70b-fp8-fast): DIRECTOR 84.1 tied with Ponytail
      but 4,514 vs 5,244 output tokens; ui-ux-pro-max design 100%; prompt-level,
-     not upstream runtime execution.
+     not upstream runtime execution;
+   - individual scorecards + 98/98 coverage verifier (`benchmarks/skill_report.py`);
+     task winners: DIRECTOR merge/parse/context, ui-ux design, Direct clarity,
+     selfdev seven-way tie, slugify no strict pass.
 14. Local agent loop:
    - `director agent run` one goal, bounded steps/time, one JSON tool call per
      turn: list/read/run-command/browser-capture/memory/propose-patch/finish;
@@ -215,5 +218,5 @@ worktree/test/review/owner-merge pipeline.
   `f439b16` (selfdev) and `85d8209` (pipeline), pushed to `origin/main` on
   2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: docs/build/EVIDENCE.md (97 tests, full demo,
+- Verified release evidence: docs/build/EVIDENCE.md (99 tests, full demo,
   zero model calls, independent review fixes).

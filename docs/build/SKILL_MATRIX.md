@@ -108,6 +108,36 @@ Observations:
 This is the honest result: DIRECTOR is a strong all-rounder with the best token
 efficiency among the top scorers, not an omnipotent winner on every dimension.
 
+## Individual scorecards
+
+Coverage is verified: **98/98** cells (7 tools × 7 tasks × 2 seeds), no empty
+outputs and no provider errors.
+
+| Tool | Best at | Strict coding | Design | Clarity | Context | Compression | Tokens |
+|---|---|---:|---:|---:|---:|---:|---:|
+| **DIRECTOR** | coding, compression, token efficiency | 4/6 | 86% | 75% | 100% | 94% | 4,514 |
+| Ponytail | coding (tied 4/6) | 4/6 | 86% | 75% | 100% | 93% | 5,244 |
+| ui-ux-pro-max | design (100%) | 3/6 | 100% | 75% | 100% | 92% | 5,529 |
+| Direct model | clarity (80%) | 3/6 | 89% | 80% | 100% | 93% | 5,131 |
+| Headroom | clarity (tied 80%) | 3/6 | 86% | 80% | 100% | 93% | 4,742 |
+| Superpowers | no outright lead; coding partial 89% | 3/6 | 86% | 75% | 100% | 93% | 4,791 |
+| ECC | no outright lead; coding partial 88% | 3/6 | 86% | 70% | 100% | 92% | 4,446 |
+
+Task winners:
+
+| Task | Winner | Pass | Partial | Notes |
+|---|---|---:|---:|---|
+| `merge_intervals` | DIRECTOR | 2/2 | 100% | 492 tokens |
+| `parse_duration` | DIRECTOR | 2/2 | 100% | 1,056 tokens |
+| `context_pack` | DIRECTOR | 2/2 | 100% | 94% compression, 100% retention |
+| `design_card` | ui-ux-pro-max | 2/2 | 100% | 2,400 tokens |
+| `clarity_worktree` | Direct model | 2/2 | 80% | 236 tokens |
+| `selfdev_median` | all tools | 2/2 | 100% | seven-way tie |
+| `slugify` | none (strict) | 0/2 | 80% best partial | Ponytail closest |
+
+Full per-task cards: `benchmarks/results/skill_individual.md`.
+Verify coverage with `python benchmarks/skill_report.py --verify-only`.
+
 ## Limits
 
 - One model, one host, one run per task unless `--seeds` is raised.

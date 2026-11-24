@@ -34,12 +34,18 @@ def main() -> int:
     matrix = json.loads(matrix_path.read_text(encoding="utf-8"))
     data = json.loads(data_path.read_text(encoding="utf-8"))
     summary = matrix["summary"]
+    individual_path = ROOT / "benchmarks" / "results" / "skill_individual.json"
+    best_at: dict[str, list[str]] = {}
+    if individual_path.is_file():
+        individual = json.loads(individual_path.read_text(encoding="utf-8"))
+        best_at = individual.get("best_at", {})
     rows = []
     for tool, row in sorted(summary.items(), key=lambda item: -item[1]["overall"]):
         rows.append(
             {
                 "tool": DISPLAY.get(tool, tool),
                 "kind": KIND.get(tool, "procedure"),
+                "best_at": best_at.get(tool, []),
                 "scores": [
                     round(row["coding_rate"] * 100),
                     row["output_tokens"],

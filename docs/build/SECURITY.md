@@ -93,7 +93,7 @@ merge approval, rollback and no auto-push/deploy.
   no merge/push. `propose_patch` enters the selfdev gate.
 - Control room: binds loopback, blocks directory listings, sends nosniff/deny
   headers; `/api/state` is read-only for the configured project root.
-- 97 offline tests including links/hardlinks/junctions, oversized frames,
+- 99 offline tests including links/hardlinks/junctions, oversized frames,
   unknown args, secret redaction, fencing, budget races, stale evidence,
   latest-fail supersession, fixture threshold tampering, ML stdlib shadowing,
   citation/calculation abuse, waiver revision binding, and selfdev patch/test/review/merge.
