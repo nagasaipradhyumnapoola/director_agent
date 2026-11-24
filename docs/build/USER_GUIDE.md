@@ -205,6 +205,16 @@ docker run --rm -v "${PWD}:/project" director:local status --root /project --jso
 The image runs unprivileged and mounts the project at `/project`. It is tested by
 the `docker` CI job (build, version, init, status).
 
+## Control room
+
+```powershell
+python -m director ui --port 8765 --root .
+```
+
+Serves the landing page and console on loopback. The console calls
+`/api/state` and shows the live project summary when `--root` is supplied;
+otherwise it uses bundled demo data. Directory listings are blocked.
+
 ## Memory and preflight
 
 ```powershell

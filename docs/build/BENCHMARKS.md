@@ -148,18 +148,20 @@ Full method and raw data: `docs/build/SKILL_MATRIX.md` and
 
 | Rank | Tool | Coding | Selfdev | Design | Clarity | Context | Tokens | Overall |
 |---:|---|---:|---:|---:|---:|---:|---:|---:|
-| 1 | **DIRECTOR** | 4/6 | 2/2 | 86% | 75% | 100% | 4,514 | **84.1** |
-| 2 | Ponytail | 4/6 | 2/2 | 86% | 75% | 100% | 5,244 | 84.1 |
-| 3 | ui-ux-pro-max | 3/6 | 2/2 | 100% | 75% | 100% | 5,529 | 81.2 |
-| 4 | Direct model | 3/6 | 2/2 | 89% | 80% | 100% | 5,131 | 80.4 |
-| 5 | Headroom | 3/6 | 2/2 | 86% | 80% | 100% | 4,742 | 79.9 |
-| 6 | Superpowers | 3/6 | 2/2 | 86% | 75% | 100% | 4,791 | 79.1 |
-| 7 | ECC | 3/6 | 2/2 | 86% | 70% | 100% | 4,446 | 78.4 |
+| 1 | **DIRECTOR** | 4/6 (93%) | 2/2 | 86% | 75% | 100% | 4,514 | **84.1** |
+| 2 | Ponytail | 4/6 (93%) | 2/2 | 86% | 75% | 100% | 5,244 | 84.1 |
+| 3 | ui-ux-pro-max | 3/6 (84%) | 2/2 | 100% | 75% | 100% | 5,529 | 81.2 |
+| 4 | Direct model | 3/6 (83%) | 2/2 | 89% | 80% | 100% | 5,131 | 80.4 |
+| 5 | Headroom | 3/6 (92%) | 2/2 | 86% | 80% | 100% | 4,742 | 79.9 |
+| 6 | Superpowers | 3/6 (89%) | 2/2 | 86% | 75% | 100% | 4,791 | 79.1 |
+| 7 | ECC | 3/6 (88%) | 2/2 | 86% | 70% | 100% | 4,446 | 78.4 |
 
 This is a prompt-level ablation, not an upstream runtime/hook benchmark. DIRECTOR
 ties Ponytail on score with 14% fewer output tokens; ui-ux-pro-max wins design.
-Coding/selfdev are test-graded; design/clarity/context use fixed rubrics. One
-model, one host, two seeds: directional, not a universal leaderboard.
+The 95% bootstrap ranges overlap heavily (DIRECTOR/Ponytail 73.4–94.1), so the
+score rank is directional, not statistically separable. Coding/selfdev are
+test-graded; design/clarity/context use fixed rubrics. One model, one host, two
+seeds.
 
 ## Honest conclusion
 

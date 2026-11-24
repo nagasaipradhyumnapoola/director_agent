@@ -1017,6 +1017,7 @@ def cmd_ui(args: argparse.Namespace) -> int:
         port=args.port,
         open_browser=not args.no_open,
         web_dir=args.web_dir or None,
+        project_root=args.root,
     )
 
 

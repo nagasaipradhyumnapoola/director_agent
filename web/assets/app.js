@@ -331,4 +331,19 @@
       }
       render();
     });
+
+  fetch("/api/state", { cache: "no-store" })
+    .then((response) => (response.ok ? response.json() : Promise.reject(new Error("no live state"))))
+    .then((live) => {
+      if (!live || !live.ok) return;
+      data.project = { ...data.project, ...live.project };
+      data.worker = live.worker;
+      data.kpis = live.kpis;
+      data.acceptance = live.acceptance;
+      if (live.patches && live.patches.length) data.patches = live.patches;
+      if (live.audit && live.audit.length) data.audit = live.audit;
+      setProjectChrome();
+      render();
+    })
+    .catch(() => {});
 })();

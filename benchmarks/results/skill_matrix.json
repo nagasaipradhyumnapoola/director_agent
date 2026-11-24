@@ -5,22 +5,22 @@
     "model": "llama-3.3-70b-fp8-fast",
     "seeds": 2,
     "tasks": [
-      "slugify",
-      "parse_duration",
-      "merge_intervals",
-      "design_card",
       "clarity_worktree",
       "context_pack",
-      "selfdev_median"
+      "design_card",
+      "merge_intervals",
+      "parse_duration",
+      "selfdev_median",
+      "slugify"
     ],
     "tools": [
       "direct",
+      "director",
+      "ecc",
       "headroom",
       "ponytail",
       "superpowers",
-      "ecc",
-      "ui_ux",
-      "director"
+      "ui_ux"
     ],
     "total_seconds": 248.7,
     "methodology": "prompt-level procedure ablation; deterministic tests and fixed rubrics; upstream runtimes not executed",
@@ -36,11 +36,13 @@
       "prompt-level procedures, not upstream runtime execution",
       "no human visual or editorial judging",
       "rubrics reward explicit checks and can be gamed by mentioning them"
-    ]
+    ],
+    "recomputed_at": "2026-11-24T03:48:10+00:00"
   },
   "summary": {
     "direct": {
       "coding_rate": 0.5,
+      "coding_score": 0.8308,
       "coding_passed": 3,
       "coding_total": 6,
       "selfdev_rate": 1.0,
@@ -53,10 +55,15 @@
       "input_tokens": 6028,
       "output_tokens": 5131,
       "latency_s": 66.0,
-      "overall": 80.4
+      "overall": 80.4,
+      "ci95": [
+        69.9,
+        90.9
+      ]
     },
     "director": {
       "coding_rate": 0.6667,
+      "coding_score": 0.9333,
       "coding_passed": 4,
       "coding_total": 6,
       "selfdev_rate": 1.0,
@@ -69,10 +76,15 @@
       "input_tokens": 6546,
       "output_tokens": 4514,
       "latency_s": 65.5,
-      "overall": 84.1
+      "overall": 84.1,
+      "ci95": [
+        73.4,
+        94.1
+      ]
     },
     "ecc": {
       "coding_rate": 0.5,
+      "coding_score": 0.8821,
       "coding_passed": 3,
       "coding_total": 6,
       "selfdev_rate": 1.0,
@@ -85,10 +97,15 @@
       "input_tokens": 6210,
       "output_tokens": 4446,
       "latency_s": 61.6,
-      "overall": 78.4
+      "overall": 78.4,
+      "ci95": [
+        68.4,
+        88.4
+      ]
     },
     "headroom": {
       "coding_rate": 0.5,
+      "coding_score": 0.9205,
       "coding_passed": 3,
       "coding_total": 6,
       "selfdev_rate": 1.0,
@@ -101,10 +118,15 @@
       "input_tokens": 6350,
       "output_tokens": 4742,
       "latency_s": 62.9,
-      "overall": 79.9
+      "overall": 79.9,
+      "ci95": [
+        69.9,
+        89.9
+      ]
     },
     "ponytail": {
       "coding_rate": 0.6667,
+      "coding_score": 0.9333,
       "coding_passed": 4,
       "coding_total": 6,
       "selfdev_rate": 1.0,
@@ -117,10 +139,15 @@
       "input_tokens": 6378,
       "output_tokens": 5244,
       "latency_s": 65.7,
-      "overall": 84.1
+      "overall": 84.1,
+      "ci95": [
+        73.4,
+        94.1
+      ]
     },
     "superpowers": {
       "coding_rate": 0.5,
+      "coding_score": 0.8949,
       "coding_passed": 3,
       "coding_total": 6,
       "selfdev_rate": 1.0,
@@ -133,10 +160,15 @@
       "input_tokens": 6378,
       "output_tokens": 4791,
       "latency_s": 61.2,
-      "overall": 79.1
+      "overall": 79.1,
+      "ci95": [
+        68.4,
+        89.9
+      ]
     },
     "ui_ux": {
       "coding_rate": 0.5,
+      "coding_score": 0.8436,
       "coding_passed": 3,
       "coding_total": 6,
       "selfdev_rate": 1.0,
@@ -149,7 +181,11 @@
       "input_tokens": 6420,
       "output_tokens": 5529,
       "latency_s": 71.9,
-      "overall": 81.2
+      "overall": 81.2,
+      "ci95": [
+        70.5,
+        92.0
+      ]
     }
   },
   "runs": [

@@ -53,6 +53,10 @@ Token totals are reported separately. Compression is measured only for the
 context task (`1 - output_words / input_words`) and is not folded into `overall`,
 so a tool cannot win by deleting evidence.
 
+`coding_pass_rate` is strict: a task counts only if the whole test suite passes.
+The parenthetical partial score is diagnostic and is **not** used in `overall`.
+A supervisor that merges a 93%-correct patch is still broken.
+
 ## Run
 
 ```powershell
@@ -75,25 +79,29 @@ Model: `llama-3.3-70b-fp8-fast`; provider: loopback OpenAI-compatible proxy.
 
 | Rank | Tool | Coding | Selfdev | Design | Clarity | Context | Compression | Tokens | Overall |
 |---:|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 | **DIRECTOR** | 4/6 | 2/2 | 86% | 75% | 100% | 94% | 4,514 | **84.1** |
-| 2 | Ponytail | 4/6 | 2/2 | 86% | 75% | 100% | 93% | 5,244 | 84.1 |
-| 3 | ui-ux-pro-max | 3/6 | 2/2 | 100% | 75% | 100% | 92% | 5,529 | 81.2 |
-| 4 | Direct model | 3/6 | 2/2 | 89% | 80% | 100% | 93% | 5,131 | 80.4 |
-| 5 | Headroom | 3/6 | 2/2 | 86% | 80% | 100% | 93% | 4,742 | 79.9 |
-| 6 | Superpowers | 3/6 | 2/2 | 86% | 75% | 100% | 93% | 4,791 | 79.1 |
-| 7 | ECC | 3/6 | 2/2 | 86% | 70% | 100% | 92% | 4,446 | 78.4 |
+| 1 | **DIRECTOR** | 4/6 (93%) | 2/2 | 86% | 75% | 100% | 94% | 4,514 | **84.1** |
+| 2 | Ponytail | 4/6 (93%) | 2/2 | 86% | 75% | 100% | 93% | 5,244 | 84.1 |
+| 3 | ui-ux-pro-max | 3/6 (84%) | 2/2 | 100% | 75% | 100% | 92% | 5,529 | 81.2 |
+| 4 | Direct model | 3/6 (83%) | 2/2 | 89% | 80% | 100% | 93% | 5,131 | 80.4 |
+| 5 | Headroom | 3/6 (92%) | 2/2 | 86% | 80% | 100% | 93% | 4,742 | 79.9 |
+| 6 | Superpowers | 3/6 (89%) | 2/2 | 86% | 75% | 100% | 93% | 4,791 | 79.1 |
+| 7 | ECC | 3/6 (88%) | 2/2 | 86% | 70% | 100% | 92% | 4,446 | 78.4 |
 
 Observations:
 
 - DIRECTOR and Ponytail tie on score; DIRECTOR uses 14% fewer output tokens and
   has the highest score per 1k output tokens (18.6 vs 17.6 for ECC, 16.9 for
   Headroom).
+- The 95% bootstrap ranges overlap heavily (DIRECTOR/Ponytail 73.4–94.1), so the
+  score rank is not statistically separable. The token difference is the
+  concrete result; the rest is directional.
 - ui-ux-pro-max wins design (100%) but costs the most tokens.
 - Headroom preserves 100% of the context facts at 93% compression; it does not
   win coding.
 - The strict coding suite is hard: `slugify` failed for every tool (sharp-s and
   transliteration), so coding differences are 3–4 of 6.
 - One seed is not statistical significance. Two seeds reduce, not remove, noise.
+  A third seed was attempted but the free proxy rate-limited; it is not included.
 - The rubric rewards stating checks; it is gameable and not a human quality
   judgment.
 

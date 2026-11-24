@@ -51,3 +51,28 @@ def test_ui_server_is_loopback_and_no_directory_listing():
     finally:
         server.shutdown()
         server.server_close()
+
+
+def test_ui_live_state_reads_a_project(tmp_path, monkeypatch):
+    from tests.helpers import new_store
+
+    store = new_store(tmp_path)
+    project_root = tmp_path / "project"
+    try:
+        project_name = store.status_summary()["project"]["name"]
+    finally:
+        store.close()
+    monkeypatch.setenv("DIRECTOR_UI_ROOT", str(project_root))
+    server = make_server(find_web_dir(), 0)
+    host, port = server.server_address[:2]
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        with urllib.request.urlopen(f"http://{host}:{port}/api/state", timeout=10) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+        assert payload["ok"] is True
+        assert payload["project"]["name"] == project_name
+        assert len(payload["kpis"]) == 4
+    finally:
+        server.shutdown()
+        server.server_close()

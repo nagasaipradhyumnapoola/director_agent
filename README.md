@@ -9,7 +9,7 @@ It is not a model wrapper and not a coding-only tool. It is the layer that says
 
 It is not a promise of omniscience. It is a machine for refusing false completion.
 
-**Release:** `v1.0.0-local-supervised` · **Tests:** 91 offline · **Retrieval:** 100M
+**Release:** `v1.0.0-local-supervised` · **Tests:** 92 offline · **Retrieval:** 100M
 tokens measured · **Idle model calls:** 0 · **Merge:** owner-gated
 
 ![DIRECTOR landing page](docs/build/ui/landing.png)
@@ -73,12 +73,13 @@ The UI is a static, dependency-free dashboard served on loopback:
 Start it with:
 
 ```powershell
-python -m director ui --port 8765
+python -m director ui --port 8765 --root .
 ```
 
 Open `http://127.0.0.1:8765/`. The server binds loopback only, blocks directory
 listings and sends `nosniff` / `no-referrer` / `DENY` headers. It is a preview
-server, not the product API.
+server, not the product API. With `--root` the console reads `/api/state` from
+that project; without it, it falls back to the bundled demo data.
 
 ## The threat model in one line
 
@@ -164,19 +165,24 @@ runtime execution.
 
 | Rank | Tool | Coding | Selfdev | Design | Clarity | Context | Compression | Tokens | Overall |
 |---:|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 | **DIRECTOR** | 4/6 | 2/2 | 86% | 75% | 100% | 94% | **4,514** | **84.1** |
-| 2 | Ponytail | 4/6 | 2/2 | 86% | 75% | 100% | 93% | 5,244 | 84.1 |
-| 3 | ui-ux-pro-max | 3/6 | 2/2 | **100%** | 75% | 100% | 92% | 5,529 | 81.2 |
-| 4 | Direct model | 3/6 | 2/2 | 89% | **80%** | 100% | 93% | 5,131 | 80.4 |
-| 5 | Headroom | 3/6 | 2/2 | 86% | **80%** | 100% | 93% | 4,742 | 79.9 |
-| 6 | Superpowers | 3/6 | 2/2 | 86% | 75% | 100% | 93% | 4,791 | 79.1 |
-| 7 | ECC | 3/6 | 2/2 | 86% | 70% | 100% | 92% | 4,446 | 78.4 |
+| 1 | **DIRECTOR** | 4/6 (93%) | 2/2 | 86% | 75% | 100% | 94% | **4,514** | **84.1** |
+| 2 | Ponytail | 4/6 (93%) | 2/2 | 86% | 75% | 100% | 93% | 5,244 | 84.1 |
+| 3 | ui-ux-pro-max | 3/6 (84%) | 2/2 | **100%** | 75% | 100% | 92% | 5,529 | 81.2 |
+| 4 | Direct model | 3/6 (83%) | 2/2 | 89% | **80%** | 100% | 93% | 5,131 | 80.4 |
+| 5 | Headroom | 3/6 (92%) | 2/2 | 86% | **80%** | 100% | 93% | 4,742 | 79.9 |
+| 6 | Superpowers | 3/6 (89%) | 2/2 | 86% | 75% | 100% | 93% | 4,791 | 79.1 |
+| 7 | ECC | 3/6 (88%) | 2/2 | 86% | 70% | 100% | 92% | 4,446 | 78.4 |
 
 **What the table says, narrowly:**
 
 - DIRECTOR and Ponytail tie on score. DIRECTOR gets there with **14% fewer output
   tokens** and the same design/clarity/context results. It also has the highest
   score per 1k output tokens (18.6 vs 17.6 for ECC and 16.9 for Headroom).
+- Coding shows **strict pass count (partial test score)**. The overall uses strict
+  pass: a gate fails if any test fails. The parenthetical is diagnostic only.
+- The 95% bootstrap ranges overlap heavily (DIRECTOR/Ponytail 73.4–94.1), so the
+  score rank is **not statistically separable**. The token difference is the
+  concrete, mechanical result; treat the rest as directional.
 - ui-ux-pro-max is the design specialist: **100%** on the design rubric, at a
   token cost.
 - Headroom keeps its compression identity: 93% compression with 100% fact
@@ -203,7 +209,7 @@ python benchmarks/skill_matrix.py --provider proxy --model llama-3.3-70b-fp8-fas
 | MCP stdio | 20 calls, p95 1.57 ms |
 | Docker image | 260 MB; cold `--version` 1.66–2.01 s |
 | Container isolation | uid 65534, read-only mount, write and network denied |
-| Tests | 91 passed in 121.72 s |
+| Tests | 92 passed in 112.23 s |
 
 Method and raw JSON: [`docs/build/BENCHMARKS.md`](docs/build/BENCHMARKS.md).
 The benchmark is a directional ablation on one host, not a universal leaderboard.

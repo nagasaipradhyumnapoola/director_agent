@@ -29,12 +29,15 @@ def serve_ui(
     port: int = 8765,
     open_browser: bool = True,
     web_dir: str | Path | None = None,
+    project_root: str | Path | None = None,
 ) -> int:
     directory = Path(web_dir).resolve() if web_dir else find_web_dir()
     if not (directory / "index.html").is_file():
         raise ValidationError("web dir has no index.html")
     if not 0 <= port <= 65535:
         raise ValidationError("port must be 0-65535")
+    if project_root:
+        os.environ["DIRECTOR_UI_ROOT"] = str(Path(project_root).resolve())
 
     spec = importlib.util.spec_from_file_location("_director_web_serve", directory / "serve.py")
     if spec is None or spec.loader is None:

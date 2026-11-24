@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import json
+import random
 import re
 import sys
 import time
@@ -174,8 +175,24 @@ def run_one(tool: str, task_name: str, seed: int, provider: str, model: str, max
     }
 
 
+def _code_score(run: dict[str, Any]) -> float:
+    if run.get("ok"):
+        return 1.0
+    if float(run.get("score") or 0.0) > 0:
+        return float(run["score"])
+    detail = str(run.get("detail") or "")
+    match = re.search(r"Ran (\d+) tests?", detail)
+    if not match:
+        return 0.0
+    total = int(match.group(1))
+    failures = int(re.search(r"failures=(\d+)", detail).group(1)) if re.search(r"failures=(\d+)", detail) else 0
+    errors = int(re.search(r"errors=(\d+)", detail).group(1)) if re.search(r"errors=(\d+)", detail) else 0
+    return max(0.0, (total - failures - errors) / total) if total else 0.0
+
+
 def summarize(runs: list[dict[str, Any]]) -> dict[str, Any]:
     summary: dict[str, Any] = {}
+    rng = random.Random(42)
     for tool in sorted({run["tool"] for run in runs}):
         rows = [run for run in runs if run["tool"] == tool]
         coding = [run for run in rows if tasks.TASKS[run["task"]]["kind"] == "code"]
@@ -188,6 +205,7 @@ def summarize(runs: list[dict[str, Any]]) -> dict[str, Any]:
             return sum(values) / len(values) if values else 0.0
 
         coding_rate = mean([1.0 if run["ok"] else 0.0 for run in coding])
+        coding_score = mean([_code_score(run) for run in coding])
         selfdev_rate = mean([1.0 if run["ok"] else 0.0 for run in selfdev])
         design_score = mean([run["score"] for run in design])
         clarity_score = mean([run["score"] for run in clarity])
@@ -202,6 +220,7 @@ def summarize(runs: list[dict[str, Any]]) -> dict[str, Any]:
         )
         summary[tool] = {
             "coding_rate": round(coding_rate, 4),
+            "coding_score": round(coding_score, 4),
             "coding_passed": sum(1 for run in coding if run["ok"]),
             "coding_total": len(coding),
             "selfdev_rate": round(selfdev_rate, 4),
@@ -216,7 +235,43 @@ def summarize(runs: list[dict[str, Any]]) -> dict[str, Any]:
             "latency_s": round(sum(run["latency_s"] for run in rows), 1),
             "overall": round(overall, 1),
         }
+        summary[tool]["ci95"] = _bootstrap_ci(runs, tool, rng, rounds=1000)
     return summary
+
+
+def _bootstrap_ci(runs: list[dict[str, Any]], tool: str, rng: random.Random, rounds: int = 1000) -> list[float]:
+    """Stratified bootstrap over seeds within each task category.
+
+    Small-sample and directional: it shows how much the score moves when the
+    observed seeds are resampled. It is not a population confidence interval.
+    """
+    categories = {
+        "coding": [run for run in runs if run["tool"] == tool and tasks.TASKS[run["task"]]["kind"] == "code"],
+        "selfdev": [run for run in runs if run["tool"] == tool and run["task"] == "selfdev_median"],
+        "design": [run for run in runs if run["tool"] == tool and run["task"] == "design_card"],
+        "clarity": [run for run in runs if run["tool"] == tool and run["task"] == "clarity_worktree"],
+        "context": [run for run in runs if run["tool"] == tool and run["task"] == "context_pack"],
+    }
+    weights = {"coding": 0.30, "selfdev": 0.20, "design": 0.15, "clarity": 0.15, "context": 0.20}
+    scores = []
+    for _ in range(rounds):
+        total = 0.0
+        total_weight = 0.0
+        for name, rows in categories.items():
+            if not rows:
+                continue
+            sample = [rng.choice(rows) for _ in rows]
+            if name in ("coding", "selfdev"):
+                value = sum((1.0 if run["ok"] else 0.0) for run in sample) / len(sample)
+            elif name == "context":
+                value = sum(run["grade"].get("retention", 0.0) for run in sample) / len(sample)
+            else:
+                value = sum(run["score"] for run in sample) / len(sample)
+            total += weights[name] * value
+            total_weight += weights[name]
+        scores.append(100 * total / total_weight if total_weight else 0.0)
+    scores.sort()
+    return [round(scores[int(rounds * 0.025)], 1), round(scores[int(rounds * 0.975) - 1], 1)]
 
 
 def markdown(summary: dict[str, Any], meta: dict[str, Any]) -> str:
@@ -237,15 +292,16 @@ def markdown(summary: dict[str, Any], meta: dict[str, Any]) -> str:
         "",
         "Prompt-level ablation. Upstream runtimes/hooks were not executed. Coding/selfdev are test-graded; design/clarity/context are rubric-graded.",
         "",
-        "| Rank | Tool | Coding | Selfdev | Design | Clarity | Context | Compression | Tokens | Overall |",
-        "|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| Rank | Tool | Coding | Selfdev | Design | Clarity | Context | Compression | Tokens | Overall | 95% CI |",
+        "|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for index, (tool, row) in enumerate(ranked, 1):
         lines.append(
-            f"| {index} | **{display.get(tool, tool)}** | {row['coding_passed']}/{row['coding_total']} | "
+            f"| {index} | **{display.get(tool, tool)}** | {row['coding_passed']}/{row['coding_total']} ({row['coding_score']:.0%}) | "
             f"{row['selfdev_passed']}/{row['selfdev_total']} | {row['design']:.0%} | "
             f"{row['clarity']:.0%} | {row['context_retention']:.0%} | "
-            f"{row['context_compression']:.0%} | {row['output_tokens']:,} | **{row['overall']:.1f}** |"
+            f"{row['context_compression']:.0%} | {row['output_tokens']:,} | **{row['overall']:.1f}** | "
+            f"{row.get('ci95', ['—', '—'])[0]}–{row.get('ci95', ['—', '—'])[1]} |"
         )
     lines += [
         "",
@@ -278,10 +334,25 @@ def main() -> int:
     parser.add_argument("--tasks", default=",".join(tasks.TASKS))
     parser.add_argument("--out", default=str(ROOT / "benchmarks" / "results" / "skill_matrix.json"))
     parser.add_argument("--resume", action="store_true", help="keep successful rows, rerun empty/error rows")
+    parser.add_argument("--recompute", action="store_true", help="re-summarize an existing JSON without model calls")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
     if args.self_test:
         return self_test()
+    if args.recompute:
+        path = Path(args.out)
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        runs = payload.get("runs", [])
+        summary = summarize(runs)
+        meta = payload.get("meta", {})
+        meta["seeds"] = len({int(run.get("seed", 0)) for run in runs}) or 1
+        meta["tasks"] = sorted({run["task"] for run in runs})
+        meta["tools"] = sorted({run["tool"] for run in runs})
+        meta["recomputed_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        path.write_text(json.dumps({"meta": meta, "summary": summary, "runs": runs}, indent=2), encoding="utf-8")
+        path.with_suffix(".md").write_text(markdown(summary, meta), encoding="utf-8")
+        print(markdown(summary, meta))
+        return 0
 
     tools = [item.strip() for item in args.tools.split(",") if item.strip()]
     task_names = [item.strip() for item in args.tasks.split(",") if item.strip()]

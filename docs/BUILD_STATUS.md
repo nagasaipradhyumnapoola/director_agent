@@ -69,7 +69,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
   never merge)
 - [x] Prompt-level skill matrix harness (7 procedures × 7 tasks, test/rubric
   graded)
-- [x] 91-test offline suite incl. historical defect regressions and selfdev
+- [x] 92-test offline suite incl. historical defect regressions and selfdev
 - [x] Independent review rounds + fixes
 - [x] Release docs, evidence report, install/uninstall
 
@@ -102,7 +102,7 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
    - isolated worktree at base `85d8209`; full suite passed in 99.1s;
    - independent reviewer PASS with patch-integrity verification;
    - owner approval recorded; fast-forward merge commit `f439b16`;
-   - merged tree: 91/91 tests, version command works, no push by the pipeline.
+   - merged tree: 92/92 tests, version command works, no push by the pipeline.
 8. Local model/provider gateway:
    - default policy denied a local model call with zero spend;
    - owner grant + contract `model_call_local` + model-call budget enabled the
@@ -145,7 +145,8 @@ Authoritative contract: `OPENCODE_BUILD_PROMPT.md`; invariants: `AGENTS.md`.
    - offline installer and uninstaller tested; wheel build includes assets.
 13. UI, autonomy and skill matrix:
    - `web/` landing page + control room, Diro/The Conductor SVG, `director ui`
-     loopback server with blocked directory listing and security headers;
+     loopback server with blocked directory listing and security headers; the
+     console reads `/api/state` from a live project and falls back to `data.json`;
    - `director autonomy` opt-in scheduler: proposals -> one local author/test job
      per interval, owner merge still required;
    - `benchmarks/skill_matrix.py` 7 procedures × 7 tasks, test/rubric graded,
@@ -205,5 +206,5 @@ worktree/test/review/owner-merge pipeline.
   `f439b16` (selfdev) and `85d8209` (pipeline), pushed to `origin/main` on
   2026-11-24.
 - Remote: https://github.com/nagasaipradhyumnapoola/director_agent
-- Verified release evidence: docs/build/EVIDENCE.md (91 tests, full demo,
+- Verified release evidence: docs/build/EVIDENCE.md (92 tests, full demo,
   zero model calls, independent review fixes).
